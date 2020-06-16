@@ -13,3 +13,7 @@ HUGE thanks to [Aaron](https://github.com/atc1441) for all his work, I would hav
 2. Get accelerometer working
 3. Get heart rate sensor working
 4. Implement main screen, and a framework for adding new screens
+## New Features
+- Faster bulk test displaying with ignoreBlankPixels parameter for writing characters
+  - This will skip over drawing the rects for blank pixels in characters
+  - It should only be used when the area you are writing to is blank (perhaps clear the screen before)
