@@ -128,64 +128,56 @@ void initDisplay() {
 
 /*
    Write a string to the specified position
-   If ignoreBlankPixels is true, the character write function will skip over blank pixels in a character
-   This will greatly speed up writing a large window of text, but should only be used when the area you are writing to is blank
-   This can be ensured by completly blanking the screen before writing
    TODO: implement dash '-' based wrapping for nicer string displaying
 */
-void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, bool ignoreBlankPixels) {
+void writeStringWithLiteral(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, uint16_t colour) {
   int currentLine = 0; //Current line
   int charPos = 0; //Position of the character we are on along the line
-  for (int i = 0; i < string.length(); i++) { //Loop through every character of the string
+  int stringLen = sizeof(string);
+  int i = 0;
+  while(string[i] != 0){ //Loop through every character of the string (only stop when you reach the null terminator)
     //If printing the next character would result in it being of screen
     if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
       currentLine++;
       charPos = 0;
     }
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i], ignoreBlankPixels);
+    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i], colour);
     charPos++;
+    i++;
   }
+//  for (int i = 0; i < stringLen; i++) { //Loop through every character of the string
+//    //If printing the next character would result in it being of screen
+//    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
+//      currentLine++;
+//      charPos = 0;
+//    }
+//    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i]);
+//    charPos++;
+//  }
 }
 
-
-bool shouldPixelBeHere(uint32_t xPosInCharacter, uint32_t yPosInCharacter, uint8_t pixelsPerPixel, char character) {
-  //uint8_t newChar[] = {0b11111111, 0b00000000, 0b00000000, 0b00000000, 0b00000000};
-  return (font[character][xPosInCharacter] >> yPosInCharacter) & 1; //MIGHT NEED AN OFFSET HERE IF THE FONT CHANGES
-  //return (newChar[xPosInCharacter] >> yPosInCharacter) & 1;
-}
-
-void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, bool ignoreBlankPixels) {
+/*
+   Write a character to the screen position (x,y)
+*/
+void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, uint16_t colour) {
   preWrite();
-  uint16_t colour = 0b1111111111111111;
 
   //Width and height of the character on the display
   int characterDispWidth = FONT_WIDTH * pixelsPerPixel;
   int characterDispHeight = 8 * pixelsPerPixel;
   setRowColRAMAddr(x, y, characterDispWidth, characterDispHeight);
 
-  bool pixelHere = false;
   //Row goes between 0 and 7, column goes between 0 and the font width
   for (int row = 0; row < 8; row++) {
     for (int col = 0; col < FONT_WIDTH; col++) {
-      pixelHere = shouldPixelBeHere(col, row, pixelsPerPixel, character);
-      setDisplayPixels(col, row, pixelsPerPixel, pixelHere, colour);
+      //(font[character][col] >> row) & 1 will return true if the font dictates that (col, row) should have a pixel there
+      setDisplayPixels(col, row, pixelsPerPixel, (font[character][col] >> row) & 1, colour);
     }
   }
   sendSPICommand(0x2C);
+  //Size 8 is probably the largest useful font, and at that size, a character takes up < 6000 bytes in the buffer, meaning we are nowhere near to filling up the buffer with a character
   writeSPI(lcdBuffer, characterDispWidth * characterDispHeight * 2);
   postWrite();
-}
-
-void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colour) {
-  int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;
-  int rowFontIndexScaledByPixelCount = charRow * pixelsPerPixel;
-  int pixelsPerRow = FONT_WIDTH * pixelsPerPixel;
-  for (int i = 0; i < pixelsPerPixel; i++) {
-    for (int j = 0; j < pixelsPerPixel; j++) {
-      lcdBuffer[2 * ((rowFontIndexScaledByPixelCount + i) * pixelsPerRow + (columnFontIndexScaledByPixelCount + j))] = pixelInCharHere ? (colour >> 8) & 0xFF : 0x00;
-      lcdBuffer[2 * ((rowFontIndexScaledByPixelCount + i) * pixelsPerRow + (columnFontIndexScaledByPixelCount + j)) + 1] = pixelInCharHere ? colour & 0xFF : 0x00;
-    }
-  }
 }
 
 /*
@@ -215,24 +207,39 @@ void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool 
      So now the MSByte index of a pixel will be twice the current index, and the LSByte index will be that plus 1
 
    In explicit form, this looks like:
+
+              void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colour) {
+                int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;
+                int rowFontIndexScaledByPixelCount = charRow * pixelsPerPixel;
+                int pixelsPerRow = FONT_WIDTH * pixelsPerPixel;
+                int newXAddOffset, newYAddOffset;
+                for (int i = 0; i < pixelsPerPixel; i++) {
+                  for (int j = 0; j < pixelsPerPixel; j++) {
+                    newXAddOffset = columnFontIndexScaledByPixelCount + j;
+                    newYAddOffset = rowFontIndexScaledByPixelCount + i;
+                    lcdBuffer[2*(newYAddOffset * pixelsPerRow + newXAddOffset)] = pixelInCharHere ? (colour >> 8) & 0xFF : 0x00;
+                    lcdBuffer[2*(newYAddOffset * pixelsPerRow + newXAddOffset) + 1] = pixelInCharHere ? colour & 0xFF : 0x00;
+                  }
+                }
+              }
+
+   Writing a full page of size 2 font is as fast as clearing the display :)
 */
 
 /*
-  void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colour) {
-    int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;
-    int rowFontIndexScaledByPixelCount = charRow * pixelsPerPixel;
-    int pixelsPerRow = FONT_WIDTH * pixelsPerPixel;
-    int newXAddOffset, newYAddOffset;
-    for (int i = 0; i < pixelsPerPixel; i++) {
-      for (int j = 0; j < pixelsPerPixel; j++) {
-        newXAddOffset = columnFontIndexScaledByPixelCount + j;
-        newYAddOffset = rowFontIndexScaledByPixelCount + i;
-        lcdBuffer[2*(newYAddOffset * pixelsPerRow + newXAddOffset)] = pixelInCharHere ? (colour >> 8) & 0xFF : 0x00;
-        lcdBuffer[2*(newYAddOffset * pixelsPerRow + newXAddOffset) + 1] = pixelInCharHere ? colour & 0xFF : 0x00;
-      }
+   Add pixel data into the LCD buffer for the current character's current pixel
+*/
+void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colour) {
+  int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;
+  int rowFontIndexScaledByPixelCount = charRow * pixelsPerPixel;
+  int pixelsPerRow = FONT_WIDTH * pixelsPerPixel;
+  for (int i = 0; i < pixelsPerPixel; i++) {
+    for (int j = 0; j < pixelsPerPixel; j++) {
+      lcdBuffer[2 * ((rowFontIndexScaledByPixelCount + i) * pixelsPerRow + (columnFontIndexScaledByPixelCount + j))] = pixelInCharHere ? (colour >> 8) & 0xFF : 0x00;
+      lcdBuffer[2 * ((rowFontIndexScaledByPixelCount + i) * pixelsPerRow + (columnFontIndexScaledByPixelCount + j)) + 1] = pixelInCharHere ? colour & 0xFF : 0x00;
     }
   }
-*/
+}
 
 /*
    Draw a rect with origin x,y and width w, height h
@@ -240,7 +247,7 @@ void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool 
 void drawRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t colour) {
   preWrite();
   setRowColRAMAddr(x, y, w, h);
-  displayColour(colour);
+  fillRectWithColour(colour);
   postWrite();
 }
 
@@ -270,7 +277,7 @@ void setRowColRAMAddr(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
 /*
    Fill the current window with the colour specified (16 bit RGB 5-6-5)
 */
-void displayColour(uint16_t colour) {
+void fillRectWithColour(uint16_t colour) {
   sendSPICommand(0x2C); //Memory write
   uint32_t numberOfBytesToWriteToLCD;
   uint32_t numberBytesInWindowArea = (windowArea * 2);
@@ -299,7 +306,5 @@ void displayColour(uint16_t colour) {
    Clear display
 */
 void clearDisplay() {
-  preWrite();
   drawRect(0, 0, 240, 240, 0x0000);
-  postWrite();
 }
