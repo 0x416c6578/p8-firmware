@@ -19,12 +19,14 @@ void setup() {
 }
 
 void randomTests(){
-  writeStringWithLiteral(50,50,2,"Test");
+  
 }
 
 void loop(){
   if (!getButton()){
     feedWatchdog();
   }
+  writeString(20,20,3,getTime());
+  writeString(20,45,3,getDate());
   delay(500);
 }

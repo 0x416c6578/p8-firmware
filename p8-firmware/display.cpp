@@ -127,10 +127,10 @@ void initDisplay() {
 }
 
 /*
-   Write a string to the specified position
+   Write a string to the specified position using a string literal (null terminated char array)
    TODO: implement dash '-' based wrapping for nicer string displaying
 */
-void writeStringWithLiteral(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, uint16_t colour) {
+void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, uint16_t colour) {
   int currentLine = 0; //Current line
   int charPos = 0; //Position of the character we are on along the line
   int stringLen = sizeof(string);
@@ -145,17 +145,26 @@ void writeStringWithLiteral(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char
     charPos++;
     i++;
   }
-//  for (int i = 0; i < stringLen; i++) { //Loop through every character of the string
-//    //If printing the next character would result in it being of screen
-//    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
-//      currentLine++;
-//      charPos = 0;
-//    }
-//    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i]);
-//    charPos++;
-//  }
 }
 
+/*
+   Write a string to the specified position using a String object
+   TODO: implement dash '-' based wrapping for nicer string displaying
+*/
+void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, uint16_t colour) {
+  int currentLine = 0; //Current line
+  int charPos = 0; //Position of the character we are on along the line
+  int stringLen = string.length();
+  for (int i = 0; i < stringLen; i++) { //Loop through every character of the string
+    //If printing the next character would result in it being of screen
+    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
+      currentLine++;
+      charPos = 0;
+    }
+    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i], colour);
+    charPos++;
+  }
+}
 /*
    Write a character to the screen position (x,y)
 */
