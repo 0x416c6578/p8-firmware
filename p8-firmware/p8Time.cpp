@@ -1,5 +1,8 @@
 #include "p8Time.h"
 
+/*
+ * Get a String object of the current time, with seconds
+ */
 String getTimeWithSecs(){
   String timeStr = "";
   if (hour() < 10) 
@@ -16,6 +19,9 @@ String getTimeWithSecs(){
   return timeStr;
 }
 
+/*
+ * Get a String object of the current time, without seconds
+ */
 String getTime(){
   String timeStr = "";
   if (hour() < 10) 
@@ -28,6 +34,9 @@ String getTime(){
   return timeStr;
 }
 
+/*
+ * Get a String object of the current date
+ */
 String getDate(){
   String dateStr = "";
   if (day() < 10) 
@@ -41,7 +50,14 @@ String getDate(){
   dateStr += String(year());
   return dateStr;
 }
+
 String getDay(){
   
 }
-void setTimeWrapper(int yr, int mth, int day, int hr, int min, int sec){}
+
+/*
+ * Set the time
+ */
+void setTimeWrapper(int yr, int mth, int dayy, int hr, int minn, int sec){
+  setTime(hr,minn,sec,dayy,mth,yr);
+}

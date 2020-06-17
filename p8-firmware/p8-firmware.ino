@@ -19,14 +19,13 @@ void setup() {
 }
 
 void randomTests(){
-  
+  setTimeWrapper(2020,6,17,21,03,00);
 }
 
 void loop(){
   if (!getButton()){
     feedWatchdog();
   }
-  writeString(20,20,3,getTime());
+  writeString(20,20,3,getTimeWithSecs());
   writeString(20,45,3,getDate());
-  delay(500);
 }
