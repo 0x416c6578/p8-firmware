@@ -148,39 +148,91 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, 
 }
 
 
+bool shouldPixelBeHere(uint32_t xPosInCharacter, uint32_t yPosInCharacter, uint8_t pixelsPerPixel, char character) {
+  //uint8_t newChar[] = {0b11111111, 0b00000000, 0b00000000, 0b00000000, 0b00000000};
+  return (font[character][xPosInCharacter] >> yPosInCharacter) & 1; //MIGHT NEED AN OFFSET HERE IF THE FONT CHANGES
+  //return (newChar[xPosInCharacter] >> yPosInCharacter) & 1;
+}
 
-/*
-   Write a character to pos x,y and pixelsPerPixel display pixels per font pixel (determines font size)
-   If ignoreBlankPixels is true, the character write function will skip over blank pixels in a character
-   This will greatly speed up writing a large window of text, but should only be used when the area you are writing to is blank
-   This can be ensured by completly blanking the screen before writing
-*/
 void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, bool ignoreBlankPixels) {
+  preWrite();
+  uint16_t colour = 0b1111111111111111;
+
+  //Width and height of the character on the display
+  int characterDispWidth = FONT_WIDTH * pixelsPerPixel;
+  int characterDispHeight = 8 * pixelsPerPixel;
+  setRowColRAMAddr(x, y, characterDispWidth, characterDispHeight);
+
   bool pixelHere = false;
-  if (ignoreBlankPixels) {
+  //Row goes between 0 and 7, column goes between 0 and the font width
+  for (int row = 0; row < 8; row++) {
     for (int col = 0; col < FONT_WIDTH; col++) {
-      for (int row = 0; row < 8; row++) {
-        //To get the binary value of the nth pixel of a column going downwards, do (font[character][col] >> row) & 1;
-        pixelHere = (font[character][col] >> row) & 1;
-        if (!pixelHere)
-          continue;
-        //Draw a rectangle of size dictated by the font size,
-        //at position relative to the origin of the character offset by the current pixel we are on (taking size into account)
-        drawRect(x + col * pixelsPerPixel, y + row * pixelsPerPixel, pixelsPerPixel, pixelsPerPixel, 0xFFFF);
-      }
+      pixelHere = shouldPixelBeHere(col, row, pixelsPerPixel, character);
+      setDisplayPixels(col, row, pixelsPerPixel, pixelHere, colour);
     }
-  } else {
-    for (int col = 0; col < FONT_WIDTH; col++) {
-      for (int row = 0; row < 8; row++) {
-        //To get the binary value of the nth pixel of a column going downwards, do (font[character][col] >> row) & 1;
-        pixelHere = (font[character][col] >> row) & 1;
-        //Draw a rectangle of size dictated by the font size,
-        //at position relative to the origin of the character offset by the current pixel we are on (taking size into account)
-        drawRect(x + col * pixelsPerPixel, y + row * pixelsPerPixel, pixelsPerPixel, pixelsPerPixel, pixelHere ? 0xFFFF : 0);
-      }
+  }
+  sendSPICommand(0x2C);
+  writeSPI(lcdBuffer, characterDispWidth * characterDispHeight * 2);
+  postWrite();
+}
+
+void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colour) {
+  int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;
+  int rowFontIndexScaledByPixelCount = charRow * pixelsPerPixel;
+  int pixelsPerRow = FONT_WIDTH * pixelsPerPixel;
+  for (int i = 0; i < pixelsPerPixel; i++) {
+    for (int j = 0; j < pixelsPerPixel; j++) {
+      lcdBuffer[2 * ((rowFontIndexScaledByPixelCount + i) * pixelsPerRow + (columnFontIndexScaledByPixelCount + j))] = pixelInCharHere ? (colour >> 8) & 0xFF : 0x00;
+      lcdBuffer[2 * ((rowFontIndexScaledByPixelCount + i) * pixelsPerRow + (columnFontIndexScaledByPixelCount + j)) + 1] = pixelInCharHere ? colour & 0xFF : 0x00;
     }
   }
 }
+
+/*
+   We have a font size (number of lcd pixels per font pixel)
+   A display pixel x offset from the character top-left corner (0 -> (FONT_WIDTH*pixelsPerPixel)-1)
+   A display pixel y offset from the character top-left corner (0 -> (8*pixelsPerPixel)-1)
+   A boolean saying whether there is a pixel there
+   shouldPixelBeHere takes a font (x,y) 0 <= x < FONT_WIDTH, 0 <= y < 8, and returns a boolean as to whether there should be a pixel there
+   We need a function that takes:
+     The font pixel x,y
+     The number of pixels per pixel
+     A bool as to whether there is a pixel in (x,y) in the font or not
+     The pixel colour (low priority)
+   Which loops through pixelsPerPixel^2 times and writes to the correct TWO positions in the lcd buffer array the colour
+   It may look like
+     for i in 0->pixelsPerPixel-1
+       for j in 0->pixelsPerPixel-1
+   If the lcdBuffer was a single byte per pixel, we could get the element of the array that (x,y) represents by
+     Scaling the font position up by the number of pixels per display pixel (x*pixelsPerPixel and y*pixelsPerPixel)
+       This will give the origin of that pixel in the display character window
+     We must then do the for loop at this point, adding i/j to the new origin positions as an offset so that we now have a coordinate in the display window for every sub-pixel of the current pixel we are on
+     We can get the number of pixels in a row by doing pixelsInRow = FONT_WIDTH*pixelsPerPixel
+     Now if the lcdBuffer was a single byte per pixel, we could just do
+     lcdBuffer[newYAddOffset*pixelsInRow + newXAddOffset] to get the position in the buffer of the current pixel we are on
+       This is because the display windows fills from top left, top row first, meaning that the offset of the current display pixel is just the y*pixelsPerRow, add the x value
+     Since there are two bytes per pixel however, we must edit the expression that accesses the buffer to take this into account.
+     So now the MSByte index of a pixel will be twice the current index, and the LSByte index will be that plus 1
+
+   In explicit form, this looks like:
+*/
+
+/*
+  void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colour) {
+    int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;
+    int rowFontIndexScaledByPixelCount = charRow * pixelsPerPixel;
+    int pixelsPerRow = FONT_WIDTH * pixelsPerPixel;
+    int newXAddOffset, newYAddOffset;
+    for (int i = 0; i < pixelsPerPixel; i++) {
+      for (int j = 0; j < pixelsPerPixel; j++) {
+        newXAddOffset = columnFontIndexScaledByPixelCount + j;
+        newYAddOffset = rowFontIndexScaledByPixelCount + i;
+        lcdBuffer[2*(newYAddOffset * pixelsPerRow + newXAddOffset)] = pixelInCharHere ? (colour >> 8) & 0xFF : 0x00;
+        lcdBuffer[2*(newYAddOffset * pixelsPerRow + newXAddOffset) + 1] = pixelInCharHere ? colour & 0xFF : 0x00;
+      }
+    }
+  }
+*/
 
 /*
    Draw a rect with origin x,y and width w, height h
