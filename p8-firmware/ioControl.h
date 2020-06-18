@@ -5,7 +5,7 @@
 #define BACKLIGHT_OFF 0
 
 void initIO();
-bool getButton();
+bool getButtonState();
 void ledOutput(bool on);
 void motorOutput(bool on);
 void setBrightness(int brightness);

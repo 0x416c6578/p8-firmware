@@ -24,7 +24,7 @@ void initIO(){
  * Get state of push button
  * Returns true if button is pressed
  */
-bool getButton(){
+bool getButtonState(){
   return digitalRead(PUSH_BUTTON_IN);
 }
 

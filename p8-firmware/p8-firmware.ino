@@ -8,7 +8,7 @@
 void setup() {
   delay(500); //Coldboot cooldown time
   initIO(); //Init GPIOs
-  if (getButton()){ //If the button is held at boot, go to the bootloader
+  if (getButtonState()){ //If the button is held at boot, go to the bootloader
     NRF_POWER->GPREGRET = 0x01;
     NVIC_SystemReset();
   }
@@ -19,13 +19,11 @@ void setup() {
 }
 
 void randomTests(){
-  setTimeWrapper(2020,6,17,21,03,00);
+  
 }
 
 void loop(){
-  if (!getButton()){
+  if (!getButtonState()){
     feedWatchdog();
   }
-  writeString(20,20,3,getTimeWithSecs());
-  writeString(20,45,3,getDate());
 }
