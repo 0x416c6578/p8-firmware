@@ -16,3 +16,5 @@ HUGE thanks to [Aaron](https://github.com/atc1441) for all his work, I would hav
 - Faster bulk test displaying with ignoreBlankPixels parameter for writing characters
   - This will skip over drawing the rects for blank pixels in characters
   - It should only be used when the area you are writing to is blank (perhaps clear the screen before)
+- Coloured text
+  - Coloured FG and BG text was implemented, but removed due to lack of use
