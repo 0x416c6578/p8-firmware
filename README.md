@@ -18,3 +18,5 @@ HUGE thanks to [Aaron](https://github.com/atc1441) for all his work, I would hav
   - It should only be used when the area you are writing to is blank (perhaps clear the screen before)
 - Coloured text
   - Coloured FG and BG text was implemented, but removed due to lack of use
+- Writing strings as String objects, and as char[]s
+- Writing integers to the display
