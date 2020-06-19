@@ -130,18 +130,19 @@ void initDisplay() {
    Write a string to the specified position using a string literal (null terminated char array)
    TODO: implement dash '-' based wrapping for nicer string displaying
 */
-void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, uint16_t colour) {
+void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, uint16_t colourFG) {
   int currentLine = 0; //Current line
   int charPos = 0; //Position of the character we are on along the line
-  int stringLen = sizeof(string);
   int i = 0;
   while (string[i] != 0) { //Loop through every character of the string (only stop when you reach the null terminator)
     //If printing the next character would result in it being of screen
-    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
+    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH*pixelsPerPixel * 2) { //If printing the next character would result in it being of screen
+      if (string[i] != 32 && string[i-1] != 32)
+        writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, '-', colourFG);
       currentLine++;
       charPos = 0;
     }
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i], colour);
+    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i], colourFG);
     charPos++;
     i++;
   }
@@ -151,17 +152,23 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, u
    Write a string to the specified position using a String object
    TODO: implement dash '-' based wrapping for nicer string displaying
 */
-void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, uint16_t colour) {
+void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, uint16_t colourFG) {
   int currentLine = 0; //Current line
   int charPos = 0; //Position of the character we are on along the line
   int stringLen = string.length();
   for (int i = 0; i < stringLen; i++) { //Loop through every character of the string
-    //If printing the next character would result in it being of screen
-    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
+    /*
+      In order to get dash wrapping, I added the * 2 to the end of the first if to test whether we will overlap with the NEXT character
+      I then also added the test to see if the character we are going to write would be a space (if so, don't add the dash)
+      Otherwise, I put a dash before the newline
+    */
+    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH*pixelsPerPixel * 2) { //If printing the next character would result in it being of screen
+      if (string[i] != 32)
+        writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, '-', colourFG);
       currentLine++;
       charPos = 0;
     }
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i], colour);
+    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i], colourFG);
     charPos++;
   }
 }
@@ -169,7 +176,7 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, 
 /*
    Write an (up to 9 digit) integer to x,y
 */
-void writeInt(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colour) {
+void writeInt(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG) {
   //Byte array for storing the digits
   uint8_t digits[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
   uint8_t i = 0;
@@ -196,7 +203,7 @@ void writeInt(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint1
       charPos = 0;
     }
     sprintf(charToWrite, "%d", digits[i]);
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colour);
+    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG);
     charPos++;
   }
 }
@@ -208,7 +215,7 @@ void writeInt(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint1
 /*
    Write a character to the screen position (x,y)
 */
-void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, uint16_t colour) {
+void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, uint16_t colourFG) {
   preWrite();
 
   //Width and height of the character on the display
@@ -220,7 +227,7 @@ void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, u
   for (int row = 0; row < 8; row++) {
     for (int col = 0; col < FONT_WIDTH; col++) {
       //(font[character][col] >> row) & 1 will return true if the font dictates that (col, row) should have a pixel there
-      setDisplayPixels(col, row, pixelsPerPixel, (font[character][col] >> row) & 1, colour);
+      setDisplayPixels(col, row, pixelsPerPixel, (font[character][col] >> row) & 1, colourFG);
     }
   }
   sendSPICommand(0x2C);
@@ -278,14 +285,14 @@ void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, u
 /*
    Add pixel data into the LCD buffer for the current character's current pixel
 */
-void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colour) {
+void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colourFG) {
   int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;
   int rowFontIndexScaledByPixelCount = charRow * pixelsPerPixel;
   int pixelsPerRow = FONT_WIDTH * pixelsPerPixel;
   for (int i = 0; i < pixelsPerPixel; i++) {
     for (int j = 0; j < pixelsPerPixel; j++) {
-      lcdBuffer[2 * ((rowFontIndexScaledByPixelCount + i) * pixelsPerRow + (columnFontIndexScaledByPixelCount + j))] = pixelInCharHere ? (colour >> 8) & 0xFF : 0x00;
-      lcdBuffer[2 * ((rowFontIndexScaledByPixelCount + i) * pixelsPerRow + (columnFontIndexScaledByPixelCount + j)) + 1] = pixelInCharHere ? colour & 0xFF : 0x00;
+      lcdBuffer[2 * ((rowFontIndexScaledByPixelCount + i) * pixelsPerRow + (columnFontIndexScaledByPixelCount + j))] = pixelInCharHere ? (colourFG >> 8) & 0xFF : 0x00;
+      lcdBuffer[2 * ((rowFontIndexScaledByPixelCount + i) * pixelsPerRow + (columnFontIndexScaledByPixelCount + j)) + 1] = pixelInCharHere ? colourFG & 0xFF : 0x00;
     }
   }
 }

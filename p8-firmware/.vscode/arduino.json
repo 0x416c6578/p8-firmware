@@ -1,0 +1,7 @@
+{
+    "board": "sandeepmistry:nRF5:p8watch",
+    "configuration": "softdevice=stockFW",
+    "programmer": "AVR ISP",
+    "sketch": "p8-firmware.ino",
+    "port": "/dev/ttyS0"
+}

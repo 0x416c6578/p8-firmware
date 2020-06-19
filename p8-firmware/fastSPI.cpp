@@ -1,5 +1,7 @@
 #include "fastSPI.h"
 #include "pinoutP8.h"
+#include "nrf52.h"
+#include "nrf52_bitfields.h"
 /*
 SPIM Structure:
 typedef struct {                                    
@@ -148,7 +150,7 @@ void writeSPI(uint8_t *ptr, uint32_t len){
  * Send data in command mode
  */
 void sendSPICommand(uint8_t command){
-  digitalWrite(LCD_RS, LOW); //Put display into command recieve mode
+  digitalWrite(LCD_RS, LOW); //Put display into command receive mode
   writeSPI(&command, 1); //Write command over SPI (requires single byte workaround)
   digitalWrite(LCD_RS, HIGH);
 }
