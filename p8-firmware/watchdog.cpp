@@ -1,5 +1,8 @@
-#include "watchdog.h"
-#include "pinoutP8.h"
+#include "headers/watchdog.h"
+#include "headers/pinoutP8.h"
+#include "nrf52.h"
+#include "nrf52_bitfields.h"
+
 //Interrupt controller
 #include <nrf_nvic.h>
 #include <nrf_sdm.h>

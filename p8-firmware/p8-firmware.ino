@@ -1,9 +1,9 @@
-#include "pinoutP8.h"
-#include "watchdog.h"
-#include "ioControl.h"
-#include "fastSPI.h"
-#include "display.h"
-#include "p8Time.h"
+#include "headers/pinoutP8.h"
+#include "headers/watchdog.h"
+#include "headers/ioControl.h"
+#include "headers/fastSPI.h"
+#include "headers/display.h"
+#include "headers/p8Time.h"
 #include "nrf52.h"
 
 void setup() {

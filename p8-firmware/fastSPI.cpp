@@ -1,5 +1,5 @@
-#include "fastSPI.h"
-#include "pinoutP8.h"
+#include "headers/fastSPI.h"
+#include "headers/pinoutP8.h"
 #include "nrf52.h"
 #include "nrf52_bitfields.h"
 /*

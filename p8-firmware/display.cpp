@@ -1,7 +1,7 @@
-#include "display.h"
-#include "pinoutP8.h"
-#include "fastSPI.h"
-#include "font.h"
+#include "headers/display.h"
+#include "headers/pinoutP8.h"
+#include "headers/fastSPI.h"
+#include "headers/font.h"
 #define LCD_BUFFER_SIZE 15000 //LCD Buffer set to 15kbytes (approx = 1/2 RAM) meaning you can write up to 7500 pixels into the buffer without having to run over
 
 /*

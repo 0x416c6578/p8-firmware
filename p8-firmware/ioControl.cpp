@@ -1,6 +1,6 @@
- #include "ioControl.h"
+#include "headers/ioControl.h"
+#include "headers/pinoutP8.h"
 #include "Arduino.h"
-#include "pinoutP8.h"
 
 int currentBrightness = 0;
 
