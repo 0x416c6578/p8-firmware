@@ -19,7 +19,7 @@
 #define TP_SDA       6
 #define TP_SCL       7
 #define TP_RESET     13
-#define TP_INT       28
+#define TP_INT       28 //Touchscreen interrupt (by default the controller is in sleep mode, and will wake up (and send an interrupt) when a touch event is detected)
 
 //Accelerometer
 #define BMA421_SDA       6
