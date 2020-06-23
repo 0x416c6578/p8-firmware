@@ -32,5 +32,3 @@
 <img src="Images/leds.jpg" alt=" " width=" 600" />
 <img src="Images/batteryCon.jpg" alt=" " width=" 600" />
 <img src="Images/overview.jpg" alt=" " width=" 600" />
-
-$\text{This is a test of inline latex}$
