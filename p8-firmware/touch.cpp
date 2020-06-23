@@ -32,6 +32,7 @@
 
   Unlike the PineTime, the P8 watch uses the CST716S touch controller, rather than the CST816S
   This means that the touch data is available via a slightly different register configuration than the PineTime
+  As per the reference driver, waking the device can only be done by toggling the reset pin low for 20ms
 */
 
 touchDataStruct touchData = {-1, -1, -1};
@@ -83,8 +84,8 @@ void updateTouchStruct() {
   4 : Other error 
   */
     touchData.gesture = -1;
-    touchData.x = -1;
-    touchData.y = -1;
+    touchData.x = 69;
+    touchData.y = 69;
     return; //If we get an unsuccessful probe, the device isn't awake, so just return
   }
   Wire.requestFrom(0x15, 8);
@@ -109,4 +110,14 @@ Get a pointer to the touchData struct containing the information about the last 
  */
 touchDataStruct* getTouchDataStruct() {
   return &touchData;
+}
+
+/* 
+Put the touch panel to sleep
+ */
+void sleepTouchController(){
+  Wire.beginTransmission(0x15);
+  Wire.write(0xA5);
+  Wire.write(0x03);
+  Wire.endTransmission();
 }

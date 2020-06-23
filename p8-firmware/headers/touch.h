@@ -29,3 +29,4 @@ void initTouch();
 void resetTouchController(bool bootup = false);
 void updateTouchStruct();
 touchDataStruct* getTouchDataStruct();
+void sleepTouchController();

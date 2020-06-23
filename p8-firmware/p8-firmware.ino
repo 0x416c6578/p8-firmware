@@ -7,7 +7,6 @@
 #include "headers/touch.h"
 #include "nrf52.h"
 
-bool lastTouch;
 
 void setup() {
   delay(500); //Coldboot cooldown time
@@ -24,15 +23,9 @@ void setup() {
 }
 
 void randomTests() {
-  lastTouch = digitalRead(TP_INT);
+
 }
 
 void loop() {
-  if (!getButtonState()) {
-    feedWatchdog();
-  }
-  updateTouchStruct();
-  touchDataStruct* data = getTouchDataStruct();
-  writeIntWithPrecedingZeroes(20, 20, 2, data->x);
-  writeIntWithPrecedingZeroes(20, 40, 2, data->y);
+  if (!getButtonState()) feedWatchdog();
 }

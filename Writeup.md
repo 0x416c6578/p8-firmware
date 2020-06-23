@@ -18,6 +18,8 @@
 - It seems to be an equivalent controller in terms of data output
 ## RTC
 - There is a 32768KHz oscillator in the main CPU, however I am still researching how to use that for RTC needs (and whether the `millis()` function uses that or the base system clock for timing)
+- Using the stock Time library, the time deviates by +1 second after about 17-18 hours of uptime
+  - I am fine with a total delta of up to +-30 seconds, so I am more than happy with the current deviation
 ## Heartrate sensor
 - There are two LEDs on the heartrate sensor board, however these are independently controllable separate to the heartrate sensor itself (which has its own LED in the package) through pin 27
 
@@ -30,3 +32,5 @@
 <img src="Images/leds.jpg" alt=" " width=" 600" />
 <img src="Images/batteryCon.jpg" alt=" " width=" 600" />
 <img src="Images/overview.jpg" alt=" " width=" 600" />
+
+$\text{This is a test of inline latex}$

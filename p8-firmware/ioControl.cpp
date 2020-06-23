@@ -13,6 +13,7 @@ void initIO() {
   pinMode(LCD_BACKLIGHT_LOW, OUTPUT);
   pinMode(LCD_BACKLIGHT_MID, OUTPUT);
   pinMode(LCD_BACKLIGHT_HIGH, OUTPUT);
+  pinMode(STATUS_LED, OUTPUT);
   ledOutput(false);
   motorOutput(false);
 
