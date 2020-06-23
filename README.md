@@ -7,8 +7,10 @@ HUGE thanks to [Aaron](https://github.com/atc1441) for all his work, I would hav
 ## TODO:
 - [x] Implement hyphenated text wrapping
 - [x] Improve character printing by creating, populating and eventually displaying a single buffer for an entire character, rather than writing many small rects as pixels
+- [ ] Implement stripped down version of <Wire.h> for increased power efficiency (use EasyDMA directly instead of a wrapper)
 #### In the future
 - [x] Get RTC working
+- [x] Get touch display working
 - [ ] Get accelerometer working
 - [ ] Get heart rate sensor working
 - [ ] Implement main screen, and a framework for adding new screens
@@ -19,4 +21,7 @@ HUGE thanks to [Aaron](https://github.com/atc1441) for all his work, I would hav
 - Coloured text
   - Coloured FG and BG text was implemented, but removed due to lack of use
 - Writing strings as String objects, and as char[]s
-- Writing integers to the display
+- Writing integers to the display (both with and without preceding zeroes)
+
+## Notes on the P8
+See [Writeup](Writeup.md)
