@@ -98,9 +98,7 @@ void updateTouchStruct() {
   */
   touchData.gesture = readBuf[0];
   /* 
-  Because the P8 uses a different touch controller, the touch data is available just through the 3rd and 5th registers
-  This means that the shifting / ORing used on the PineTime isn't needed :)
-  I discovered this before looking at Aaron's implementation fully, so it took way longer to figure out what was wrong than it had any right to :(
+  Because the display is 240*240, the highest 4 bits of the positions are not used, meaning we can just use the lower byte of the position to get all the information we need
    */
   touchData.x = (readBuf[3]);// << 8 | (uint16_t)readBuf[4]; (Not needed)
   touchData.y = (readBuf[5]);// << 8 | (uint16_t)readBuf[6]; (Not needed)

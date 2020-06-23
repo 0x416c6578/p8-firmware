@@ -11,7 +11,7 @@
 - There are still further optimizations that could be made to this routine (and parameterising it for use with different fonts), however I am happy with the current implementation
 ### Touch
 - The touch controller used in the P8 is the CST716S, rather than the CST816S
-- This means that getting touch position data from the controller is slightly different, and will produce garbage when using PineTime implementations
+- It seems to be an equivalent controller in terms of data output
 ## RTC
 - There is a 32768KHz oscillator in the main CPU, however I am still researching how to use that for RTC needs (and whether the `millis()` function uses that or the base system clock for timing)
 ## Heartrate sensor
