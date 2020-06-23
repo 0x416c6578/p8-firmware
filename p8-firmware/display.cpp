@@ -1,7 +1,4 @@
 #include "headers/display.h"
-#include "headers/pinoutP8.h"
-#include "headers/fastSPI.h"
-#include "headers/font.h"
 #define LCD_BUFFER_SIZE 15000 //LCD Buffer set to 15kbytes (approx = 1/2 RAM) meaning you can write up to 7500 pixels into the buffer without having to run over
 
 /*
@@ -136,8 +133,8 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, u
   int i = 0;
   while (string[i] != 0) { //Loop through every character of the string (only stop when you reach the null terminator)
     //If printing the next character would result in it being of screen
-    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH*pixelsPerPixel * 2) { //If printing the next character would result in it being of screen
-      if (string[i] != 32 && string[i-1] != 32)
+    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH * pixelsPerPixel * 2) { //If printing the next character would result in it being of screen
+      if (string[i] != 32 && string[i - 1] != 32)
         writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, '-', colourFG);
       currentLine++;
       charPos = 0;
@@ -162,7 +159,7 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, 
       I then also added the test to see if the character we are going to write would be a space (if so, don't add the dash)
       Otherwise, I put a dash before the newline
     */
-    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH*pixelsPerPixel * 2) { //If printing the next character would result in it being of screen
+    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH * pixelsPerPixel * 2) { //If printing the next character would result in it being of screen
       if (string[i] != 32)
         writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, '-', colourFG);
       currentLine++;
@@ -174,9 +171,9 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, 
 }
 
 /*
-   Write an (up to 9 digit) integer to x,y
+   Write an (up to 9 digit) integer to x,y, without preceding zeroes (useful when you know the numbers you are writing will have the same number of digits on rewriting)
 */
-void writeInt(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG) {
+void writeIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG) {
   //Byte array for storing the digits
   uint8_t digits[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
   uint8_t i = 0;
@@ -208,7 +205,34 @@ void writeInt(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint1
   }
 }
 
-
+/* 
+Write a number always with 9 digits to x,y (with preceding zeroes for variable length rewrites)
+ */
+void writeIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG){
+  //Byte array for storing the digits
+  uint8_t digits[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+  uint8_t i = 0;
+  //Write the number (of num digits n) into the LAST n indexes of the digits array (everything preceding the number will be 0)
+  while (toWrite) {
+    digits[8 - i] = toWrite % 10;
+    toWrite /= 10;
+    i++;
+  }
+  int currentLine = 0; //Current line
+  int charPos = 0; //Position of the character we are on along the line
+  char charToWrite[1];
+  //Do the normal writing routine but for every digit of the number, starting from the 0th index (writing preceding zeroes)
+  for (i = 0; i < 9; i++) { //Loop through every character of the string
+    //If printing the next character would result in it being of screen
+    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
+      currentLine++;
+      charPos = 0;
+    }
+    sprintf(charToWrite, "%d", digits[i]);
+    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG);
+    charPos++;
+  }
+}
 
 
 

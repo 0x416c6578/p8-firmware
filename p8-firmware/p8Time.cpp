@@ -1,11 +1,11 @@
 #include "headers/p8Time.h"
 
 /*
- * Get a String object of the current time, with seconds
- */
-String getTimeWithSecs(){
+   Get a String object of the current time, with seconds
+*/
+String getTimeWithSecs() {
   String timeStr = "";
-  if (hour() < 10) 
+  if (hour() < 10)
     timeStr += "0";
   timeStr += String(hour());
   timeStr += ":";
@@ -13,18 +13,18 @@ String getTimeWithSecs(){
     timeStr += "0";
   timeStr += String(minute());
   timeStr += ":";
-  if (second() < 10) 
+  if (second() < 10)
     timeStr += "0";
   timeStr += String(second());
   return timeStr;
 }
 
 /*
- * Get a String object of the current time, without seconds
- */
-String getTime(){
+   Get a String object of the current time, without seconds
+*/
+String getTime() {
   String timeStr = "";
-  if (hour() < 10) 
+  if (hour() < 10)
     timeStr += "0";
   timeStr += String(hour());
   timeStr += ":";
@@ -35,11 +35,11 @@ String getTime(){
 }
 
 /*
- * Get a String object of the current date
- */
-String getDate(){
+   Get a String object of the current date
+*/
+String getDate() {
   String dateStr = "";
-  if (day() < 10) 
+  if (day() < 10)
     dateStr += "0";
   dateStr += String(day());
   dateStr += "/";
@@ -51,13 +51,13 @@ String getDate(){
   return dateStr;
 }
 
-String getDay(){
-  
+String getDay() {
+
 }
 
 /*
- * Set the time
- */
-void setTimeWrapper(int yr, int mth, int dayy, int hr, int minn, int sec){
-  setTime(hr,minn,sec,dayy,mth,yr);
+   Set the time
+*/
+void setTimeWrapper(int yr, int mth, int dayy, int hr, int minn, int sec) {
+  setTime(hr, minn, sec, dayy, mth, yr);
 }

@@ -1,10 +1,8 @@
 #include "headers/fastSPI.h"
-#include "headers/pinoutP8.h"
-#include "nrf52.h"
-#include "nrf52_bitfields.h"
+
 /*
-SPIM Structure:
-typedef struct {                                    
+  SPIM Structure:
+  typedef struct {
   __I  uint32_t  RESERVED0[4];
   __O  uint32_t  TASKS_START;                       Start SPI transaction
   __O  uint32_t  TASKS_STOP;                        Stop SPI transaction
@@ -38,13 +36,13 @@ typedef struct {
   __IO uint32_t  CONFIG;                            Configuration register
   __I  uint32_t  RESERVED13[26];
   __IO uint32_t  ORC;                               Over-read character. Character clocked out in case and over-read of the TXD buffer.
-} NRF_SPIM_Type;
- */
+  } NRF_SPIM_Type;
+*/
 
 /*
- * Initialize fast SPI interface for display/flash for use with EasyDMA
- */
-void initFastSPI(){
+   Initialize fast SPI interface for display/flash for use with EasyDMA
+*/
+void initFastSPI() {
   pinMode(LCD_SCK, OUTPUT); //SPI clock (pin 2)
   pinMode(LCD_SDI, OUTPUT); //SPI MOSI (pin 3)
   pinMode(SPI_MISO, INPUT); //Flash memory MISO (pin 4)
@@ -54,7 +52,7 @@ void initFastSPI(){
   digitalWrite(LCD_SCK, HIGH);
   digitalWrite(LCD_SDI, HIGH);
   digitalWrite(LCD_CS, HIGH);
-  
+
   NRF_SPIM2->PSELSCK  = LCD_SCK; //This is the same as the display SCK since SPI is a shared bus (pin 2)
   NRF_SPIM2->PSELMOSI = LCD_SDI; //Ditto for the MOSI (pin 3)
   NRF_SPIM2->PSELMISO = SPI_MISO; //This is only used by the flash storage (pin 4)
@@ -65,21 +63,21 @@ void initFastSPI(){
 }
 
 /*
- * Enable SPI
- */
-void enableSPI(bool state){
-  if (state){
+   Enable SPI
+*/
+void enableSPI(bool state) {
+  if (state) {
     NRF_SPIM2->ENABLE = 7;
   }
-  else{
+  else {
     while (NRF_SPIM2->ENABLE == 0) NRF_SPIM2->ENABLE = 0;
   }
 }
 
 /*
- * Enable workaround for writing 1 byte (I think, don't quite know what it is doing)
- */
-void enableSingleByteWorkaround(NRF_SPIM_Type *spim, uint32_t ppi_channel, uint32_t gpiote_channel){
+   Enable workaround for writing 1 byte (I think, don't quite know what it is doing)
+*/
+void enableSingleByteWorkaround(NRF_SPIM_Type *spim, uint32_t ppi_channel, uint32_t gpiote_channel) {
   NRF_GPIOTE->CONFIG[gpiote_channel] = (GPIOTE_CONFIG_MODE_Event << GPIOTE_CONFIG_MODE_Pos) |
                                        (spim->PSEL.SCK << GPIOTE_CONFIG_PSEL_Pos) |
                                        (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos);
@@ -90,18 +88,18 @@ void enableSingleByteWorkaround(NRF_SPIM_Type *spim, uint32_t ppi_channel, uint3
 }
 
 /*
- * Disable workaround for writing 1 byte (again speculation)
- */
-void disableSingleByteWorkaround(NRF_SPIM_Type *spim, uint32_t ppi_channel, uint32_t gpiote_channel){
+   Disable workaround for writing 1 byte (again speculation)
+*/
+void disableSingleByteWorkaround(NRF_SPIM_Type *spim, uint32_t ppi_channel, uint32_t gpiote_channel) {
   NRF_GPIOTE->CONFIG[gpiote_channel] = 0;
   NRF_PPI->CH[ppi_channel].EEP = 0;
   NRF_PPI->CH[ppi_channel].TEP = 0;
   NRF_PPI->CHENSET = ppi_channel;
 }
 /*
- * Write a byte buffer over SPI
- */
-void writeSPI(uint8_t *ptr, uint32_t len){
+   Write a byte buffer over SPI
+*/
+void writeSPI(uint8_t *ptr, uint32_t len) {
   //Handle edge case workaround
   if (len == 1)
     enableSingleByteWorkaround(NRF_SPIM2, 8, 8);
@@ -116,18 +114,18 @@ void writeSPI(uint8_t *ptr, uint32_t len){
     NRF_SPIM2->EVENTS_ENDTX = 0;
 
     /*
-    Transmit structure
-    typedef struct {
+      Transmit structure
+      typedef struct {
       __IO uint32_t  PTR; Data pointer
       __IO uint32_t  MAXCNT; Maximum number of bytes in transmit buffer
       __I  uint32_t  AMOUNT; Number of bytes transferred in the last transaction
       __IO uint32_t  LIST; EasyDMA list type
-    } SPIM_TXD_Type;
+      } SPIM_TXD_Type;
     */
-  
+
     NRF_SPIM2->TXD.PTR = (uint32_t) ptr + pointerOffset;
-    
-    if ( len <= 0xFF ){ //If we have reached the end of the buffer (<=255 bytes to go)
+
+    if ( len <= 0xFF ) { //If we have reached the end of the buffer (<=255 bytes to go)
       NRF_SPIM2->TXD.MAXCNT = len; //Max bytes to TX = length
       pointerOffset += len;
       len = 0;
@@ -141,24 +139,24 @@ void writeSPI(uint8_t *ptr, uint32_t len){
     NRF_SPIM2->RXD.MAXCNT = 0;
     NRF_SPIM2->TASKS_START = 1; //Start SPI transaction
     while (NRF_SPIM2->EVENTS_END == 0);
-      NRF_SPIM2->EVENTS_END = 0;
+    NRF_SPIM2->EVENTS_END = 0;
   }
   while (len);
 }
 
 /*
- * Send data in command mode
- */
-void sendSPICommand(uint8_t command){
+   Send data in command mode
+*/
+void sendSPICommand(uint8_t command) {
   digitalWrite(LCD_RS, LOW); //Put display into command receive mode
   writeSPI(&command, 1); //Write command over SPI (requires single byte workaround)
   digitalWrite(LCD_RS, HIGH);
 }
 
 /*
- * Helper function to write a single byte
- */
-void writeSPISingleByte(uint8_t toWrite){
+   Helper function to write a single byte
+*/
+void writeSPISingleByte(uint8_t toWrite) {
   writeSPI(&toWrite, 1);
 }
 
