@@ -23,9 +23,16 @@ void setup() {
 }
 
 void randomTests() {
-
+  digitalWrite(STATUS_LED, HIGH);
 }
 
 void loop() {
   if (!getButtonState()) feedWatchdog();
+  updateTouchStruct();
+  touchDataStruct* data = getTouchDataStruct();
+  if (data->gesture)
+    writeIntWithPrecedingZeroes(0, 0, 2, data->gesture);
+  writeIntWithPrecedingZeroes(0, 20, 2, data->x);
+  writeIntWithPrecedingZeroes(0, 40, 2, data->y);
+  delay(5);
 }

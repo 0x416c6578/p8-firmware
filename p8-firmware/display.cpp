@@ -247,11 +247,13 @@ void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, u
   int characterDispHeight = 8 * pixelsPerPixel;
   setRowColRAMAddr(x, y, characterDispWidth, characterDispHeight);
 
+  int offset = FONT_NEEDS_OFFSET ? 32 : 0;
+
   //Row goes between 0 and 7, column goes between 0 and the font width
   for (int row = 0; row < 8; row++) {
     for (int col = 0; col < FONT_WIDTH; col++) {
       //(font[character][col] >> row) & 1 will return true if the font dictates that (col, row) should have a pixel there
-      setDisplayPixels(col, row, pixelsPerPixel, (font[character][col] >> row) & 1, colourFG);
+      setDisplayPixels(col, row, pixelsPerPixel, (font[character - offset][col] >> row) & 1, colourFG);
     }
   }
   sendSPICommand(0x2C);

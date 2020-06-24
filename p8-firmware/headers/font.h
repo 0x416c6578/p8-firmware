@@ -4,11 +4,14 @@
  * font[character][0] is the first (leftmost) column
  * The LSB of a column is the top most pixel.
  * To get the binary value of the nth pixel of a column going downwards, do (font[character][col] >> n-1) & 1;
- * Since this font doesn't represent the unprintable characters, (ascii 0-31), it starts at the first printable character, space
+ * Since some fonts don't represent the unprintable characters, (ascii 0-31), it starts at the first printable character, space
  * So in order to print an ascii character, you must first subtract an offset of 32 from the code to get the index of the font array
+ * This is optional depending on the font, so there is a preprocessor command that handles that
  */
 
+#define FONT_NEEDS_OFFSET false
 #define FONT_WIDTH 5
+
 const unsigned char font[][5] = 
   {{0x00, 0x00, 0x00, 0x00, 0x00},
   {0x3E, 0x5B, 0x4F, 0x5B, 0x3E},

@@ -71,7 +71,8 @@ void resetTouchController(bool bootup) {
 Read touch data from the controller and store it in the global touchDataStruct
  */
 void updateTouchStruct() {
-  uint8_t readBuf[6]; //Read buffer where the raw bytes are stored
+  int readBufSize = 6;
+  uint8_t readBuf[readBufSize]; //Read buffer where the raw bytes are stored
   Wire.beginTransmission(0x15);
   Wire.write(0x1); //Probe touch display at i2c port 1 to see if the touch display is awake
   if (Wire.endTransmission()){
@@ -88,8 +89,8 @@ void updateTouchStruct() {
     touchData.y = 69;
     return; //If we get an unsuccessful probe, the device isn't awake, so just return
   }
-  Wire.requestFrom(0x15, 8);
-  for (int x = 0; x < 6; x++){
+  Wire.requestFrom(0x15, readBufSize);
+  for (int x = 0; x < readBufSize; x++){
     readBuf[x] = Wire.read(); //Read the data about the last touch event into the raw data buffer
   }
   /* 
