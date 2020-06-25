@@ -38,7 +38,7 @@
 #define POWER_CONTROL     24
 
 //Various IO
-#define STATUS_LED        27
+#define GREEN_LEDS        27
 #define VIBRATOR_OUT      16
 #define PUSH_BUTTON_IN    17
 #define PUSH_BUTTON_OUT   -1

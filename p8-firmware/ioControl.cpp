@@ -7,13 +7,13 @@ int currentBrightness = 0;
    Initialize various GPIOs, should be done at bootup
 */
 void initIO() {
-  pinMode(STATUS_LED, OUTPUT);
+  pinMode(GREEN_LEDS, OUTPUT);
   pinMode(VIBRATOR_OUT, OUTPUT);
   pinMode(PUSH_BUTTON_IN, INPUT);
   pinMode(LCD_BACKLIGHT_LOW, OUTPUT);
   pinMode(LCD_BACKLIGHT_MID, OUTPUT);
   pinMode(LCD_BACKLIGHT_HIGH, OUTPUT);
-  pinMode(STATUS_LED, OUTPUT);
+  pinMode(GREEN_LEDS, OUTPUT);
   ledOutput(false);
   motorOutput(false);
 
@@ -32,7 +32,7 @@ bool getButtonState() {
    Turn the status LED on or off (LED on the heartrate sensor board)
 */
 void ledOutput(bool on) {
-  digitalWrite(STATUS_LED, on);
+  digitalWrite(GREEN_LEDS, on);
 }
 
 /*

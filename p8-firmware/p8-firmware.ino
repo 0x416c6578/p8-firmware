@@ -5,6 +5,8 @@
 #include "headers/display.h"
 #include "headers/p8Time.h"
 #include "headers/touch.h"
+#include "headers/interrupts.h"
+#include "headers/screenController.h"
 #include "nrf52.h"
 
 
@@ -19,20 +21,15 @@ void setup() {
   initFastSPI(); //Initialize EasyDMA SPI
   initDisplay(); //Initialize display
   initTouch(); //Initialize touch panel
+  initInterrupts(); //Setup interrupts
   randomTests();
 }
 
 void randomTests() {
-  digitalWrite(STATUS_LED, HIGH);
+
 }
 
 void loop() {
   if (!getButtonState()) feedWatchdog();
-  updateTouchStruct();
-  touchDataStruct* data = getTouchDataStruct();
-  if (data->gesture)
-    writeIntWithPrecedingZeroes(0, 0, 2, data->gesture);
-  writeIntWithPrecedingZeroes(0, 20, 2, data->x);
-  writeIntWithPrecedingZeroes(0, 40, 2, data->y);
-  delay(5);
+  screenControllerLoop();
 }
