@@ -31,33 +31,33 @@
   } NRF_TWIM_Type;
 
   Unlike the PineTime, the P8 watch uses the CST716S touch controller, rather than the CST816S
-  This means that the touch data is available via a slightly different register configuration than the PineTime
+  However implementation wise, getting the data is equivalent
   As per the reference driver, waking the device can only be done by toggling the reset pin low for 20ms
 */
 
 touchDataStruct touchData = {-1, -1, -1};
 
 /* 
-Initialize the touch panel (basically just reset and put into running (not sleeping) state)
- */
+  Initialize the touch panel (basically just reset and put into running (not sleeping) state)
+*/
 void initTouch() {
-  pinMode(TP_RESET, OUTPUT); //Reset pin
-  pinMode(TP_INT, INPUT); //Interrupt pin
+  pinMode(TP_RESET, OUTPUT);  //Reset pin
+  pinMode(TP_INT, INPUT);     //Interrupt pin
 
-  Wire.begin(); //Initialize i2c bus
-  Wire.setClock(200000); //Set clock to 200Kbaud
+  Wire.begin();           //Initialize i2c bus
+  Wire.setClock(200000);  //Set clock to 200Kbaud
 
-  resetTouchController();
+  resetTouchController(true);  //Since it is at boot, we must pass in true for the extra delay
 }
 
 /* 
-Reset the touch controller
-Setting bootup to true will add an additional 50 msec high write to the reset pin (used to put pin into known state after boot)
-Calling just resetTouchController() will not add the bootup delay
+  Reset the touch controller
+  Setting bootup to true will add an additional 50 msec high write to the reset pin (used to put pin into known state after boot)
+  Calling just resetTouchController() will not add the bootup delay
  */
 void resetTouchController(bool bootup) {
   //Reset touch controller:
-  if (bootup){
+  if (bootup) {
     digitalWrite(TP_RESET, HIGH);
     delay(50);
   }
@@ -68,55 +68,55 @@ void resetTouchController(bool bootup) {
 }
 
 /* 
-Read touch data from the controller and store it in the global touchDataStruct
+  Read touch data from the controller and store it in the global touchDataStruct
  */
 void updateTouchStruct() {
   int readBufSize = 6;
-  uint8_t readBuf[readBufSize]; //Read buffer where the raw bytes are stored
+  uint8_t readBuf[readBufSize];  //Read buffer where the raw bytes are stored
   Wire.beginTransmission(0x15);
-  Wire.write(0x1); //Probe touch display at i2c port 1 to see if the touch display is awake
-  if (Wire.endTransmission()){
-  /* 
-  Errors upon calling endTransmission()
-  0 : Success
-  1 : Data too long
-  2 : NACK on transmit of address
-  3 : NACK on transmit of data
-  4 : Other error 
-  */
+  Wire.write(0x1);  //Probe touch display at i2c port 1 to see if the touch display is awake
+  if (Wire.endTransmission()) {
+    /* 
+      Errors upon calling endTransmission()
+      0 : Success
+      1 : Data too long
+      2 : NACK on transmit of address
+      3 : NACK on transmit of data
+      4 : Other error 
+    */
     touchData.gesture = -1;
     touchData.x = 69;
     touchData.y = 69;
-    return; //If we get an unsuccessful probe, the device isn't awake, so just return
+    return;  //If we get an unsuccessful probe, the device isn't awake, so just return
   }
   Wire.requestFrom(0x15, readBufSize);
-  for (int x = 0; x < readBufSize; x++){
-    readBuf[x] = Wire.read(); //Read the data about the last touch event into the raw data buffer
+  for (int x = 0; x < readBufSize; x++) {
+    readBuf[x] = Wire.read();  //Read the data about the last touch event into the raw data buffer
   }
   /* 
-  Byte 1 = gesture
-  Byte 3 bits 0-3 = x most significant bits
-  Byte 5 bits 0-3 = y most significant bits
+    Byte 0 = gesture
+    Byte 3 = x LSByte
+    Byte 5  = y LSByte
   */
   touchData.gesture = readBuf[0];
   /* 
-  Because the display is 240*240, the highest 4 bits of the positions are not used, meaning we can just use the lower byte of the position to get all the information we need
+    Because the display is 240*240, the highest 4 bits of the positions are not used, meaning we can just use the lower byte of the position to get all the information we need
    */
-  touchData.x = (readBuf[3]);// << 8 | (uint16_t)readBuf[4]; (Not needed)
-  touchData.y = (readBuf[5]);// << 8 | (uint16_t)readBuf[6]; (Not needed)
+  touchData.x = (readBuf[3]);  // << 8 | (uint16_t)readBuf[4]; (Not needed)
+  touchData.y = (readBuf[5]);  // << 8 | (uint16_t)readBuf[6]; (Not needed)
 }
 
 /* 
-Get a pointer to the touchData struct containing the information about the last touch event
+  Get a pointer to the touchData struct containing the information about the last touch event
  */
 touchDataStruct* getTouchDataStruct() {
   return &touchData;
 }
 
 /* 
-Put the touch panel to sleep
+  Put the touch panel to sleep
  */
-void sleepTouchController(){
+void sleepTouchController() {
   Wire.beginTransmission(0x15);
   Wire.write(0xA5);
   Wire.write(0x03);

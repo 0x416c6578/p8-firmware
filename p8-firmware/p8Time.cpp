@@ -1,7 +1,7 @@
 #include "headers/p8Time.h"
 
 /*
-   Get a String object of the current time, with seconds
+  Get a String object of the current time, with seconds
 */
 String getTimeWithSecs() {
   String timeStr = "";
@@ -20,7 +20,7 @@ String getTimeWithSecs() {
 }
 
 /*
-   Get a String object of the current time, without seconds
+  Get a String object of the current time, without seconds
 */
 String getTime() {
   String timeStr = "";
@@ -35,7 +35,7 @@ String getTime() {
 }
 
 /*
-   Get a String object of the current date
+  Get a String object of the current date
 */
 String getDate() {
   String dateStr = "";
@@ -51,12 +51,14 @@ String getDate() {
   return dateStr;
 }
 
+/* 
+  Get a String object of the current day
+*/
 String getDay() {
-
 }
 
 /*
-   Set the time
+  Set the time (just a wrapper for the library implementation (here for convenience))
 */
 void setTimeWrapper(int yr, int mth, int dayy, int hr, int minn, int sec) {
   setTime(hr, minn, sec, dayy, mth, yr);

@@ -1,7 +1,8 @@
 #pragma once
+#include <Wire.h>
+
 #include "Arduino.h"
 #include "pinoutP8.h"
-#include <Wire.h>
 
 #define NO_GESTURE 0x00
 #define SLIDE_DOWN 0x01
@@ -13,17 +14,16 @@
 #define LONG_PRESS 0x0C
 
 /* 
-This struct will hold the data collected from the touch controller
-x = touch x position
-y = touch y position
-gesture = byte representing the gesture (see definitions)
+  This struct will hold the data collected from the touch controller
+  x = touch x position
+  y = touch y position
+  gesture = byte representing the gesture (see definitions)
  */
 typedef struct {
   uint8_t gesture;
   uint8_t x;
   uint8_t y;
 } touchDataStruct;
-
 
 void initTouch();
 void resetTouchController(bool bootup = false);
