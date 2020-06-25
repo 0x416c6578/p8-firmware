@@ -6,9 +6,8 @@ bool ledStatus = false;
   Function called when a touch event is detected (detects a falling edge on TP_INT)
 */
 void touchEvent() {
-  digitalWrite(GREEN_LEDS, HIGH);
-  delay(5);
-  digitalWrite(GREEN_LEDS, LOW);
+  //Look at which event it was
+  //Call the function in screenController.cpp relating to that method (optionally with args)
 }
 
 /*
