@@ -26,8 +26,10 @@
 <img src="Images/leds.jpg" alt=" " width=" 600" />
 
 ## Accelerometer
+## Implementation of Screens as Classes
 
-## Internal Images
+___
+# Internal Images
 
 <img src="Images/leds.jpg" alt=" " width=" 600" />
 <img src="Images/batteryCon.jpg" alt=" " width=" 600" />

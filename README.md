@@ -13,7 +13,7 @@ HUGE HUGE thanks to [Aaron](https://github.com/atc1441) for all his work, I woul
 - [x] Get touch display working
 - [ ] Get accelerometer working
 - [ ] Get heart rate sensor working
-- [ ] Implement main screen, and a framework for adding new screens
+- [x] Implement main screen, and a framework for adding new screens
 ## New Features over ATCWatch
 - Faster bulk test displaying with ignoreBlankPixels parameter for writing characters
   - This will skip over drawing the rects for blank pixels in characters
