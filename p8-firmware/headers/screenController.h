@@ -7,4 +7,4 @@ void handleTap(uint8_t x, uint8_t y);
 void handleLeftSwipe();
 void handleRightSwipe();
 void handleButtonPress();
-void drawAppDrawer();
+void drawAppIndicator();

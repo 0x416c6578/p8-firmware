@@ -121,6 +121,37 @@ void initDisplay() {
   postWrite();
 }
 
+/* 
+  Writing a string is as follows:
+  The x position of character n (starting at char 0) in a string is
+  stringXOrigin + n*pixelsPerPixel*FONT_WIDTH + (n*pixelsPerPixel)
+  This means that before adding the thing in brackets, the position of a character is
+  just the origin + n*(horizontal pixels per character).
+  This doesn't allow for a gap between characters however, so an offset must then be added
+  proportional to the current character we are on, so we add n*pixelsPerPixel, which 
+  effectively adds another pixel-width between characters
+ */
+uint32_t getWidthOfString(String string, uint8_t pixelsPerPixel) {
+  int numChars = string.length();
+  return numChars * pixelsPerPixel * FONT_WIDTH + (numChars - 1) * pixelsPerPixel;
+}
+
+/* 
+  This is the same implementation as above, except for a char*
+ */
+uint32_t getWidthOfString(char* string, uint8_t pixelsPerPixel) {
+  int numChars = 0;
+  while (string[numChars] != 0) numChars++;
+  return numChars * pixelsPerPixel * FONT_WIDTH + (numChars - 1) * pixelsPerPixel;
+}
+
+/* 
+Same implementation as above, except for just passing in the number of characters rather than a string
+ */
+uint32_t getWidthOfNChars(uint8_t numChars, uint8_t pixelsPerPixel) {
+  return numChars * pixelsPerPixel * FONT_WIDTH + (numChars - 1) * pixelsPerPixel;
+}
+
 /*
   Write a string to the specified position using a string literal (null terminated char array)
   TODO: implement dash '-' based wrapping for nicer string displaying

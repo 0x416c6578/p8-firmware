@@ -41,12 +41,21 @@ class DemoScreen : public WatchScreenBase {
   This screen is used to just display the time and date
  */
 class TimeScreen : public WatchScreenBase {
+ private:
+  uint8_t currentDay = -1;
+
  public:
-  void screenSetup() { clearDisplay(); }
+  void screenSetup() {
+    clearDisplay();
+    currentDay = -1;
+  }
   void screenDestroy() {}
   void screenLoop() {
     writeString(20, 20, 3, getTimeWithSecs());
     writeString(20, 50, 3, getDate());
+    //Only update the day string on a new day
+    if (getDayOfWeek(day(), month(), year()) != currentDay)
+      writeString(20, 80, 3, getDay());
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
@@ -96,4 +105,27 @@ class StopWatchScreen : public WatchScreenBase {
   void stopStopWatch() {
     hasStarted = false;
   }
+};
+
+class TimeDateSetScreen : public WatchScreenBase {
+ private:
+  int8_t setHour = -1;
+  int8_t setMinute = -1;
+  int8_t setSecond = -1;
+  int setYear = -1;
+  int8_t setMonth = -1;
+  int8_t setDay = -1;
+
+ public:
+  void screenSetup() {
+    clearDisplay();
+    writeString(20, 20, 3, "Settings");
+  }
+  void screenDestroy() {}
+  void screenLoop() {}
+  void screenTap(uint8_t x, uint8_t y) {}
+  bool doesImplementSwipeRight() { return false; }
+  bool doesImplementSwipeLeft() { return false; }
+  void swipeUp() {}
+  void swipeDown() {}
 };

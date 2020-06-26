@@ -1,6 +1,6 @@
 #include "headers/screenController.h"
 
-#define NUM_SCREENS 3
+#define NUM_SCREENS 4
 /*
   Similar to ATCWatch, an instance of every screen will be instantiated at bootup
   There will be a pointer to the current screen which will have the methods called on it
@@ -9,9 +9,10 @@
 DemoScreen demoScreen;
 TimeScreen timeScreen;
 StopWatchScreen stopWatchScreen;
+TimeDateSetScreen timeDateSetScreen;
 
 int currentHomeScreenIndex = 0;
-WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, &demoScreen, &stopWatchScreen};
+WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, &demoScreen, &stopWatchScreen, &timeDateSetScreen};
 WatchScreenBase* currentScreen = homeScreens[currentHomeScreenIndex];
 
 /*
@@ -19,7 +20,7 @@ WatchScreenBase* currentScreen = homeScreens[currentHomeScreenIndex];
 */
 void initScreen() {
   currentScreen->screenSetup();  //Call screenSetup() on the current screen
-  drawAppDrawer();
+  drawAppIndicator();
 }
 
 void handleLeftSwipe() {
@@ -84,16 +85,16 @@ void screenControllerLoop() {
 /*
 Draw an indicator as to which screen you are currently on
 */
-void drawAppDrawer() {
-  switch (currentHomeScreenIndex) {
-    case 0:
-      writeString(105, 224, 2, "*--");
-      break;
-    case 1:
-      writeString(105, 224, 2, "-*-");
-      break;
-    case 2:
-      writeString(105, 224, 2, "--*");
-      break;
+void drawAppIndicator() {
+  int widthOfIndicator = getWidthOfNChars(NUM_SCREENS, 2);
+  char notSelected = '-';
+  char selected = '*';
+  uint8_t startOfString = 120 - (widthOfIndicator / 2);
+  for (int i = 0; i < NUM_SCREENS; i++){
+    if (i != 3){
+      writeChar(startOfString + (i*2*FONT_WIDTH) + (i*2), 220, 2, (i == currentHomeScreenIndex) ? selected : notSelected, COLOUR_WHITE, COLOUR_BLACK);
+    } else{
+      writeChar(startOfString + (i*2*FONT_WIDTH) + (i*2), 220, 2, (i == currentHomeScreenIndex) ? 0 : '-', COLOUR_WHITE, COLOUR_BLACK);
+    }
   }
 }

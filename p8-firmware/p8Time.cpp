@@ -55,6 +55,33 @@ String getDate() {
   Get a String object of the current day
 */
 String getDay() {
+  switch (getDayOfWeek(day(), month(), year())) {
+    case 0:
+      return String("Sun");
+    case 1:
+      return String("Mon");
+    case 2:
+      return String("Tues");
+    case 3:
+      return String("Wed");
+    case 4:
+      return String("Thurs");
+    case 5:
+      return String("Fri");
+    case 6:
+      return String("Sat");
+    default:
+      return String("UNK");
+  }
+}
+
+/* 
+  Function to get the current weekday (sunday = 1)
+ */
+uint8_t getDayOfWeek(int d, int m, int y) {
+  int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+  y -= m < 3;
+  return (y + y / 4 - y / 100 + y / 400 + t[m - 1] + d) % 7;
 }
 
 /*
@@ -67,7 +94,7 @@ void setTimeWrapper(int yr, int mth, int dayy, int hr, int minn, int sec) {
 /* 
   Get a string representing the current elapsed time of the stopwatch, given the start time, and the current time
  */
-String getStopWatchTime(int startTime, int currentTime){
+String getStopWatchTime(int startTime, int currentTime) {
   int elapsedTimeMillis = currentTime - startTime;
   int second = (elapsedTimeMillis / 1000) % 60;
   int minute = (elapsedTimeMillis / 60000) % 60;
