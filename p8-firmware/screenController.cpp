@@ -86,15 +86,23 @@ void screenControllerLoop() {
 Draw an indicator as to which screen you are currently on
 */
 void drawAppIndicator() {
-  int widthOfIndicator = getWidthOfNChars(NUM_SCREENS, 2);
-  char notSelected = '-';
-  char selected = '*';
+  uint8_t indicatorFontSize = 3;
+  uint8_t widthOfIndicator = getWidthOfNChars(NUM_SCREENS, 3);
   uint8_t startOfString = 120 - (widthOfIndicator / 2);
-  for (int i = 0; i < NUM_SCREENS; i++){
-    if (i != 3){
-      writeChar(startOfString + (i*2*FONT_WIDTH) + (i*2), 220, 2, (i == currentHomeScreenIndex) ? selected : notSelected, COLOUR_WHITE, COLOUR_BLACK);
-    } else{
-      writeChar(startOfString + (i*2*FONT_WIDTH) + (i*2), 220, 2, (i == currentHomeScreenIndex) ? 0 : '-', COLOUR_WHITE, COLOUR_BLACK);
+  for (int i = 0; i < NUM_SCREENS; i++) {
+    switch (i) {
+      case 0:
+        writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_CLOCK_SEL : GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+        break;
+      case 1:
+        writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_TOUCH_SEL : GLYPH_TOUCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+        break;
+      case 2:
+        writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_STOPWATCH_SEL : GLYPH_STOPWATCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+        break;
+      case 3:
+        writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+        break;
     }
   }
 }

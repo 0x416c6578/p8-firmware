@@ -19,7 +19,7 @@
 class DemoScreen : public WatchScreenBase {
  public:
   void screenSetup() {
-    clearDisplay();
+    clearDisplay(true);
     writeString(5, 25, 1, "X:");
     writeString(5, 45, 1, "Y:");
     writeIntWithPrecedingZeroes(20, 20, 2, 0);
@@ -46,7 +46,7 @@ class TimeScreen : public WatchScreenBase {
 
  public:
   void screenSetup() {
-    clearDisplay();
+    clearDisplay(true);
     currentDay = -1;
   }
   void screenDestroy() {}
@@ -74,11 +74,11 @@ class StopWatchScreen : public WatchScreenBase {
 
  public:
   void screenSetup() {
-    clearDisplay();
-    drawRect(0, 0, 120, 60, COLOUR_GREEN);
-    drawRect(120, 0, 120, 60, COLOUR_RED);
-    writeString(15, 18, 3, "Start", 0, COLOUR_GREEN);  //Look at screenTap() for more info
-    writeString(145, 18, 3, "Stop", COLOUR_WHITE, COLOUR_RED);
+    clearDisplay(true);
+    drawRect(0, 0, 120, 60, 0b0000011101000000);
+    drawRect(120, 0, 120, 60, 0b1110100000000000);
+    writeString(60 - (getWidthOfNChars(5,3)/2), 18, 3, "Start", COLOUR_WHITE, 0b0000011101000000);  //Look at screenTap() for more info
+    writeString(180 - (getWidthOfNChars(4,3)/2), 18, 3, "Stop", COLOUR_WHITE, 0b1110100000000000);
   }
   void screenDestroy() {}
   void screenLoop() {
@@ -118,7 +118,7 @@ class TimeDateSetScreen : public WatchScreenBase {
 
  public:
   void screenSetup() {
-    clearDisplay();
+    clearDisplay(true);
     writeString(20, 20, 3, "Settings");
   }
   void screenDestroy() {}

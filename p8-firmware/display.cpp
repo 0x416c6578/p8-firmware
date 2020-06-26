@@ -424,6 +424,6 @@ void fillRectWithColour(uint16_t colour) {
 /*
   Clear display
 */
-void clearDisplay() {
-  drawRect(0, 0, 240, 240, 0x0000);
+void clearDisplay(bool appDrawClear) {
+  drawRect(0, 0, 240, appDrawClear ? 216 : 240, 0x0000);
 }
