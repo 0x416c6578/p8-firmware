@@ -19,27 +19,12 @@ WatchScreenBase* currentScreen = homeScreens[currentHomeScreenIndex];
 */
 void initScreen() {
   currentScreen->screenSetup();  //Call screenSetup() on the current screen
+  drawAppDrawer();
 }
 
-void handleLeftSwipe(){
-  if (currentScreen->doesImplementSwipeLeft() == false){
-    if (currentHomeScreenIndex == 0){
-      currentHomeScreenIndex = NUM_SCREENS - 1;
-      currentScreen = homeScreens[currentHomeScreenIndex];
-      initScreen();
-    } else {
-      currentHomeScreenIndex--;
-      currentScreen = homeScreens[currentHomeScreenIndex];
-      initScreen();
-    }
-  }
-  else
-    currentScreen->swipeLeft();
-}
-
-void handleRightSwipe(){
-  if (currentScreen->doesImplementSwipeRight() == false){
-    if (currentHomeScreenIndex == NUM_SCREENS - 1){
+void handleLeftSwipe() {
+  if (currentScreen->doesImplementSwipeRight() == false) {
+    if (currentHomeScreenIndex == NUM_SCREENS - 1) {
       currentHomeScreenIndex = 0;
       currentScreen = homeScreens[currentHomeScreenIndex];
       initScreen();
@@ -48,29 +33,42 @@ void handleRightSwipe(){
       currentScreen = homeScreens[currentHomeScreenIndex];
       initScreen();
     }
-  }
-  else
+  } else
     currentScreen->swipeRight();
+}
+
+void handleRightSwipe() {
+  if (currentScreen->doesImplementSwipeLeft() == false) {
+    if (currentHomeScreenIndex == 0) {
+      currentHomeScreenIndex = NUM_SCREENS - 1;
+      currentScreen = homeScreens[currentHomeScreenIndex];
+      initScreen();
+    } else {
+      currentHomeScreenIndex--;
+      currentScreen = homeScreens[currentHomeScreenIndex];
+      initScreen();
+    }
+  } else
+    currentScreen->swipeLeft();
 }
 
 /* 
   A button press will ALWAYS return to the time screen NO MATTER WHAT (no application 
   can have access to a button press event)
  */
-void handleButtonPress(){
-  if (currentHomeScreenIndex != 0){
+void handleButtonPress() {
+  if (currentHomeScreenIndex != 0) {
     currentHomeScreenIndex = 0;
     currentScreen = homeScreens[currentHomeScreenIndex];
     initScreen();
   }
 }
 
-
 /* 
   Function called when a tap event is received by the interrupt handler 
   The parameters are the x and y coords of the tap
 */
-void handleTap(uint8_t x, uint8_t y){
+void handleTap(uint8_t x, uint8_t y) {
   currentScreen->screenTap(x, y);
 }
 
@@ -81,4 +79,21 @@ void handleTap(uint8_t x, uint8_t y){
  */
 void screenControllerLoop() {
   currentScreen->screenLoop();
+}
+
+/*
+Draw an indicator as to which screen you are currently on
+*/
+void drawAppDrawer() {
+  switch (currentHomeScreenIndex) {
+    case 0:
+      writeString(105, 224, 2, "*--");
+      break;
+    case 1:
+      writeString(105, 224, 2, "-*-");
+      break;
+    case 2:
+      writeString(105, 224, 2, "--*");
+      break;
+  }
 }

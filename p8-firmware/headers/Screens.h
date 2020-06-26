@@ -66,20 +66,22 @@ class StopWatchScreen : public WatchScreenBase {
  public:
   void screenSetup() {
     clearDisplay();
-    writeString(10, 10, 6, "Start");  //Look at screenTap() for more info
-    writeString(10, 185, 6, "Stop");
+    drawRect(0, 0, 120, 60, COLOUR_GREEN);
+    drawRect(120, 0, 120, 60, COLOUR_RED);
+    writeString(15, 18, 3, "Start", 0, COLOUR_GREEN);  //Look at screenTap() for more info
+    writeString(145, 18, 3, "Stop", COLOUR_WHITE, COLOUR_RED);
   }
   void screenDestroy() {}
   void screenLoop() {
     if (hasStarted) {
-      writeString(10, 107, 3, getStopWatchTime(startTime, millis()));
+      writeString(26, 130, 4, getStopWatchTime(startTime, millis()));
     }
   }
   void screenTap(uint8_t x, uint8_t y) {
     //This is effectively a button touch listener, making sure the touch is in bounds of the button
-    if (y < 60) {
+    if (x < 120 && y < 60) {
       startStopWatch();
-    } else if (y > 185) {
+    } else if (x > 120 && y < 60) {
       stopStopWatch();
     }
   }
