@@ -1,10 +1,9 @@
 #include "headers/display.h"
 #include "headers/fastSPI.h"
-#include "headers/interrupts.h"
+#include "headers/interrupts.h" //Includes screenController.h
 #include "headers/ioControl.h"
 #include "headers/p8Time.h"
 #include "headers/pinoutP8.h"
-#include "headers/screenController.h"
 #include "headers/touch.h"
 #include "headers/watchdog.h"
 #include "nrf52.h"
@@ -21,6 +20,7 @@ void setup() {
   initDisplay();     // Initialize display
   initTouch();       // Initialize touch panel
   initInterrupts();  // Setup interrupts
+  initScreen();
   randomTests();
 }
 
@@ -29,4 +29,5 @@ void randomTests() {}
 void loop() {
   if (!getButtonState()) feedWatchdog();
   screenControllerLoop();
+  handleInterrupts();
 }

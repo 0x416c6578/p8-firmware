@@ -63,3 +63,26 @@ String getDay() {
 void setTimeWrapper(int yr, int mth, int dayy, int hr, int minn, int sec) {
   setTime(hr, minn, sec, dayy, mth, yr);
 }
+
+/* 
+  Get a string representing the current elapsed time of the stopwatch, given the start time, and the current time
+ */
+String getStopWatchTime(int startTime, int currentTime){
+  int elapsedTimeMillis = currentTime - startTime;
+  int second = (elapsedTimeMillis / 1000) % 60;
+  int minute = (elapsedTimeMillis / 60000) % 60;
+  int hour = (elapsedTimeMillis / 3600000);
+  String timeStr = "";
+  if (hour < 10)
+    timeStr += "0";
+  timeStr += String(hour);
+  timeStr += ":";
+  if (minute < 10)
+    timeStr += "0";
+  timeStr += String(minute);
+  timeStr += ":";
+  if (second < 10)
+    timeStr += "0";
+  timeStr += String(second);
+  return timeStr;
+}

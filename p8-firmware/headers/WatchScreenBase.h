@@ -1,3 +1,4 @@
+#pragma once
 /*
   This class should be inherited by other screens so that they follow the correct
   blueprint Methods should be overriden if they will be used by that screen,
@@ -19,8 +20,13 @@ class WatchScreenBase {
   virtual void screenSetup() {}
   virtual void screenDestroy() {}
   virtual void screenLoop() {}
+  virtual void screenTap(uint8_t x, uint8_t y) {}
   virtual void swipeLeft() {}
   virtual void swipeRight() {}
   virtual void swipeUp() {}
   virtual void swipeDown() {}
+  virtual bool doesImplementSwipeLeft() {return true;}
+  virtual bool doesImplementSwipeRight() {return true;}
+  virtual bool doesImplementSwipeUp() {return true;}
+  virtual bool doesImplementSwipeDown() {return true;}
 };

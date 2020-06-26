@@ -35,7 +35,7 @@
   As per the reference driver, waking the device can only be done by toggling the reset pin low for 20ms
 */
 
-touchDataStruct touchData = {-1, -1, -1};
+TouchDataStruct touchData = {-1, -1, -1};
 
 /* 
   Initialize the touch panel (basically just reset and put into running (not sleeping) state)
@@ -109,7 +109,7 @@ void updateTouchStruct() {
 /* 
   Get a pointer to the touchData struct containing the information about the last touch event
  */
-touchDataStruct* getTouchDataStruct() {
+TouchDataStruct* getTouchDataStruct() {
   return &touchData;
 }
 

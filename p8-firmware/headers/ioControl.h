@@ -13,3 +13,4 @@ void setBrightness(int brightness);
 int getBrightness();
 void incBrightness();
 void decBrightness();
+void ledPing();

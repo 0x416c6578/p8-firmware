@@ -83,3 +83,11 @@ void decBrightness() {
     setBrightness(getBrightness() - 1);
   }
 }
+
+/* 
+Quickly flash green LEDs for debugging */
+void ledPing(){
+  digitalWrite(GREEN_LEDS, HIGH);
+  delay(5);
+  digitalWrite(GREEN_LEDS, LOW);
+}
