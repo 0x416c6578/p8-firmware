@@ -4,6 +4,7 @@
 #include "display.h"
 #include "p8Time.h"
 #include "pinoutP8.h"
+#include "powerControl.h"
 
 /* 
   A screen with a public method bool doesImplementSwipe____ returning true says to the screen controller
@@ -51,16 +52,18 @@ class TimeScreen : public WatchScreenBase {
   }
   void screenDestroy() {}
   void screenLoop() {
-    writeString(20, 20, 3, getTimeWithSecs());
-    writeString(20, 50, 3, getDate());
+    writeString(20, 20, 4, getTimeWithSecs());
+    writeString(20, 65, 3, getDate());
     //Only update the day string on a new day
     if (getDayOfWeek(day(), month(), year()) != currentDay)
-      writeString(20, 80, 3, getDay());
+      writeString(20, 95, 3, getDay());
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
-  void swipeUp() {}
+  void swipeUp() {
+    enterSleep();
+  }
   void swipeDown() {}
 };
 
@@ -77,8 +80,8 @@ class StopWatchScreen : public WatchScreenBase {
     clearDisplay(true);
     drawRect(0, 0, 120, 60, 0b0000011101000000);
     drawRect(120, 0, 120, 60, 0b1110100000000000);
-    writeString(60 - (getWidthOfNChars(5,3)/2), 18, 3, "Start", COLOUR_WHITE, 0b0000011101000000);  //Look at screenTap() for more info
-    writeString(180 - (getWidthOfNChars(4,3)/2), 18, 3, "Stop", COLOUR_WHITE, 0b1110100000000000);
+    writeString(60 - (getWidthOfNChars(5, 3) / 2), 18, 3, "Start", COLOUR_WHITE, 0b0000011101000000);  //Look at screenTap() for more info
+    writeString(180 - (getWidthOfNChars(4, 3) / 2), 18, 3, "Stop", COLOUR_WHITE, 0b1110100000000000);
   }
   void screenDestroy() {}
   void screenLoop() {

@@ -122,6 +122,22 @@ void initDisplay() {
 }
 
 /* 
+Enable/disable the display
+ */
+void displayEnable(bool state){
+  preWrite();
+  if (state){
+    sendSPICommand(0x29); //Display on
+    sendSPICommand(0x11); //Sleep out
+  } else{
+    sendSPICommand(0x28); //Display off
+    sendSPICommand(0x10); //Sleep in 
+  }
+  postWrite();
+}
+
+
+/* 
   Writing a string is as follows:
   The x position of character n (starting at char 0) in a string is
   stringXOrigin + n*pixelsPerPixel*FONT_WIDTH + (n*pixelsPerPixel)
@@ -425,5 +441,5 @@ void fillRectWithColour(uint16_t colour) {
   Clear display
 */
 void clearDisplay(bool appDrawClear) {
-  drawRect(0, 0, 240, appDrawClear ? 216 : 240, 0x0000);
+  drawRect(0, 0, 240, appDrawClear ? 212 : 240, 0x0000);
 }

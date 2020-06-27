@@ -14,8 +14,11 @@ void initIO() {
   pinMode(LCD_BACKLIGHT_HIGH, OUTPUT);
   ledOutput(false);
   motorOutput(false);
+  //Disable flash
+  pinMode(SPI_CE, OUTPUT);
+  digitalWrite(SPI_CE, HIGH);
 
-  setBrightness(MAX_BRIGHTNESS);
+  setBrightness(MIN_BRIGHTNESS);
 }
 
 /*
@@ -86,7 +89,7 @@ void decBrightness() {
 
 /* 
 Quickly flash green LEDs for debugging */
-void ledPing(){
+void ledPing() {
   digitalWrite(GREEN_LEDS, HIGH);
   delay(5);
   digitalWrite(GREEN_LEDS, LOW);

@@ -1,18 +1,18 @@
 #include "headers/screenController.h"
 
-#define NUM_SCREENS 4
+#define NUM_SCREENS 3
 /*
   Similar to ATCWatch, an instance of every screen will be instantiated at bootup
   There will be a pointer to the current screen which will have the methods called on it
   Finally a screen will be switched by moving the pointer to a different instance of a different screen
 */
-DemoScreen demoScreen;
+//DemoScreen demoScreen;
 TimeScreen timeScreen;
 StopWatchScreen stopWatchScreen;
 TimeDateSetScreen timeDateSetScreen;
 
 int currentHomeScreenIndex = 0;
-WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, &demoScreen, &stopWatchScreen, &timeDateSetScreen};
+WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, /*&demoScreen,*/ &stopWatchScreen, &timeDateSetScreen};
 WatchScreenBase* currentScreen = homeScreens[currentHomeScreenIndex];
 
 /*
@@ -53,6 +53,14 @@ void handleRightSwipe() {
     currentScreen->swipeLeft();
 }
 
+void handleUpSwipe(){
+  currentScreen->swipeUp();
+}
+
+void handleDownSwipe(){
+  currentScreen->swipeDown();
+}
+
 /* 
   A button press will ALWAYS return to the time screen NO MATTER WHAT (no application 
   can have access to a button press event)
@@ -86,6 +94,7 @@ void screenControllerLoop() {
 Draw an indicator as to which screen you are currently on
 */
 void drawAppIndicator() {
+  drawRect(0, 213, 240, 1, COLOUR_WHITE);
   uint8_t indicatorFontSize = 3;
   uint8_t widthOfIndicator = getWidthOfNChars(NUM_SCREENS, 3);
   uint8_t startOfString = 120 - (widthOfIndicator / 2);
@@ -94,13 +103,13 @@ void drawAppIndicator() {
       case 0:
         writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_CLOCK_SEL : GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
         break;
-      case 1:
+      /*case 1:
         writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_TOUCH_SEL : GLYPH_TOUCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-        break;
-      case 2:
+        break;*/
+      case 1:
         writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_STOPWATCH_SEL : GLYPH_STOPWATCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
         break;
-      case 3:
+      case 2:
         writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
         break;
     }

@@ -47,6 +47,30 @@ void initTouch() {
   Wire.begin();           //Initialize i2c bus
   Wire.setClock(200000);  //Set clock to 200Kbaud
 
+  Wire.beginTransmission(0x15);
+  Wire.write(0x15);
+  Wire.endTransmission();
+  Wire.requestFrom(0x15, 1);
+  byte t1 = Wire.read();
+
+  Wire.beginTransmission(0x15);
+  Wire.write(0xA7);
+  Wire.endTransmission();
+  Wire.requestFrom(0x15, 1);
+  byte t2 = Wire.read();
+
+  Wire.beginTransmission(0x15);
+  Wire.write(0xA8);
+  Wire.endTransmission();
+  Wire.requestFrom(0x15, 1);
+  byte t3 = Wire.read();
+
+  Wire.beginTransmission(0x15);
+  Wire.write(0xA9);
+  Wire.endTransmission();
+  Wire.requestFrom(0x15, 1);
+  byte t4 = Wire.read();
+  
   resetTouchController(true);  //Since it is at boot, we must pass in true for the extra delay
 }
 
