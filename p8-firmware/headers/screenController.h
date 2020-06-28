@@ -10,3 +10,5 @@ void handleUpSwipe();
 void handleDownSwipe();
 void handleButtonPress();
 void drawAppIndicator();
+void prevScreen();
+void nextScreen();

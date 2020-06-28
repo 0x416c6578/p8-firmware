@@ -18,7 +18,7 @@ void initIO() {
   pinMode(SPI_CE, OUTPUT);
   digitalWrite(SPI_CE, HIGH);
 
-  setBrightness(MIN_BRIGHTNESS);
+  setBrightness(MAX_BRIGHTNESS);
 }
 
 /*

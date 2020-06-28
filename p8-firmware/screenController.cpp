@@ -23,41 +23,63 @@ void initScreen() {
   drawAppIndicator();
 }
 
+/* 
+  Move to the right screen if the current screen doesn't have a handler for the right swipe,
+  else call that handler 
+*/
 void handleLeftSwipe() {
   if (currentScreen->doesImplementSwipeRight() == false) {
-    if (currentHomeScreenIndex == NUM_SCREENS - 1) {
-      currentHomeScreenIndex = 0;
-      currentScreen = homeScreens[currentHomeScreenIndex];
-      initScreen();
-    } else {
-      currentHomeScreenIndex++;
-      currentScreen = homeScreens[currentHomeScreenIndex];
-      initScreen();
-    }
-  } else
+    nextScreen();
+  } else {
     currentScreen->swipeRight();
+  }
 }
 
+/* 
+  Move to the left screen if the current screen doesn't have a handler for the left swipe,
+  else call that handler
+ */
 void handleRightSwipe() {
   if (currentScreen->doesImplementSwipeLeft() == false) {
-    if (currentHomeScreenIndex == 0) {
-      currentHomeScreenIndex = NUM_SCREENS - 1;
-      currentScreen = homeScreens[currentHomeScreenIndex];
-      initScreen();
-    } else {
-      currentHomeScreenIndex--;
-      currentScreen = homeScreens[currentHomeScreenIndex];
-      initScreen();
-    }
-  } else
+    prevScreen();
+  } else {
     currentScreen->swipeLeft();
+  }
 }
 
-void handleUpSwipe(){
+/* 
+  Move to the left screen if you are not at screen 0
+ */
+void prevScreen() {
+  if (currentHomeScreenIndex != 0) {
+    currentHomeScreenIndex--;
+    currentScreen = homeScreens[currentHomeScreenIndex];
+    initScreen();
+  }
+}
+
+/* 
+  Move to the right screen if you aren't at the rightmost screen
+ */
+void nextScreen() {
+  if (currentHomeScreenIndex != NUM_SCREENS - 1) {
+    currentHomeScreenIndex++;
+    currentScreen = homeScreens[currentHomeScreenIndex];
+    initScreen();
+  }
+}
+
+/*
+  Since the main UI doesn't need a swipe up or down event (yet), just call the handler of the current screen
+*/
+void handleUpSwipe() {
   currentScreen->swipeUp();
 }
 
-void handleDownSwipe(){
+/* 
+  Ditto as above 
+*/
+void handleDownSwipe() {
   currentScreen->swipeDown();
 }
 
@@ -78,7 +100,15 @@ void handleButtonPress() {
   The parameters are the x and y coords of the tap
 */
 void handleTap(uint8_t x, uint8_t y) {
-  currentScreen->screenTap(x, y);
+  if (y < 212) {
+    currentScreen->screenTap(x, y);
+  } else {
+    if (x < 100) {
+      prevScreen();
+    } else if (x > 160) {
+      nextScreen();
+    }
+  }
 }
 
 /* 
@@ -98,20 +128,23 @@ void drawAppIndicator() {
   uint8_t indicatorFontSize = 3;
   uint8_t widthOfIndicator = getWidthOfNChars(NUM_SCREENS, 3);
   uint8_t startOfString = 120 - (widthOfIndicator / 2);
-  for (int i = 0; i < NUM_SCREENS; i++) {
-    switch (i) {
-      case 0:
-        writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_CLOCK_SEL : GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-        break;
-      /*case 1:
-        writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_TOUCH_SEL : GLYPH_TOUCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-        break;*/
-      case 1:
-        writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_STOPWATCH_SEL : GLYPH_STOPWATCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-        break;
-      case 2:
-        writeChar(startOfString + (i * indicatorFontSize * FONT_WIDTH) + (i * indicatorFontSize), 216, indicatorFontSize, (i == currentHomeScreenIndex) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-        break;
-    }
+  //Draw the current screen indicators
+  writeChar(startOfString + (0 * indicatorFontSize * FONT_WIDTH) + (0 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 0) ? GLYPH_CLOCK_SEL : GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  writeChar(startOfString + (1 * indicatorFontSize * FONT_WIDTH) + (1 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 1) ? GLYPH_STOPWATCH_SEL : GLYPH_STOPWATCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  writeChar(startOfString + (2 * indicatorFontSize * FONT_WIDTH) + (2 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 2) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  //Draw the "can scroll left/right" indicators in the corners of the screen
+  switch (currentHomeScreenIndex) {
+    case 0:
+      writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, 0b1000010000010000, COLOUR_BLACK);
+      writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
+      break;
+    case 1:
+      writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
+      writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
+      break;
+    case 2:
+      writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
+      writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, 0b1000010000010000, COLOUR_BLACK);
+      break;
   }
 }

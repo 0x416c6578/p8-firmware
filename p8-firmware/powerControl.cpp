@@ -20,7 +20,7 @@ void enterSleep() {
 void exitSleep() {
   powerMode = POWER_ON;
   displayEnable(POWER_ON);
-  setBrightness(MIN_BRIGHTNESS);
+  setBrightness(MAX_BRIGHTNESS);
   ledOutput(POWER_OFF);
   motorOutput(POWER_OFF);
 }
