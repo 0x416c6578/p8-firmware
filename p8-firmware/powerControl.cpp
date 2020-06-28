@@ -5,6 +5,7 @@ void initSleep() {
                                              //This is just a wrapper around inline assembly
                                              //svc 59
                                              //bx r14
+  sd_power_dcdc_mode_set(NRF_POWER_DCDC_DISABLE);
 }
 
 bool powerMode = POWER_ON;
@@ -20,15 +21,17 @@ void enterSleep() {
 void exitSleep() {
   powerMode = POWER_ON;
   displayEnable(POWER_ON);
-  setBrightness(MAX_BRIGHTNESS);
+  setBrightness(getBrightness());
   ledOutput(POWER_OFF);
   motorOutput(POWER_OFF);
 }
 
-bool getPowerMode(){
+bool getPowerMode() {
   return powerMode;
 }
 
-void sleepWait(){
-  sd_app_evt_wait();
+void sleepWait() {
+  __WFE();
+  __SEV();
+  __WFE();
 }

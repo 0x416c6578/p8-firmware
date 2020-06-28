@@ -124,18 +124,17 @@ void initDisplay() {
 /* 
 Enable/disable the display
  */
-void displayEnable(bool state){
+void displayEnable(bool state) {
   preWrite();
-  if (state){
-    sendSPICommand(0x29); //Display on
-    sendSPICommand(0x11); //Sleep out
-  } else{
-    sendSPICommand(0x28); //Display off
-    sendSPICommand(0x10); //Sleep in 
+  if (state) {
+    sendSPICommand(0x29);  //Display on
+    sendSPICommand(0x11);  //Sleep out
+  } else {
+    sendSPICommand(0x28);  //Display off
+    sendSPICommand(0x10);  //Sleep in
   }
   postWrite();
 }
-
 
 /* 
   Writing a string is as follows:
@@ -219,6 +218,10 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, 
   Write an (up to 9 digit) integer to x,y, without preceding zeroes (useful when you know the numbers you are writing will have the same number of digits on rewriting)
 */
 void writeIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
+  if (toWrite == 0) {
+    writeChar(x, y, pixelsPerPixel, '0', colourFG, colourBG);
+    return;
+  }
   //Byte array for storing the digits
   uint8_t digits[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
   uint8_t i = 0;
@@ -254,6 +257,10 @@ void writeIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPix
   Write a number always with 9 digits to x,y (with preceding zeroes for variable length rewrites)
 */
 void writeIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
+  if (toWrite == 0) {
+    writeChar(x, y, pixelsPerPixel, '0', colourFG, colourBG);
+    return;
+  }
   //Byte array for storing the digits
   uint8_t digits[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
   uint8_t i = 0;
@@ -441,5 +448,5 @@ void fillRectWithColour(uint16_t colour) {
   Clear display
 */
 void clearDisplay(bool appDrawClear) {
-  drawRect(0, 0, 240, appDrawClear ? 212 : 240, 0x0000);
+  drawRect(0, 0, 240, appDrawClear ? 213 : 240, 0x0000);
 }

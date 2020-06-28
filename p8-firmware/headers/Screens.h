@@ -49,6 +49,7 @@ class TimeScreen : public WatchScreenBase {
   void screenSetup() {
     clearDisplay(true);
     currentDay = -1;
+    writeString(20, 140, 2, "Bat:");
   }
   void screenDestroy() {}
   void screenLoop() {
@@ -57,13 +58,12 @@ class TimeScreen : public WatchScreenBase {
     //Only update the day string on a new day
     if (getDayOfWeek(day(), month(), year()) != currentDay)
       writeString(20, 95, 3, getDay());
+    writeIntWithoutPrecedingZeroes(69, 135, 3, getBatteryPercent());
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
-  void swipeUp() {
-    enterSleep();
-  }
+  void swipeUp() {}
   void swipeDown() {}
 };
 
@@ -110,25 +110,185 @@ class StopWatchScreen : public WatchScreenBase {
   }
 };
 
+/* 
+  Jank way of setting the time and date and Brightness
+ */
 class TimeDateSetScreen : public WatchScreenBase {
  private:
-  int8_t setHour = -1;
-  int8_t setMinute = -1;
-  int8_t setSecond = -1;
-  int setYear = -1;
-  int8_t setMonth = -1;
-  int8_t setDay = -1;
+  int8_t setHour = 0;
+  int8_t setMinute = 0;
+  int8_t setSecond = 0;
+  int setYear = 2020;
+  int8_t setMonth = 1;
+  int8_t setDay = 1;
 
  public:
+  enum settingsWindow {
+    BRIGHTNESS,
+    SECOND,
+    MINUTE,
+    HOUR,
+    DAY,
+    MONTH,
+    YEAR
+  };
+
+  settingsWindow currentSettingsWindow = BRIGHTNESS;
   void screenSetup() {
     clearDisplay(true);
-    writeString(20, 20, 3, "Settings");
+    drawRects();
   }
   void screenDestroy() {}
-  void screenLoop() {}
-  void screenTap(uint8_t x, uint8_t y) {}
+  void screenLoop() {
+    switch (currentSettingsWindow) {
+      case BRIGHTNESS:
+        writeString(0, 0, 3, "Brightness");
+        writeIntWithoutPrecedingZeroes(0, 26, 3, getBrightness());
+        break;
+      case SECOND:
+        writeString(0, 0, 3, "Second");
+        writeIntWithoutPrecedingZeroes(0, 26, 3, setSecond);
+        break;
+      case MINUTE:
+        writeString(0, 0, 3, "Minute");
+        writeIntWithoutPrecedingZeroes(0, 26, 3, setMinute);
+        break;
+      case HOUR:
+        writeString(0, 0, 3, "Hour");
+        writeIntWithoutPrecedingZeroes(0, 26, 3, setHour);
+        break;
+      case DAY:
+        writeString(0, 0, 3, "Day");
+        writeIntWithoutPrecedingZeroes(0, 26, 3, setDay);
+        break;
+      case MONTH:
+        writeString(0, 0, 3, "Month");
+        writeIntWithoutPrecedingZeroes(0, 26, 3, setMonth);
+        break;
+      case YEAR:
+        writeString(0, 0, 3, "Year");
+        writeIntWithoutPrecedingZeroes(0, 26, 3, setYear);
+        break;
+    }
+    setTimeWrapper(setYear, setMonth, setDay, setHour, setMinute, setSecond);
+  }
+  void screenTap(uint8_t x, uint8_t y) {
+    if (x <= 120) {
+      switch (currentSettingsWindow) {
+        case BRIGHTNESS:
+          decBrightness();
+          break;
+        case SECOND:
+          setSecond--;
+          break;
+        case MINUTE:
+          setMinute--;
+          break;
+        case HOUR:
+          setHour--;
+          break;
+        case DAY:
+          setDay--;
+          break;
+        case MONTH:
+          setMonth--;
+          break;
+        case YEAR:
+          setYear--;
+          break;
+      }
+    } else if (x > 120) {
+      switch (currentSettingsWindow) {
+        case BRIGHTNESS:
+          incBrightness();
+          break;
+        case SECOND:
+          setSecond++;
+          break;
+        case MINUTE:
+          setMinute++;
+          break;
+        case HOUR:
+          setHour++;
+          break;
+        case DAY:
+          setDay++;
+          break;
+        case MONTH:
+          setMonth++;
+          break;
+        case YEAR:
+          setYear++;
+          break;
+      }
+    }
+  }
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
-  void swipeUp() {}
-  void swipeDown() {}
+  void swipeUp() {
+    switch (currentSettingsWindow) {
+      case BRIGHTNESS:
+        currentSettingsWindow = SECOND;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      case SECOND:
+        currentSettingsWindow = MINUTE;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      case MINUTE:
+        currentSettingsWindow = HOUR;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      case HOUR:
+        currentSettingsWindow = DAY;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      case DAY:
+        currentSettingsWindow = MONTH;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      case MONTH:
+        currentSettingsWindow = YEAR;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      default:
+        break;
+    }
+  }
+  void swipeDown() {
+    switch (currentSettingsWindow) {
+      case SECOND:
+        currentSettingsWindow = BRIGHTNESS;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      case MINUTE:
+        currentSettingsWindow = SECOND;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      case HOUR:
+        currentSettingsWindow = MINUTE;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      case DAY:
+        currentSettingsWindow = HOUR;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      case MONTH:
+        currentSettingsWindow = DAY;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      case YEAR:
+        currentSettingsWindow = MONTH;
+        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        break;
+      default:
+        break;
+    }
+  }
+  void drawRects() {
+    drawRect(0, 50, 120, 150, COLOUR_RED);
+    drawRect(120, 50, 120, 150, COLOUR_BLUE);
+    writeChar(30, 107, 6, '-', COLOUR_WHITE, COLOUR_RED);
+    writeChar(175, 107, 6, '+', COLOUR_WHITE, COLOUR_BLUE);
+  }
 };

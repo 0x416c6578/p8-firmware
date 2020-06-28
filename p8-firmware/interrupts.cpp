@@ -1,8 +1,9 @@
 #include "headers/interrupts.h"
 
+#define SLEEP_AFTER_N_SECONDS 10
+
 uint16_t interruptsFlag = 0b0000000000000000;
-
-
+int lastWakeTime = 0;
 
 
 /*
@@ -64,6 +65,7 @@ void handleInterrupts() {
   if (interruptsFlag != 0) {
     if (getPowerMode() == POWER_OFF)
       exitSleep();
+    lastWakeTime = millis();
     switch (interruptsFlag) {
       case SINGLE_TAP_INT:
         handleTap(getTouchDataStruct()->x, getTouchDataStruct()->y);
@@ -87,6 +89,10 @@ void handleInterrupts() {
         break;
     }
     resetInterruptFlag();
+  } else{
+    if (millis() - lastWakeTime > SLEEP_AFTER_N_SECONDS*1000){
+      enterSleep();
+    }
   }
 }
 

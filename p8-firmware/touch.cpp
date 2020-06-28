@@ -43,6 +43,7 @@ TouchDataStruct touchData = {-1, -1, -1};
 void initTouch() {
   pinMode(TP_RESET, OUTPUT);  //Reset pin
   pinMode(TP_INT, INPUT);     //Interrupt pin
+  resetTouchController(true);
 
   Wire.begin();           //Initialize i2c bus
   Wire.setClock(200000);  //Set clock to 200Kbaud
@@ -70,8 +71,6 @@ void initTouch() {
   Wire.endTransmission();
   Wire.requestFrom(0x15, 1);
   byte t4 = Wire.read();
-  
-  resetTouchController(true);  //Since it is at boot, we must pass in true for the extra delay
 }
 
 /* 

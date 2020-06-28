@@ -43,7 +43,7 @@ void initFastSPI() {
   NRF_SPIM2->PSEL.MOSI = LCD_SDI;     //Ditto for the MOSI (pin 3)
   NRF_SPIM2->PSEL.MISO = SPI_MISO;    //This is only used by the flash storage (pin 4)
   NRF_SPIM2->FREQUENCY = 0x80000000;  //SPI bus speed
-  NRF_SPIM2->INTENSET = 0;            //SPI interrupt enable
+  NRF_SPIM2->INTENSET = 0;            //SPI interrupt disable
   NRF_SPIM2->ORC = 255;               //Over-read character
   NRF_SPIM2->CONFIG = 0;              //Configuration register
 }
