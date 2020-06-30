@@ -73,7 +73,7 @@ class TimeScreen : public WatchScreenBase {
 class StopWatchScreen : public WatchScreenBase {
  private:
   bool hasStarted = false;
-  int startTime = 0;
+  long startTime = 0;
 
  public:
   void screenSetup() {
@@ -148,6 +148,7 @@ class TimeDateSetScreen : public WatchScreenBase {
       case SECOND:
         writeString(0, 0, 3, "Second");
         writeIntWithoutPrecedingZeroes(0, 26, 3, setSecond);
+        setTimeWrapper(setYear, setMonth, setDay, setHour, setMinute, setSecond);
         break;
       case MINUTE:
         writeString(0, 0, 3, "Minute");
@@ -170,7 +171,7 @@ class TimeDateSetScreen : public WatchScreenBase {
         writeIntWithoutPrecedingZeroes(0, 26, 3, setYear);
         break;
     }
-    setTimeWrapper(setYear, setMonth, setDay, setHour, setMinute, setSecond);
+    
   }
   void screenTap(uint8_t x, uint8_t y) {
     if (x <= 120) {

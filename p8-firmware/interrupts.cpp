@@ -3,7 +3,7 @@
 #define SLEEP_AFTER_N_SECONDS 10
 
 uint16_t interruptsFlag = 0b0000000000000000;
-int lastWakeTime = 0;
+long lastWakeTime = 0;
 
 
 /*

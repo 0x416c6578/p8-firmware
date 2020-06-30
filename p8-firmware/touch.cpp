@@ -49,28 +49,17 @@ void initTouch() {
   Wire.setClock(200000);  //Set clock to 200Kbaud
 
   Wire.beginTransmission(0x15);
-  Wire.write(0x15);
+  Wire.write(0xF7);
+  Wire.write(0xFF);
   Wire.endTransmission();
-  Wire.requestFrom(0x15, 1);
-  byte t1 = Wire.read();
-
   Wire.beginTransmission(0x15);
-  Wire.write(0xA7);
+  Wire.write(0xF8);
+  Wire.write(0xFF);
   Wire.endTransmission();
-  Wire.requestFrom(0x15, 1);
-  byte t2 = Wire.read();
-
   Wire.beginTransmission(0x15);
-  Wire.write(0xA8);
+  Wire.write(0xF9);
+  Wire.write(0x03);
   Wire.endTransmission();
-  Wire.requestFrom(0x15, 1);
-  byte t3 = Wire.read();
-
-  Wire.beginTransmission(0x15);
-  Wire.write(0xA9);
-  Wire.endTransmission();
-  Wire.requestFrom(0x15, 1);
-  byte t4 = Wire.read();
 }
 
 /* 
@@ -142,6 +131,7 @@ TouchDataStruct* getTouchDataStruct() {
 void sleepTouchController() {
   Wire.beginTransmission(0x15);
   Wire.write(0xA5);
-  Wire.write(0x03);
+  Wire.write(0x03); //CHANGED
+  delay(20);
   Wire.endTransmission();
 }
