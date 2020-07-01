@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 #include "pinoutP8.h"
-#include "i2c.h"
+#include "i2cLock.h"
 #include "ioControl.h"
 
 #define NO_GESTURE 0x00

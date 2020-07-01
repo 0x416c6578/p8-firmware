@@ -44,6 +44,12 @@ void initTouch() {
   pinMode(TP_RESET, OUTPUT);  //Reset pin
   pinMode(TP_INT, INPUT);     //Interrupt pin
   resetTouchController(true);
+  lockI2C();
+  Wire.beginTransmission(0x15);
+  Wire.write(0xED);
+  Wire.write(0xC8);
+  Wire.endTransmission();
+  unlockI2C();
 }
 
 /* 
@@ -67,14 +73,16 @@ void resetTouchController(bool bootup) {
   Read touch data from the controller and store it in the global touchDataStruct
  */
 void updateTouchStruct() {
-  int readBufSize = 6;
-  uint8_t readBuf[readBufSize];  //Read buffer where the raw bytes are stored
-  if (i2cBeginTransmission(0x15) == 1){
-    ledPing();
+  if (getI2CState() == I2C_LOCKED){
     return;
   }
-  i2cWrite(0x1);  //Try to ping the touch controller
-  if (i2cEndTransmission()) {
+  lockI2C();
+
+  uint8_t readBufSize = 6;
+  uint8_t readBuf[readBufSize];  //Read buffer where the raw bytes are stored
+  Wire.beginTransmission(0x15);
+  Wire.write(0x1);  //Try to ping the touch controller
+  if (Wire.endTransmission()) {
     /* 
       Errors upon calling endTransmission()
       0 : Success
@@ -88,7 +96,10 @@ void updateTouchStruct() {
     touchData.y = 69;
     return;  //If we get an unsuccessful probe, the device isn't awake, so just return
   }
-  i2cRead(0x15, readBuf, readBufSize);
+  Wire.requestFrom(0x15, readBufSize);
+  for (uint8_t i = 0; i < readBufSize; i++){
+    readBuf[i] = Wire.read();
+  }
   /* 
     Byte 0 = gesture
     Byte 3 = x LSByte
@@ -100,6 +111,9 @@ void updateTouchStruct() {
    */
   touchData.x = (readBuf[3]);  // << 8 | (uint16_t)readBuf[4]; (Not needed)
   touchData.y = (readBuf[5]);  // << 8 | (uint16_t)readBuf[6]; (Not needed)
+  ledPing();
+
+  unlockI2C();
 }
 
 /* 
@@ -113,9 +127,11 @@ TouchDataStruct* getTouchDataStruct() {
   Put the touch panel to sleep
  */
 void sleepTouchController() {
-  i2cBeginTransmission(0x15);
-  i2cWrite(0xA5);
-  i2cWrite(0x03);
+  lockI2C();
+  Wire.beginTransmission(0x15);
+  Wire.write(0xA5);
+  Wire.write(0x03);
   delay(20);
-  i2cEndTransmission();
+  Wire.endTransmission();
+  unlockI2C();
 }

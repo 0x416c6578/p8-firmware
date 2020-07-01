@@ -34,6 +34,6 @@
 void initInterrupts();
 void touchEvent();
 void handleInterrupts();
-void resetInterruptFlag();
+void resetInterrupts();
 void buttonEvent();
 void handleTouchInt();
