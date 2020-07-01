@@ -1,6 +1,7 @@
 #pragma once
 #include "Arduino.h"
 #include "WatchScreenBase.h"
+#include "accelerometer.h"
 #include "display.h"
 #include "p8Time.h"
 #include "pinoutP8.h"
@@ -21,17 +22,15 @@ class DemoScreen : public WatchScreenBase {
  public:
   void screenSetup() {
     clearDisplay(true);
-    writeString(5, 25, 1, "X:");
-    writeString(5, 45, 1, "Y:");
-    writeIntWithPrecedingZeroes(20, 20, 2, 0);
-    writeIntWithPrecedingZeroes(20, 40, 2, 0);
   }
   void screenDestroy() {}
-  void screenLoop() {}
-  void screenTap(uint8_t x, uint8_t y) {
-    writeIntWithPrecedingZeroes(20, 20, 2, x);
-    writeIntWithPrecedingZeroes(20, 40, 2, y);
+  void screenLoop() {
+    bma4_accel* data = getAcclData();
+    writeIntWithoutPrecedingZeroes(0, 0, 2, (int)data->x);
+    writeIntWithoutPrecedingZeroes(0, 20, 2, (int)data->y);
+    writeIntWithoutPrecedingZeroes(0, 40, 2, (int)data->z);
   }
+  void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
   void swipeUp() {}
@@ -50,6 +49,7 @@ class TimeScreen : public WatchScreenBase {
     clearDisplay(true);
     currentDay = -1;
     writeString(20, 140, 2, "Bat:");
+    writeString(143, 135, 3, "mV");
   }
   void screenDestroy() {}
   void screenLoop() {
@@ -58,7 +58,7 @@ class TimeScreen : public WatchScreenBase {
     //Only update the day string on a new day
     if (getDayOfWeek(day(), month(), year()) != currentDay)
       writeString(20, 95, 3, getDay());
-    writeIntWithoutPrecedingZeroes(69, 135, 3, getBatteryPercent());
+    writeIntWithoutPrecedingZeroes(69, 135, 3, getBatteryMV());
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
@@ -137,6 +137,7 @@ class TimeDateSetScreen : public WatchScreenBase {
   void screenSetup() {
     clearDisplay(true);
     drawRects();
+    currentSettingsWindow = BRIGHTNESS;
   }
   void screenDestroy() {}
   void screenLoop() {
@@ -148,7 +149,6 @@ class TimeDateSetScreen : public WatchScreenBase {
       case SECOND:
         writeString(0, 0, 3, "Second");
         writeIntWithoutPrecedingZeroes(0, 26, 3, setSecond);
-        setTimeWrapper(setYear, setMonth, setDay, setHour, setMinute, setSecond);
         break;
       case MINUTE:
         writeString(0, 0, 3, "Minute");
@@ -169,9 +169,9 @@ class TimeDateSetScreen : public WatchScreenBase {
       case YEAR:
         writeString(0, 0, 3, "Year");
         writeIntWithoutPrecedingZeroes(0, 26, 3, setYear);
+        setTimeWrapper(setYear, setMonth, setDay, setHour, setMinute, setSecond);
         break;
     }
-    
   }
   void screenTap(uint8_t x, uint8_t y) {
     if (x <= 120) {
@@ -226,7 +226,7 @@ class TimeDateSetScreen : public WatchScreenBase {
   }
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
-  void swipeUp() {
+  void swipeDown() {
     switch (currentSettingsWindow) {
       case BRIGHTNESS:
         currentSettingsWindow = SECOND;
@@ -256,7 +256,7 @@ class TimeDateSetScreen : public WatchScreenBase {
         break;
     }
   }
-  void swipeDown() {
+  void swipeUp() {
     switch (currentSettingsWindow) {
       case SECOND:
         currentSettingsWindow = BRIGHTNESS;

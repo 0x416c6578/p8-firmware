@@ -1,10 +1,8 @@
 #include "headers/ioControl.h"
 
 int currentBrightness = 0;
-long lastReq = 10000;
-int lastReturn;
-int lastCounter;
-int lastmvolts;
+uint16_t lastMV = 1111;
+long lastBatReadTime = 0;
 
 /*
   Initialize various GPIOs, should be done at bootup
@@ -106,7 +104,26 @@ void ledPing() {
   digitalWrite(GREEN_LEDS, LOW);
 }
 
-int getBatteryPercent(){
+/* 
+Battery percent handling:
+Because reading the percent is quite a heavy task, we want to only read it once in a
+while. So we store the time the battery was last read, and the value of the last percent
+returned. We only update those two variables when the time since the last reading is
+long enough
+ */
+
+uint16_t getBatteryMV() {
+  if (millis() - lastBatReadTime > 10000){
+    lastMV = map(analogRead(BATTERY_VOLTAGE), 496, 696, 3000, 4200);
+    lastBatReadTime = millis();
+    return lastMV;
+  } else{
+    return lastMV;
+  }
+}
+
+//ATCWatch implementation:
+/* int getBatteryPercent(){
   lastmvolts += map(get_battery_raw(), 496, 696, 3000, 4200);
   lastCounter++;
   if (millis() - lastReq > 10000) {
@@ -135,10 +152,6 @@ int milliVoltToPercent(float mvolts) {
   else return 0;
 }
 
-float get_battery() {
-  return map(get_battery_raw(), 496, 696, 3000, 4200) / 1000.0;
-}
-
 int get_battery_raw() {
   return analogRead(BATTERY_VOLTAGE);
-}
+} */

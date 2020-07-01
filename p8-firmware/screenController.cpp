@@ -1,6 +1,6 @@
 #include "headers/screenController.h"
 
-#define NUM_SCREENS 3
+#define NUM_SCREENS 4
 /*
   Similar to ATCWatch, an instance of every screen will be instantiated at bootup
   There will be a pointer to the current screen which will have the methods called on it
@@ -10,9 +10,10 @@
 TimeScreen timeScreen;
 StopWatchScreen stopWatchScreen;
 TimeDateSetScreen timeDateSetScreen;
+DemoScreen demoScreen;
 
 int currentHomeScreenIndex = 0;
-WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, /*&demoScreen,*/ &stopWatchScreen, &timeDateSetScreen};
+WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, &stopWatchScreen, &timeDateSetScreen, &demoScreen};
 WatchScreenBase* currentScreen = homeScreens[currentHomeScreenIndex];
 
 /*
@@ -132,6 +133,7 @@ void drawAppIndicator() {
   writeChar(startOfString + (0 * indicatorFontSize * FONT_WIDTH) + (0 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 0) ? GLYPH_CLOCK_SEL : GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   writeChar(startOfString + (1 * indicatorFontSize * FONT_WIDTH) + (1 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 1) ? GLYPH_STOPWATCH_SEL : GLYPH_STOPWATCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   writeChar(startOfString + (2 * indicatorFontSize * FONT_WIDTH) + (2 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 2) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  writeChar(startOfString + (3 * indicatorFontSize * FONT_WIDTH) + (3 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 3) ? GLYPH_TOUCH_SEL : GLYPH_TOUCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   //Draw the "can scroll left/right" indicators in the corners of the screen
   switch (currentHomeScreenIndex) {
     case 0:
@@ -143,6 +145,10 @@ void drawAppIndicator() {
       writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
       break;
     case 2:
+      writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
+      writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
+      break;
+    case 3:
       writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
       writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, 0b1000010000010000, COLOUR_BLACK);
       break;

@@ -44,22 +44,6 @@ void initTouch() {
   pinMode(TP_RESET, OUTPUT);  //Reset pin
   pinMode(TP_INT, INPUT);     //Interrupt pin
   resetTouchController(true);
-
-  Wire.begin();           //Initialize i2c bus
-  Wire.setClock(200000);  //Set clock to 200Kbaud
-
-  Wire.beginTransmission(0x15);
-  Wire.write(0xF7);
-  Wire.write(0xFF);
-  Wire.endTransmission();
-  Wire.beginTransmission(0x15);
-  Wire.write(0xF8);
-  Wire.write(0xFF);
-  Wire.endTransmission();
-  Wire.beginTransmission(0x15);
-  Wire.write(0xF9);
-  Wire.write(0x03);
-  Wire.endTransmission();
 }
 
 /* 
@@ -85,9 +69,12 @@ void resetTouchController(bool bootup) {
 void updateTouchStruct() {
   int readBufSize = 6;
   uint8_t readBuf[readBufSize];  //Read buffer where the raw bytes are stored
-  Wire.beginTransmission(0x15);
-  Wire.write(0x1);  //Probe touch display at i2c port 1 to see if the touch display is awake
-  if (Wire.endTransmission()) {
+  if (i2cBeginTransmission(0x15) == 1){
+    ledPing();
+    return;
+  }
+  i2cWrite(0x1);  //Try to ping the touch controller
+  if (i2cEndTransmission()) {
     /* 
       Errors upon calling endTransmission()
       0 : Success
@@ -101,10 +88,7 @@ void updateTouchStruct() {
     touchData.y = 69;
     return;  //If we get an unsuccessful probe, the device isn't awake, so just return
   }
-  Wire.requestFrom(0x15, readBufSize);
-  for (int x = 0; x < readBufSize; x++) {
-    readBuf[x] = Wire.read();  //Read the data about the last touch event into the raw data buffer
-  }
+  i2cRead(0x15, readBuf, readBufSize);
   /* 
     Byte 0 = gesture
     Byte 3 = x LSByte
@@ -129,9 +113,9 @@ TouchDataStruct* getTouchDataStruct() {
   Put the touch panel to sleep
  */
 void sleepTouchController() {
-  Wire.beginTransmission(0x15);
-  Wire.write(0xA5);
-  Wire.write(0x03); //CHANGED
+  i2cBeginTransmission(0x15);
+  i2cWrite(0xA5);
+  i2cWrite(0x03);
   delay(20);
-  Wire.endTransmission();
+  i2cEndTransmission();
 }

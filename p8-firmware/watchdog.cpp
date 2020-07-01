@@ -8,7 +8,7 @@ void initWatchdog() {
 }
 
 /*
-  Enable the watchdog (code taken from atc1441)
+  Enable the watchdog
 */
 void enableWatchdog(int timeoutMillis) {
   NRF_WDT->CONFIG = (WDT_CONFIG_HALT_Pause << WDT_CONFIG_HALT_Pos) | (WDT_CONFIG_SLEEP_Pause << WDT_CONFIG_SLEEP_Pos);

@@ -14,7 +14,4 @@ int getBrightness();
 void incBrightness();
 void decBrightness();
 void ledPing();
-int getBatteryPercent();
-int milliVoltToPercent(float mvolts);
-int get_battery_raw();
-float get_battery();
+uint16_t getBatteryMV();

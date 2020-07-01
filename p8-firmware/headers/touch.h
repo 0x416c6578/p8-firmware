@@ -3,6 +3,8 @@
 
 #include "Arduino.h"
 #include "pinoutP8.h"
+#include "i2c.h"
+#include "ioControl.h"
 
 #define NO_GESTURE 0x00
 #define SWIPE_DOWN 0x01

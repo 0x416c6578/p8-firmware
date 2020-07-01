@@ -1,6 +1,6 @@
 #include "headers/display.h"
 #include "headers/fastSPI.h"
-#include "headers/heartrate.h"
+//#include "headers/heartrate.h"
 #include "headers/interrupts.h"  //Includes screenController.h
 #include "headers/ioControl.h"
 #include "headers/p8Time.h"
@@ -8,6 +8,8 @@
 #include "headers/powerControl.h"
 #include "headers/touch.h"
 #include "headers/watchdog.h"
+#include "headers/i2c.h"
+#include "headers/accelerometer.h"
 #include "nrf52.h"
 
 void setup() {
@@ -19,11 +21,15 @@ void setup() {
   initWatchdog();    //Start the watchdog
   initFastSPI();     //Initialize EasyDMA SPI
   initDisplay();     //Initialize display
+  initI2C();
+  initAccel();
   initTouch();       //Initialize touch panel
+  
   initInterrupts();  //Setup interrupts
+  
   initScreen();      //Initialize the screen controller (the thing that actually handles what is displayed)
   initSleep();       //Initialize the sleep power mode
-  initHeartrate();   //Initialize the heartrate sensors
+  //initHeartrate();   //Initialize the heartrate sensors
   randomTests();
 }
 
