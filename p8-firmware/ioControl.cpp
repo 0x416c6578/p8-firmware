@@ -1,8 +1,12 @@
 #include "headers/ioControl.h"
 
 int currentBrightness = 0;
-uint16_t lastMV = 1111;
-long lastBatReadTime = 0;
+uint16_t avgReading = 0;
+long lastBatCalcTime = 0;
+long lastBatPollTime = 0;
+uint16_t batCounter = 0;
+int cumulativeBatRead = 0;
+uint16_t lastBatPercent = 69;
 
 /*
   Initialize various GPIOs, should be done at bootup
@@ -105,53 +109,65 @@ void ledPing() {
 }
 
 /* 
-Battery percent handling:
-Because reading the percent is quite a heavy task, we want to only read it once in a
-while. So we store the time the battery was last read, and the value of the last percent
-returned. We only update those two variables when the time since the last reading is
-long enough
+  Only update the battery percent every 10 seconds to get a more accurate long-term reading
+  every 10 seconds
  */
-
 uint16_t getBatteryMV() {
-  if (millis() - lastBatReadTime > 10000){
-    lastMV = map(analogRead(BATTERY_VOLTAGE), 496, 696, 3000, 4200);
-    lastBatReadTime = millis();
-    return lastMV;
-  } else{
-    return lastMV;
+  if (millis() - lastBatCalcTime > 6000) {
+    lastBatCalcTime = millis();
+    avgReading = cumulativeBatRead / batCounter;
+    cumulativeBatRead = 0;
+    batCounter = 0;
+    lastBatPercent = milliVoltToPercent(avgReading);
+    return lastBatPercent;
+  } else {
+    return lastBatPercent;
   }
 }
 
-//ATCWatch implementation:
-/* int getBatteryPercent(){
-  lastmvolts += map(get_battery_raw(), 496, 696, 3000, 4200);
-  lastCounter++;
-  if (millis() - lastReq > 10000) {
-    lastReq = millis();
-    lastReturn =  milliVoltToPercent(lastmvolts / lastCounter);
-    lastCounter = 0;
-    lastmvolts = 0;
-    return lastReturn;
+/* 
+  Every 500ms add to the cumulative battery reading 
+*/
+void addToCumulativeBatReading(){
+  if (millis() - lastBatPollTime > 200) {
+    batCounter++;
+    cumulativeBatRead += map(analogRead(BATTERY_VOLTAGE), 496, 696, 3000, 4200);
+    lastBatPollTime = millis();
   }
-  return lastReturn;
 }
 
-int milliVoltToPercent(float mvolts) {
-  if ( mvolts >= 4145 ) return 99;
-  else if ( mvolts > 4010 ) return (99 - (int16_t)(4145 - mvolts) / 13);
-  else if ( mvolts > 3920 ) return (90 - (int16_t)(4010 - mvolts) / 9);
-  else if ( mvolts > 3850 ) return (80 - (int16_t)(3920 - mvolts) / 7);
-  else if ( mvolts > 3789 ) return (70 - (int16_t)(3850 - mvolts) / 6);
-  else if ( mvolts > 3740 ) return (60 - (int16_t)(3789 - mvolts) / 4);
-  else if ( mvolts > 3703 ) return (50 - (int16_t)(3740 - mvolts) / 3);
-  else if ( mvolts > 3676 ) return (40 - (int16_t)(3703 - mvolts) / 2);
-  else if ( mvolts > 3648 ) return (30 - (int16_t)(3676 - mvolts) / 2);
-  else if ( mvolts > 3609 ) return (20 - (int16_t)(3648 - mvolts) / 3);
-  else if ( mvolts > 3575 ) return (10 - (int16_t)(3609 - mvolts) / 6);
-  else if ( mvolts > 3482 ) return ( 5 - (int16_t)(3575 - mvolts) / 18);
-  else return 0;
+uint16_t milliVoltToPercent(int batteryMV) {
+  if (batteryMV >= 4145)
+    return 99;
+  else if (batteryMV > 4010)
+    return (99 - (int16_t)(4145 - batteryMV) / 13);
+  else if (batteryMV > 3920)
+    return (90 - (int16_t)(4010 - batteryMV) / 9);
+  else if (batteryMV > 3850)
+    return (80 - (int16_t)(3920 - batteryMV) / 7);
+  else if (batteryMV > 3789)
+    return (70 - (int16_t)(3850 - batteryMV) / 6);
+  else if (batteryMV > 3740)
+    return (60 - (int16_t)(3789 - batteryMV) / 4);
+  else if (batteryMV > 3703)
+    return (50 - (int16_t)(3740 - batteryMV) / 3);
+  else if (batteryMV > 3676)
+    return (40 - (int16_t)(3703 - batteryMV) / 2);
+  else if (batteryMV > 3648)
+    return (30 - (int16_t)(3676 - batteryMV) / 2);
+  else if (batteryMV > 3609)
+    return (20 - (int16_t)(3648 - batteryMV) / 3);
+  else if (batteryMV > 3575)
+    return (10 - (int16_t)(3609 - batteryMV) / 6);
+  else if (batteryMV > 3482)
+    return (5 - (int16_t)(3575 - batteryMV) / 18);
+  else
+    return 0;
 }
 
-int get_battery_raw() {
-  return analogRead(BATTERY_VOLTAGE);
-} */
+/* 
+  Get the battery charge state
+ */
+bool getChargeState(){
+  return digitalRead(POWER_INDICATION);
+}

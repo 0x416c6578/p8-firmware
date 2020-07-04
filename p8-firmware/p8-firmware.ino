@@ -38,6 +38,7 @@ void randomTests() {
 
 void loop() {
   if (!getButtonState()) feedWatchdog();
+  addToCumulativeBatReading();
   if (getPowerMode() == POWER_ON) {
     screenControllerLoop();  //This will run the main loop of the current screen
   } else {

@@ -73,8 +73,14 @@ void resetTouchController(bool bootup) {
   Read touch data from the controller and store it in the global touchDataStruct
  */
 void updateTouchStruct() {
-  if (getI2CState() == I2C_LOCKED){
-    return;
+  if (getI2CState() == I2C_LOCKED) {
+    /* 
+      Make sure that no previous transmission is happening when this is called
+      When this is called during the interrupt, sometimes it would interfere
+      with another accelerometer transmission and there would be undefined behaviour
+      resulting in a crash
+    */
+    Wire.endTransmission();
   }
   lockI2C();
 
@@ -97,7 +103,7 @@ void updateTouchStruct() {
     return;  //If we get an unsuccessful probe, the device isn't awake, so just return
   }
   Wire.requestFrom(0x15, readBufSize);
-  for (uint8_t i = 0; i < readBufSize; i++){
+  for (uint8_t i = 0; i < readBufSize; i++) {
     readBuf[i] = Wire.read();
   }
   /* 
@@ -111,7 +117,6 @@ void updateTouchStruct() {
    */
   touchData.x = (readBuf[3]);  // << 8 | (uint16_t)readBuf[4]; (Not needed)
   touchData.y = (readBuf[5]);  // << 8 | (uint16_t)readBuf[6]; (Not needed)
-  ledPing();
 
   unlockI2C();
 }

@@ -32,8 +32,5 @@
  */
 
 void initInterrupts();
-void touchEvent();
 void handleInterrupts();
 void resetInterrupts();
-void buttonEvent();
-void handleTouchInt();

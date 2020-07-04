@@ -15,3 +15,6 @@ void incBrightness();
 void decBrightness();
 void ledPing();
 uint16_t getBatteryMV();
+uint16_t milliVoltToPercent(int batteryMV);
+void addToCumulativeBatReading();
+bool getChargeState();

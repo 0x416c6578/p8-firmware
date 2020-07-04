@@ -11,7 +11,7 @@ void initSleep() {
 bool powerMode = POWER_ON;
 
 void enterSleep() {
-  //sleepTouchController();
+  sleepTouchController();
 
   powerMode = POWER_OFF;
   displayEnable(POWER_OFF);
@@ -21,7 +21,7 @@ void enterSleep() {
 }
 
 void exitSleep() {
-  //resetTouchController();
+  resetTouchController();
 
   powerMode = POWER_ON;
   displayEnable(POWER_ON);

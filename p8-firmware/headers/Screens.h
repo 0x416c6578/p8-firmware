@@ -42,13 +42,15 @@ class DemoScreen : public WatchScreenBase {
 class TimeScreen : public WatchScreenBase {
  private:
   uint8_t currentDay = -1;
+  int chargeIndicationCounter = 0;
+  bool chargeIndicationState = false;
 
  public:
   void screenSetup() {
     clearDisplay(true);
     currentDay = -1;
-    writeString(20, 140, 2, "Bat:");
-    writeString(143, 135, 3, "mV");
+    writeString(20, 130, 2, "Bat:");
+    writeString(107, 125, 3, "%");
   }
   void screenDestroy() {}
   void screenLoop() {
@@ -57,7 +59,16 @@ class TimeScreen : public WatchScreenBase {
     //Only update the day string on a new day
     if (getDayOfWeek(day(), month(), year()) != currentDay)
       writeString(20, 95, 3, getDay());
-    writeIntWithoutPrecedingZeroes(69, 135, 3, getBatteryMV());
+    writeIntWithoutPrecedingZeroes(69, 125, 3, getBatteryMV());
+    if (!getChargeState()){
+      if (millis() - chargeIndicationCounter > 500){
+        writeString(127, 125, 3, chargeIndicationState ? "+ " : " +", COLOUR_GREEN, COLOUR_BLACK);
+        chargeIndicationState = !chargeIndicationState;
+        chargeIndicationCounter = millis();
+      }
+    } else{
+      writeString(127, 125, 3, "  ");
+    }
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
@@ -291,4 +302,64 @@ class TimeDateSetScreen : public WatchScreenBase {
     writeChar(30, 107, 6, '-', COLOUR_WHITE, COLOUR_RED);
     writeChar(175, 107, 6, '+', COLOUR_WHITE, COLOUR_BLUE);
   }
+};
+
+/* 
+  Show info/uptime
+ */
+class InfoScreen : public WatchScreenBase {
+ public:
+  void screenSetup() {
+    clearDisplay(true);
+    writeString(0, 0, 1, "Firmware by:");
+    writeString(0, 10, 2, "Alex Underwood");
+    writeString(0, 30, 1, "Uptime:");
+  }
+  void screenDestroy() {}
+  void screenLoop() {
+    writeIntWithPrecedingZeroes(0, 40, 2, millis());
+  }
+  void screenTap(uint8_t x, uint8_t y) {}
+  bool doesImplementSwipeLeft() { return false; }
+  bool doesImplementSwipeRight() { return false; }
+  void swipeUp() {}
+  void swipeDown() {}
+};
+
+/* 
+  Screen to reboot/bootloader etc
+ */
+class PowerScreen : public WatchScreenBase {
+ public:
+  void screenSetup() {
+    clearDisplay(true);
+    drawRect(0, 0, 118, 118, COLOUR_WHITE);
+    drawRect(2, 2, 114, 114, COLOUR_BLACK);
+    drawRect(122, 0, 118, 118, COLOUR_WHITE);
+    drawRect(124, 2, 114, 114, COLOUR_BLACK);
+    writeChar(59 - (getWidthOfNChars(1, 4) / 2), 43, 4, GLYPH_REBOOT_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+    writeChar(181 - (getWidthOfNChars(1, 4) / 2), 43, 4, GLYPH_BOOTLOADER_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  }
+  void screenDestroy() {}
+  void screenLoop() {}
+  void screenTap(uint8_t x, uint8_t y) {
+    if (y < 118 && x < 118) {
+      __DSB(); /* Ensure all outstanding memory accesses included
+                  buffered write are completed before reset */
+
+      //We need to make sure we write the correct key into vectkey otherwise the write will be ignored
+      SCB->AIRCR = ((0x5FAUL << SCB_AIRCR_VECTKEY_Pos) |
+                    SCB_AIRCR_SYSRESETREQ_Msk);
+      __DSB(); /* Ensure completion of memory access */
+
+      for (;;) /* wait until reset */
+      {
+        __NOP();
+      }
+    }
+  }
+  bool doesImplementSwipeLeft() { return false; }
+  bool doesImplementSwipeRight() { return false; }
+  void swipeUp() {}
+  void swipeDown() {}
 };
