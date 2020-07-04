@@ -21,6 +21,7 @@
 class DemoScreen : public WatchScreenBase {
  private:
   struct bma4_accel data;
+  long lastUpdateTime = 0;
 
  public:
   void screenSetup() {
@@ -31,10 +32,13 @@ class DemoScreen : public WatchScreenBase {
   }
   void screenDestroy() {}
   void screenLoop() {
-    getAcclData(&data);
-    writeIntWithPrecedingZeroes(25, 0, 2, abs(data.x));
-    writeIntWithPrecedingZeroes(25, 20, 2, abs(data.y));
-    writeIntWithPrecedingZeroes(25, 40, 2, abs(data.z));
+    if (millis() - lastUpdateTime > 150) {
+      getAcclData(&data);
+      writeIntWithPrecedingZeroes(25, 0, 2, abs(data.x));
+      writeIntWithPrecedingZeroes(25, 20, 2, abs(data.y));
+      writeIntWithPrecedingZeroes(25, 40, 2, abs(data.z));
+      lastUpdateTime = millis();
+    }
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
