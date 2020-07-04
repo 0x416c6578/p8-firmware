@@ -1,6 +1,6 @@
 #include "headers/interrupts.h"
 
-#define SLEEP_AFTER_N_SECONDS 10
+#define SLEEP_AFTER_N_SECONDS 15
 
 uint16_t interruptsFlag = 0b0000000000000000;
 long lastWakeTime = 0;
@@ -91,6 +91,7 @@ void handleInterrupts() {
         handleTap(touchData->x, touchData->y);
         break;
       case LONG_PRESS:
+        handleLongTap(touchData->x, touchData->y);
         break;
       case SWIPE_DOWN:
         handleDownSwipe();
@@ -112,8 +113,10 @@ void handleInterrupts() {
       lastWakeTime = millis();
       return;
     }
-    lastWakeTime = millis();
-    handleButtonPress();
+    if (millis() - lastWakeTime > 350) {
+      lastWakeTime = millis();
+      handleButtonPress();
+    }
   }
 
   else {

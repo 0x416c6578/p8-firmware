@@ -27,7 +27,6 @@ void initAccel() {
   uint16_t result = 0;
   ledPing();
   feedWatchdog();
-  delay(100);
   result = result | bma423_init(&BMAInfoStruct);
   result = result | bma423_write_config_file(&BMAInfoStruct);
   result = result | bma4_set_accel_enable(1, &BMAInfoStruct);
@@ -55,34 +54,44 @@ void initAccel() {
   for reading
  */
 int8_t acclI2CRead(uint8_t registerAddress, uint8_t *readBuf, uint32_t readBufLength, void *intf_ptr) {
-  i2cBeginTransmission(BMA4_I2C_ADDR_PRIMARY);
-  i2cWrite(registerAddress);
-  if (i2cEndTransmission()) {
-    //If we have an error in ending the transmission
-    return -1;
+  if (getI2CState() == I2C_LOCKED){
+    return 1;
   }
-  i2cRead(BMA4_I2C_ADDR_PRIMARY, readBuf, readBufLength);
-  /* Wire.requestFrom(BMA4_I2C_ADDR_PRIMARY, length);
-  for (int i = 0; i < length; i++) {
-    *reg_data++ = Wire.read();
-  } */
-  return 0;
+  lockI2C();
+  Wire.beginTransmission(BMA4_I2C_ADDR_PRIMARY);
+  Wire.write(registerAddress);
+  if (Wire.endTransmission()) {
+    //If we have an error in ending the transmission
+    return 1;
+  }
+  Wire.requestFrom(BMA4_I2C_ADDR_PRIMARY, readBufLength);
+  for (int i = 0; i < readBufLength; i++) {
+    *readBuf++ = Wire.read();
+  }
+  unlockI2C();
+  return BMA4_INTF_RET_SUCCESS;
 }
 
 /* 
   This is the user defined function for writing to the i2c bus
  */
 int8_t acclI2CWrite(uint8_t registerAddress, const uint8_t *writeBuf, uint32_t writeBufLength, void *intf_ptr) {
-  byte error;
-  i2cBeginTransmission(BMA4_I2C_ADDR_PRIMARY);
-  i2cWrite(registerAddress);
+  //ledPing();
+  if (getI2CState() == I2C_LOCKED){
+    return 1;
+  }
+  lockI2C();
+  Wire.beginTransmission(BMA4_I2C_ADDR_PRIMARY);
+  Wire.write(registerAddress);
   for (int i = 0; i < writeBufLength; i++) {
-    i2cWrite(*writeBuf++);
+    Wire.write(*writeBuf++); //Write the data and increment the pointer
   }
-  if (i2cEndTransmission()) {
-    return -1;
+  if (Wire.endTransmission()) {
+    //If we have an error in ending the transmission
+    return 1;
   }
-  return 0;
+  unlockI2C();
+  return BMA4_INTF_RET_SUCCESS;
 }
 
 /*
@@ -95,13 +104,11 @@ void acclDelay(uint32_t period_us, void *intf_ptr) {
 /* 
   Test function to get the accelerometer data
  */
-bma4_accel* getAcclData() {
-  struct bma4_accel* data;
-  // uint8_t result = bma4_read_accel_xyz(data, &BMAInfoStruct);
-  // if (result == 0)
-  //   return data;
+void getAcclData(struct bma4_accel* data) {
+  uint8_t result = bma4_read_accel_xyz(data, &BMAInfoStruct);
+  if (result == 0)
+    return;
   data->x = 69;
   data->y = 69;
   data->z = 69;
-  return data;
 }

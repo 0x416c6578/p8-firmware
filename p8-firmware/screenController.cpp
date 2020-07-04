@@ -1,6 +1,6 @@
 #include "headers/screenController.h"
 
-#define NUM_SCREENS 5
+#define NUM_SCREENS 6
 /*
   Similar to ATCWatch, an instance of every screen will be instantiated at bootup
   There will be a pointer to the current screen which will have the methods called on it
@@ -15,7 +15,7 @@ InfoScreen infoScreen;
 PowerScreen powerScreen;
 
 int currentHomeScreenIndex = 0;
-WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, &stopWatchScreen, &timeDateSetScreen, &infoScreen, &powerScreen};
+WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, &stopWatchScreen, &timeDateSetScreen, &infoScreen, &powerScreen, &demoScreen};
 WatchScreenBase* currentScreen = homeScreens[currentHomeScreenIndex];
 
 /*
@@ -115,6 +115,12 @@ void handleTap(uint8_t x, uint8_t y) {
 }
 
 /* 
+  Sleep when we receive a long tap */
+void handleLongTap(uint8_t x, uint8_t y){
+  enterSleep();
+}
+
+/* 
   This method is called AFAP by the main loop() in p8-firmware.ino
   The loop method of a screen should be as efficient as possible
     For example if any graphics are used, they should be drawn in setup rather than being redrawn every loop
@@ -137,6 +143,7 @@ void drawAppIndicator() {
   writeChar(startOfString + (2 * indicatorFontSize * FONT_WIDTH) + (2 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 2) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   writeChar(startOfString + (3 * indicatorFontSize * FONT_WIDTH) + (3 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 3) ? GLYPH_INFO_SEL : GLYPH_INFO_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   writeChar(startOfString + (4 * indicatorFontSize * FONT_WIDTH) + (4 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 4) ? GLYPH_POWER_SEL : GLYPH_POWER_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  writeChar(startOfString + (5 * indicatorFontSize * FONT_WIDTH) + (5 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 5) ? GLYPH_DATA_SEL : GLYPH_DATA_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   //Draw the "can scroll left/right" indicators in the corners of the screen
   switch (currentHomeScreenIndex) {
     case 0:
@@ -156,6 +163,10 @@ void drawAppIndicator() {
       writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
       break;
     case 4:
+      writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
+      writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
+      break;
+    case 5:
       writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
       writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, 0b1000010000010000, COLOUR_BLACK);
       break;

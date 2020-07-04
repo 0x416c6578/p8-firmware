@@ -9,7 +9,7 @@
 #include "headers/touch.h"
 #include "headers/watchdog.h"
 #include "headers/i2cLock.h"
-//#include "headers/accelerometer.h"
+#include "headers/accelerometer.h"
 #include "nrf52.h"
 
 void setup() {
@@ -22,7 +22,7 @@ void setup() {
   initFastSPI();     //Initialize EasyDMA SPI
   initDisplay();     //Initialize display
   initI2C();
-  //initAccel();
+  initAccel();
   initTouch();       //Initialize touch panel
   
   initInterrupts();  //Setup interrupts

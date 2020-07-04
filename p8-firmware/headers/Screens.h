@@ -1,6 +1,7 @@
 #pragma once
 #include "Arduino.h"
 #include "WatchScreenBase.h"
+#include "accelerometer.h"
 #include "display.h"
 #include "p8Time.h"
 #include "pinoutP8.h"
@@ -18,20 +19,26 @@
   This demo screen is used for testing purposes
 */
 class DemoScreen : public WatchScreenBase {
+ private:
+  struct bma4_accel data;
+
  public:
   void screenSetup() {
     clearDisplay(true);
+    writeString(0, 0, 2, "X:");
+    writeString(0, 20, 2, "Y:");
+    writeString(0, 40, 2, "Z:");
   }
   void screenDestroy() {}
   void screenLoop() {
-    updateTouchStruct();
-    writeIntWithPrecedingZeroes(0, 0, 2, getTouchDataStruct()->gesture);
-    writeIntWithPrecedingZeroes(0, 20, 2, getTouchDataStruct()->x);
-    writeIntWithPrecedingZeroes(0, 40, 2, getTouchDataStruct()->y);
+    getAcclData(&data);
+    writeIntWithPrecedingZeroes(25, 0, 2, abs(data.x));
+    writeIntWithPrecedingZeroes(25, 20, 2, abs(data.y));
+    writeIntWithPrecedingZeroes(25, 40, 2, abs(data.z));
   }
   void screenTap(uint8_t x, uint8_t y) {}
-  void swipeRight() {}
-  void swipeLeft() {}
+  bool doesImplementSwipeRight() { return false; }
+  bool doesImplementSwipeLeft() { return false; }
   void swipeUp() {}
   void swipeDown() {}
 };
@@ -60,13 +67,13 @@ class TimeScreen : public WatchScreenBase {
     if (getDayOfWeek(day(), month(), year()) != currentDay)
       writeString(20, 95, 3, getDay());
     writeIntWithoutPrecedingZeroes(69, 125, 3, getBatteryMV());
-    if (!getChargeState()){
-      if (millis() - chargeIndicationCounter > 500){
+    if (!getChargeState()) {
+      if (millis() - chargeIndicationCounter > 500) {
         writeString(127, 125, 3, chargeIndicationState ? "+ " : " +", COLOUR_GREEN, COLOUR_BLACK);
         chargeIndicationState = !chargeIndicationState;
         chargeIndicationCounter = millis();
       }
-    } else{
+    } else {
       writeString(127, 125, 3, "  ");
     }
   }

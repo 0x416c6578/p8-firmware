@@ -10,6 +10,7 @@ void handleRightSwipe();
 void handleUpSwipe();
 void handleDownSwipe();
 void handleButtonPress();
+void handleLongTap(uint8_t x, uint8_t y);
 void drawAppIndicator();
 void prevScreen();
 void nextScreen();
