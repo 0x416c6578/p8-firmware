@@ -9,6 +9,13 @@ struct bma4_accel_config accelConfig;
  */
 void initAccel() {
   pinMode(BMA421_INT, INPUT);
+
+  //Reset the accelerometer
+  Wire.beginTransmission(BMA4_I2C_ADDR_PRIMARY);
+  Wire.write(0x7E);
+  Wire.write(0xB6);
+  Wire.endTransmission();
+
   BMAInfoStruct.intf = BMA4_I2C_INTF;
   BMAInfoStruct.bus_read = acclI2CRead;    //Function pointer to bus read function
   BMAInfoStruct.bus_write = acclI2CWrite;  //Function pointer to bus write function
@@ -25,13 +32,15 @@ void initAccel() {
   bma423_reset_step_counter(&BMAInfoStruct);
 
   uint16_t result = 0;
-  ledPing();
+  /* ledPing(); */
   feedWatchdog();
   result = result | bma423_init(&BMAInfoStruct);
   result = result | bma423_write_config_file(&BMAInfoStruct);
   result = result | bma4_set_accel_enable(1, &BMAInfoStruct);
   result = result | bma4_set_accel_config(&accelConfig, &BMAInfoStruct);
   result = result | bma423_feature_enable(BMA423_STEP_CNTR | BMA423_STEP_ACT, 1, &BMAInfoStruct);
+  /* result = result | bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_ANY_MOT_INT, 1, &BMAInfoStruct); */
+
   /* struct bma4_int_pin_config int_pin_config;
   int_pin_config.edge_ctrl = BMA4_LEVEL_TRIGGER;
   int_pin_config.lvl = BMA4_ACTIVE_LOW;
@@ -39,6 +48,7 @@ void initAccel() {
   int_pin_config.output_en = BMA4_OUTPUT_ENABLE;
   int_pin_config.input_en = BMA4_INPUT_DISABLE;
   bma4_set_int_pin_config(&int_pin_config, BMA4_INTR1_MAP, &BMAInfoStruct); */
+
   if (result == 0) {
     ledPing();
     delay(50);
@@ -54,7 +64,7 @@ void initAccel() {
   for reading
  */
 int8_t acclI2CRead(uint8_t registerAddress, uint8_t *readBuf, uint32_t readBufLength, void *intf_ptr) {
-  if (getI2CState() == I2C_LOCKED){
+  if (getI2CState() == I2C_LOCKED) {
     return 1;
   }
   lockI2C();
@@ -77,14 +87,14 @@ int8_t acclI2CRead(uint8_t registerAddress, uint8_t *readBuf, uint32_t readBufLe
  */
 int8_t acclI2CWrite(uint8_t registerAddress, const uint8_t *writeBuf, uint32_t writeBufLength, void *intf_ptr) {
   //ledPing();
-  if (getI2CState() == I2C_LOCKED){
+  if (getI2CState() == I2C_LOCKED) {
     return 1;
   }
   lockI2C();
   Wire.beginTransmission(BMA4_I2C_ADDR_PRIMARY);
   Wire.write(registerAddress);
   for (int i = 0; i < writeBufLength; i++) {
-    Wire.write(*writeBuf++); //Write the data and increment the pointer
+    Wire.write(*writeBuf++);  //Write the data and increment the pointer
   }
   if (Wire.endTransmission()) {
     //If we have an error in ending the transmission
@@ -104,11 +114,17 @@ void acclDelay(uint32_t period_us, void *intf_ptr) {
 /* 
   Test function to get the accelerometer data
  */
-void getAcclData(struct bma4_accel* data) {
-  uint8_t result = bma4_read_accel_xyz(data, &BMAInfoStruct);
-  if (result == 0)
-    return;
+void getAcclData(struct bma4_accel *data) {
+  if (getI2CState() != I2C_LOCKED) {
+    uint8_t result = bma4_read_accel_xyz(data, &BMAInfoStruct);
+    if (result == 0)
+      return;
+  }
   data->x = 69;
   data->y = 69;
   data->z = 69;
+}
+
+void getStepCount(uint32_t *steps) {
+  bma423_step_counter_output(steps, &BMAInfoStruct);
 }

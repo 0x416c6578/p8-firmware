@@ -112,7 +112,7 @@ void ledPing() {
   Only update the battery percent every 10 seconds to get a more accurate long-term reading
   every 10 seconds
  */
-uint16_t getBatteryMV() {
+uint16_t getBatteryPercent() {
   if (millis() - lastBatCalcTime > 6000) {
     lastBatCalcTime = millis();
     avgReading = cumulativeBatRead / batCounter;

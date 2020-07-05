@@ -80,7 +80,9 @@ void updateTouchStruct() {
       with another accelerometer transmission and there would be undefined behaviour
       resulting in a crash
     */
-    Wire.endTransmission();
+    Wire.end();
+    Wire.begin();
+    Wire.setClock(250000);
   }
   lockI2C();
 

@@ -55,13 +55,14 @@ class TimeScreen : public WatchScreenBase {
   uint8_t currentDay = -1;
   int chargeIndicationCounter = 0;
   bool chargeIndicationState = false;
+  uint32_t steps = 0;
 
  public:
   void screenSetup() {
     clearDisplay(true);
     currentDay = -1;
-    writeString(20, 130, 2, "Bat:");
-    writeString(107, 125, 3, "%");
+    writeString(80, 125, 3, "%");
+    /* writeChar(20, 152, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK); */
   }
   void screenDestroy() {}
   void screenLoop() {
@@ -70,8 +71,7 @@ class TimeScreen : public WatchScreenBase {
     //Only update the day string on a new day
     if (getDayOfWeek(day(), month(), year()) != currentDay)
       writeString(20, 95, 3, getDay());
-    writeIntWithoutPrecedingZeroes(69, 125, 3, getBatteryMV());
-    if (!getChargeState()) {
+    /* if (!getChargeState()) {
       if (millis() - chargeIndicationCounter > 500) {
         writeString(127, 125, 3, chargeIndicationState ? "+ " : " +", COLOUR_GREEN, COLOUR_BLACK);
         chargeIndicationState = !chargeIndicationState;
@@ -79,7 +79,15 @@ class TimeScreen : public WatchScreenBase {
       }
     } else {
       writeString(127, 125, 3, "  ");
+    } */
+    if (!getChargeState()) {
+      writeChar(20, 122, 3, GLYPH_BATTERY, COLOUR_GREEN, COLOUR_BLACK);
+    } else {
+      writeChar(20, 122, 3, GLYPH_BATTERY, COLOUR_WHITE, COLOUR_BLACK);
     }
+    writeIntWithoutPrecedingZeroes(40, 125, 3, getBatteryPercent());
+    /* getStepCount(&steps);
+    writeIntWithoutPrecedingZeroes(40, 155, 3, (int) steps); */
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
