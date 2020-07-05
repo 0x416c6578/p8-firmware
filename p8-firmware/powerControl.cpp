@@ -79,7 +79,7 @@ int getLastWakeTime(){
 }
 
 /* 
-  Set the time to sleep
+  Set the time to sleep (unused in this branch)
  */
 void setSleepTime(uint8_t seconds){
   sleepTime = seconds;

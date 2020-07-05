@@ -1,7 +1,7 @@
 #include "headers/display.h"
 #include "headers/fastSPI.h"
 //#include "headers/heartrate.h"
-#include "headers/accelerometer.h"
+//#include "headers/accelerometer.h"
 #include "headers/i2cLock.h"
 #include "headers/interrupts.h"  //Includes screenController.h
 #include "headers/ioControl.h"
@@ -22,7 +22,7 @@ void setup() {
   initFastSPI();   //Initialize EasyDMA SPI
   initDisplay();   //Initialize display
   initI2C();
-  initAccel();
+  //initAccel();
   initTouch();  //Initialize touch panel
 
   initInterrupts();  //Setup interrupts
@@ -39,9 +39,6 @@ void randomTests() {
 void loop() {
   if (!getButtonState()) {
     feedWatchdog();
-  } else{
-    updateLastWakeTime();
-    setSleepTime(10);  //We must make sure that the device cannot go to sleep whilst the button is held otherwise there may be a softlock
   }
   addToCumulativeBatReading();
   if (getPowerMode() == POWER_ON) {

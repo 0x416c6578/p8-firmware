@@ -1,7 +1,6 @@
 #pragma once
 #include "Arduino.h"
 #include "WatchScreenBase.h"
-#include "accelerometer.h"
 #include "display.h"
 #include "p8Time.h"
 #include "pinoutP8.h"
@@ -19,28 +18,26 @@
   This demo screen is used for testing purposes
 */
 class DemoScreen : public WatchScreenBase {
- private:
-  struct bma4_accel data;
-  long lastUpdateTime = 0;
-
  public:
   void screenSetup() {
     clearDisplay(true);
-    writeString(0, 0, 2, "X:");
-    writeString(0, 20, 2, "Y:");
-    writeString(0, 40, 2, "Z:");
+    writeString(0, 0, 3, "X:");
+    writeString(0, 30, 3, "Y:");
   }
   void screenDestroy() {}
   void screenLoop() {
-    if (millis() - lastUpdateTime > 150) {
+    /* if (millis() - lastUpdateTime > 150) {
       getAcclData(&data);
       writeIntWithPrecedingZeroes(25, 0, 2, abs(data.x));
       writeIntWithPrecedingZeroes(25, 20, 2, abs(data.y));
       writeIntWithPrecedingZeroes(25, 40, 2, abs(data.z));
       lastUpdateTime = millis();
-    }
+    } */
   }
-  void screenTap(uint8_t x, uint8_t y) {}
+  void screenTap(uint8_t x, uint8_t y) {
+    writeIntWithPrecedingZeroes(35, 0, 3, x);
+    writeIntWithPrecedingZeroes(35, 30, 3, y);
+  }
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
   void swipeUp() {}

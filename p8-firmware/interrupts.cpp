@@ -1,14 +1,14 @@
 #include "headers/interrupts.h"
 
-#define LF_FREQUENCY 32768UL
+/* #define LF_FREQUENCY 32768UL
 #define SECONDS(x) ((uint32_t)((LF_FREQUENCY * x) + 0.5))
-#define TIMER_WAKEUP_INTERVAL 0.5
+#define TIMER_WAKEUP_INTERVAL 0.5 */
 
-bma4_accel acclData;
+/* bma4_accel acclData; */
 
 bool pendingButtonInt = false;
 bool pendingTouchInt = false;
-bool pendingTimerInt = true;
+/* bool pendingTimerInt = true; */
 /* bool pendingAcclInt = false; */
 bool lastButtonState;
 bool lastTouchState;
@@ -34,8 +34,7 @@ void initInterrupts() {
   lastTouchState = digitalRead(TP_INT);
   NRF_GPIO->PIN_CNF[TP_INT] |= (GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos);
 
-  //Setup the timer interrupt for raise-to-wake stuff
-  NVIC_ClearPendingIRQ(RTC2_IRQn);
+  /* NVIC_ClearPendingIRQ(RTC2_IRQn);
   NVIC_SetPriority(RTC2_IRQn, 15);
   NVIC_EnableIRQ(RTC2_IRQn);
 
@@ -44,8 +43,8 @@ void initInterrupts() {
   NRF_RTC2->INTENSET = RTC_EVTENSET_COMPARE0_Enabled << RTC_EVTENSET_COMPARE0_Pos;
   NRF_RTC2->EVTENSET = RTC_INTENSET_COMPARE0_Enabled << RTC_INTENSET_COMPARE0_Pos;
   NRF_RTC2->TASKS_START = 1;
-
-  /* lastAcclState = digitalRead(BMA421_INT);
+  
+  lastAcclState = digitalRead(BMA421_INT);
   NRF_GPIO->PIN_CNF[BMA421_INT] |= (GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos); */
 }
 
@@ -106,7 +105,7 @@ void GPIOTE_IRQHandler() {
 }
 #endif
 
-#ifdef __cplusplus
+/* #ifdef __cplusplus
 extern "C" {
 #endif
 void RTC2_IRQHandler(void) {
@@ -124,7 +123,7 @@ void RTC2_IRQHandler(void) {
 }
 #ifdef __cplusplus
 }
-#endif
+#endif */
 
 /* 
 This method is called AFAP by the main Arduino loop()
@@ -132,7 +131,7 @@ This method is called AFAP by the main Arduino loop()
 void handleInterrupts() {
   //If we have a pending touch interrupt
   if (pendingTouchInt) {
-    setSleepTime(DEFAULT_SLEEP_TIME);
+    /* setSleepTime(DEFAULT_SLEEP_TIME); */
     updateLastWakeTime();
 
     TouchDataStruct *touchData = getTouchDataStruct();
@@ -164,7 +163,7 @@ void handleInterrupts() {
     if (getPowerMode() == POWER_OFF) {
       exitSleep();
       resetInterrupts();
-      setSleepTime(DEFAULT_SLEEP_TIME);
+      /* setSleepTime(DEFAULT_SLEEP_TIME); */
       updateLastWakeTime();
       return;
     }
@@ -174,13 +173,13 @@ void handleInterrupts() {
     */
     if (millis() - getLastWakeTime() > 100) {
       //Since we registered a button press, the last wake time must be updated
-      setSleepTime(DEFAULT_SLEEP_TIME);
+      /* setSleepTime(DEFAULT_SLEEP_TIME); */
       updateLastWakeTime();
       handleButtonPress();
     }
-
-    //Wake up if we receive an accelerometer interrupt
-  } else if (pendingTimerInt) {
+  }
+  //Wake up if we receive an accelerometer interrupt
+  /*  else if (pendingTimerInt) {
     getAcclData(&acclData);
     if (acclData.y < -250 && acclData.y > -750) {
       exitSleep();
@@ -191,7 +190,7 @@ void handleInterrupts() {
     } else {
       resetInterrupts();
     }
-  }
+  } */
 
   else {  //If this is called when there is no interrupt, check the wake time and sleep if necessary
     checkWakeTime();
@@ -206,6 +205,6 @@ void handleInterrupts() {
 void resetInterrupts() {
   pendingTouchInt = false;
   pendingButtonInt = false;
-  pendingTimerInt = false;
+  /* pendingTimerInt = false; */
   /* pendingAcclInt = false; */
 }
