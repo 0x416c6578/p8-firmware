@@ -79,7 +79,6 @@ void handleInterrupts() {
   //If we have a pending touch interrupt
   if (pendingTouchInt) {
     updateLastWakeTime();
-    ledPing();
 
     TouchDataStruct *touchData = getTouchDataStruct();
     //Handle the touch type
@@ -118,7 +117,7 @@ void handleInterrupts() {
       We want to make sure that we only register a button press after a certain period of time
       so as to reduce the chance of button bouncing being registered as a press 
     */
-    if (millis() - getLastWakeTime() > 100) {
+    if (millis() - getLastWakeTime() > 350) {
       //Since we registered a button press, the last wake time must be updated
       updateLastWakeTime();
       handleButtonPress();

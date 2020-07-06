@@ -68,23 +68,15 @@ class TimeScreen : public WatchScreenBase {
     //Only update the day string on a new day
     if (getDayOfWeek(day(), month(), year()) != currentDay)
       writeString(20, 95, 3, getDay());
-    /* if (!getChargeState()) {
-      if (millis() - chargeIndicationCounter > 500) {
-        writeString(127, 125, 3, chargeIndicationState ? "+ " : " +", COLOUR_GREEN, COLOUR_BLACK);
-        chargeIndicationState = !chargeIndicationState;
-        chargeIndicationCounter = millis();
-      }
-    } else {
-      writeString(127, 125, 3, "  ");
-    } */
     if (!getChargeState()) {
-      writeChar(20, 122, 3, GLYPH_BATTERY, COLOUR_GREEN, COLOUR_BLACK);
+      if (getBatteryPercent() < 99)
+        writeChar(20, 122, 3, GLYPH_BATTERY, COLOUR_RED, COLOUR_BLACK);
+      else
+        writeChar(20, 122, 3, GLYPH_BATTERY, COLOUR_GREEN, COLOUR_BLACK);
     } else {
       writeChar(20, 122, 3, GLYPH_BATTERY, COLOUR_WHITE, COLOUR_BLACK);
     }
     writeIntWithoutPrecedingZeroes(40, 125, 3, getBatteryPercent());
-    /* getStepCount(&steps);
-    writeIntWithoutPrecedingZeroes(40, 155, 3, (int) steps); */
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
@@ -141,12 +133,12 @@ class StopWatchScreen : public WatchScreenBase {
  */
 class TimeDateSetScreen : public WatchScreenBase {
  private:
-  int8_t setHour = 0;
-  int8_t setMinute = 0;
+  int8_t setHour = 12;
+  int8_t setMinute = 30;
   int8_t setSecond = 0;
   int setYear = 2020;
-  int8_t setMonth = 1;
-  int8_t setDay = 1;
+  int8_t setMonth = 6;
+  int8_t setDay = 15;
 
  public:
   enum settingsWindow {
@@ -170,31 +162,31 @@ class TimeDateSetScreen : public WatchScreenBase {
     switch (currentSettingsWindow) {
       case BRIGHTNESS:
         writeString(0, 0, 3, "Brightness");
-        writeIntWithoutPrecedingZeroes(0, 26, 3, getBrightness());
+        writeIntWithPrecedingZeroes(0, 26, 3, getBrightness());
         break;
       case SECOND:
         writeString(0, 0, 3, "Second");
-        writeIntWithoutPrecedingZeroes(0, 26, 3, setSecond);
+        writeIntWithPrecedingZeroes(0, 26, 3, setSecond);
         break;
       case MINUTE:
         writeString(0, 0, 3, "Minute");
-        writeIntWithoutPrecedingZeroes(0, 26, 3, setMinute);
+        writeIntWithPrecedingZeroes(0, 26, 3, setMinute);
         break;
       case HOUR:
         writeString(0, 0, 3, "Hour");
-        writeIntWithoutPrecedingZeroes(0, 26, 3, setHour);
+        writeIntWithPrecedingZeroes(0, 26, 3, setHour);
         break;
       case DAY:
         writeString(0, 0, 3, "Day");
-        writeIntWithoutPrecedingZeroes(0, 26, 3, setDay);
+        writeIntWithPrecedingZeroes(0, 26, 3, setDay);
         break;
       case MONTH:
         writeString(0, 0, 3, "Month");
-        writeIntWithoutPrecedingZeroes(0, 26, 3, setMonth);
+        writeIntWithPrecedingZeroes(0, 26, 3, setMonth);
         break;
       case YEAR:
         writeString(0, 0, 3, "Year");
-        writeIntWithoutPrecedingZeroes(0, 26, 3, setYear);
+        writeIntWithPrecedingZeroes(0, 26, 3, setYear);
         setTimeWrapper(setYear, setMonth, setDay, setHour, setMinute, setSecond);
         break;
     }
@@ -206,22 +198,28 @@ class TimeDateSetScreen : public WatchScreenBase {
           decBrightness();
           break;
         case SECOND:
-          setSecond--;
+          if (setSecond > 0)
+            setSecond--;
           break;
         case MINUTE:
-          setMinute--;
+          if (setMinute > 0)
+            setMinute--;
           break;
         case HOUR:
-          setHour--;
+          if (setHour > 0)
+            setHour--;
           break;
         case DAY:
-          setDay--;
+          if (setDay > 0)
+            setDay--;
           break;
         case MONTH:
-          setMonth--;
+          if (setMonth > 0)
+            setMonth--;
           break;
         case YEAR:
-          setYear--;
+          if (setYear > 0)
+            setYear--;
           break;
       }
     } else if (x > 120) {
@@ -230,19 +228,24 @@ class TimeDateSetScreen : public WatchScreenBase {
           incBrightness();
           break;
         case SECOND:
-          setSecond++;
+          if (setSecond < 60)
+            setSecond++;
           break;
         case MINUTE:
-          setMinute++;
+          if (setSecond < 60)
+            setMinute++;
           break;
         case HOUR:
-          setHour++;
+          if (setSecond < 23)
+            setHour++;
           break;
         case DAY:
-          setDay++;
+          if (setSecond < 31)
+            setDay++;
           break;
         case MONTH:
-          setMonth++;
+          if (setSecond < 12)
+            setMonth++;
           break;
         case YEAR:
           setYear++;
@@ -358,8 +361,6 @@ class PowerScreen : public WatchScreenBase {
   }
   void screenDestroy() {}
   void screenLoop() {
-
-  
   }
   void screenTap(uint8_t x, uint8_t y) {
     if (y < 118 && x < 118) {

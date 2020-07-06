@@ -258,7 +258,7 @@ void writeIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPix
 */
 void writeIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
   if (toWrite == 0) {
-    writeChar(x, y, pixelsPerPixel, '0', colourFG, colourBG);
+    writeString(x, y, pixelsPerPixel, "000000000", colourFG, colourBG);
     return;
   }
   //Byte array for storing the digits
