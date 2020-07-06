@@ -78,7 +78,6 @@ This method is called AFAP by the main Arduino loop()
 void handleInterrupts() {
   //If we have a pending touch interrupt
   if (pendingTouchInt) {
-    /* setSleepTime(DEFAULT_SLEEP_TIME); */
     updateLastWakeTime();
     ledPing();
 
@@ -112,7 +111,6 @@ void handleInterrupts() {
     if (getPowerMode() == POWER_OFF) {
       exitSleep();
       resetInterrupts();
-      /* setSleepTime(DEFAULT_SLEEP_TIME); */
       updateLastWakeTime();
       return;
     }
@@ -122,7 +120,6 @@ void handleInterrupts() {
     */
     if (millis() - getLastWakeTime() > 100) {
       //Since we registered a button press, the last wake time must be updated
-      /* setSleepTime(DEFAULT_SLEEP_TIME); */
       updateLastWakeTime();
       handleButtonPress();
       resetInterrupts();
