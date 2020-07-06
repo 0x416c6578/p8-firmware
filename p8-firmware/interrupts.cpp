@@ -1,5 +1,6 @@
 #include "headers/interrupts.h"
 
+#define BUTTON_WAIT_DELAY_AFTER_WAKE_MS 300
 bool pendingButtonInt = false;
 bool pendingTouchInt = false;
 bool lastButtonState;
@@ -117,11 +118,13 @@ void handleInterrupts() {
       We want to make sure that we only register a button press after a certain period of time
       so as to reduce the chance of button bouncing being registered as a press 
     */
-    if (millis() - getLastWakeTime() > 450) {
+    if (millis() - getLastWakeTime() > BUTTON_WAIT_DELAY_AFTER_WAKE_MS) {
       //Since we registered a button press, the last wake time must be updated
       updateLastWakeTime();
       handleButtonPress();
       resetInterrupts();
+    } else{
+      resetInterrupts(); //We want to reject any button presses done within the wait period to hopefully stop bouncing
     }
   } else {  //If this is called when there is no interrupt, check the wake time and sleep if necessary
     checkWakeTime();

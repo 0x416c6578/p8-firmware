@@ -179,11 +179,11 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, u
     //If printing the next character would result in it being of screen
     if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH * pixelsPerPixel * 2) {  //If printing the next character would result in it being of screen
       if (string[i] != 32 && string[i - 1] != 32)
-        writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, '-', colourFG, colourBG);
+        writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, '-', colourFG, colourBG);
       currentLine++;
       charPos = 0;
     }
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i], colourFG, colourBG);
+    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, string[i], colourFG, colourBG);
     charPos++;
     i++;
   }
@@ -205,11 +205,11 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, 
     */
     if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH * pixelsPerPixel * 2) {  //If printing the next character would result in it being of screen
       if (string[i] != 32)
-        writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, '-', colourFG, colourBG);
+        writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, '-', colourFG, colourBG);
       currentLine++;
       charPos = 0;
     }
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, string[i], colourFG, colourBG);
+    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, string[i], colourFG, colourBG);
     charPos++;
   }
 }
@@ -248,7 +248,7 @@ void writeIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPix
       charPos = 0;
     }
     sprintf(charToWrite, "%d", digits[i]);
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
+    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
     charPos++;
   }
 }
@@ -281,7 +281,7 @@ void writeIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel,
       charPos = 0;
     }
     sprintf(charToWrite, "%d", digits[i]);
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * 8 * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
+    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
     charPos++;
   }
 }
@@ -294,13 +294,13 @@ void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, u
 
   //Width and height of the character on the display
   int characterDispWidth = FONT_WIDTH * pixelsPerPixel;
-  int characterDispHeight = 8 * pixelsPerPixel;
+  int characterDispHeight = FONT_HEIGHT * pixelsPerPixel;
   setRowColRAMAddr(x, y, characterDispWidth, characterDispHeight);
 
   int offset = FONT_NEEDS_OFFSET ? 32 : 0;
 
   //Row goes between 0 and 7, column goes between 0 and the font width
-  for (int row = 0; row < 8; row++) {
+  for (int row = 0; row < FONT_HEIGHT; row++) {
     for (int col = 0; col < FONT_WIDTH; col++) {
       //(font[character][col] >> row) & 1 will return true if the font dictates that (col, row) should have a pixel there
       setDisplayPixels(col, row, pixelsPerPixel, (font[character - offset][col] >> row) & 1, colourFG, colourBG);
@@ -465,7 +465,7 @@ void drawRectOutline(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lin
 void drawRectOutlineWithChar(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t rectColour, char character, uint8_t fontSize) {
   drawRectOutline(x, y, w, h, lineWidth, rectColour);
   writeChar((x + (w / 2)) - ((getWidthOfNChars(1, fontSize)) / 2),
-            (y + (h / 2)) - ((8 * fontSize) / 2),
+            (y + (h / 2)) - ((FONT_HEIGHT * fontSize) / 2),
             fontSize, character, COLOUR_WHITE, COLOUR_BLACK);
 }
 
