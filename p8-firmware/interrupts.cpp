@@ -117,7 +117,7 @@ void handleInterrupts() {
       We want to make sure that we only register a button press after a certain period of time
       so as to reduce the chance of button bouncing being registered as a press 
     */
-    if (millis() - getLastWakeTime() > 350) {
+    if (millis() - getLastWakeTime() > 450) {
       //Since we registered a button press, the last wake time must be updated
       updateLastWakeTime();
       handleButtonPress();

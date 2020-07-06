@@ -333,6 +333,9 @@ class InfoScreen : public WatchScreenBase {
     writeString(0, 0, 1, "Firmware by:");
     writeString(0, 10, 2, "Alex Underwood");
     writeString(0, 30, 1, "Uptime:");
+    writeString(0,60,1,"Compiled:");
+    writeString(0,70,2,__DATE__);
+    writeString(0,90,2,__TIME__);
   }
   void screenDestroy() {}
   void screenLoop() {
@@ -352,18 +355,14 @@ class PowerScreen : public WatchScreenBase {
  public:
   void screenSetup() {
     clearDisplay(true);
-    drawRect(0, 0, 118, 118, COLOUR_WHITE);
-    drawRect(2, 2, 114, 114, COLOUR_BLACK);
-    drawRect(122, 0, 118, 118, COLOUR_WHITE);
-    drawRect(124, 2, 114, 114, COLOUR_BLACK);
-    writeChar(59 - (getWidthOfNChars(1, 4) / 2), 43, 4, GLYPH_REBOOT_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-    writeChar(181 - (getWidthOfNChars(1, 4) / 2), 43, 4, GLYPH_BOOTLOADER_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+    drawRectOutlineWithChar(0, 0, 70, 70, 5, COLOUR_WHITE, GLYPH_REBOOT_UNSEL, 4);
+    drawRectOutlineWithChar(85, 0, 70, 70, 5, COLOUR_WHITE, GLYPH_BOOTLOADER_UNSEL, 4);
+    drawRectOutline(170, 0, 70, 70, 5, COLOUR_WHITE);
   }
   void screenDestroy() {}
-  void screenLoop() {
-  }
+  void screenLoop() {}
   void screenTap(uint8_t x, uint8_t y) {
-    if (y < 118 && x < 118) {
+    if (y < 70 && x < 70) {
       __DSB(); /* Ensure all outstanding memory accesses included
                   buffered write are completed before reset */
 

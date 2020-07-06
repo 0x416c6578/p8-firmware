@@ -444,6 +444,31 @@ void fillRectWithColour(uint16_t colour) {
   } while (numberBytesInWindowArea > 0);
 }
 
+/* 
+  Draw a rectangle with outline of width lineWidth
+ */
+void drawRectOutline(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t colour) {
+  drawRect(x, y, w, h, COLOUR_BLACK);  //Clear rect of stuff
+  //Top rect
+  drawRect(x, y, w, lineWidth, colour);
+  //Bottom rect
+  drawRect(x, y + h - lineWidth, w, lineWidth, colour);
+  //Left rect
+  drawRect(x, y, lineWidth, h, colour);
+  //Right rect
+  drawRect(x + w - lineWidth, y, lineWidth, h, colour);
+}
+
+/* 
+  Draw a rect outline with character in the middle (look at writeup for explanation)
+ */
+void drawRectOutlineWithChar(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t rectColour, char character, uint8_t fontSize) {
+  drawRectOutline(x, y, w, h, lineWidth, rectColour);
+  writeChar((x + (w / 2)) - ((getWidthOfNChars(1, fontSize)) / 2),
+            (y + (h / 2)) - ((8 * fontSize) / 2),
+            fontSize, character, COLOUR_WHITE, COLOUR_BLACK);
+}
+
 /*
   Clear display
 */
