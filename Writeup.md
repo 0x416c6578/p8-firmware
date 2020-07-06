@@ -13,6 +13,12 @@
   - This is different to Aarons, which draws a rect for each pixel
   - This implementation is faster still than Aarons implementation, and by the naked eye, writing a full screen of text is equally as fast as drawing a rect equal to the display size (theoretically the fastest you could write to the display)
 - There are still further optimizations that could be made to this routine (and parameterising it for use with different fonts), however I am happy with the current implementation
+#### Drawing Rectangle Outlines with Text
+
+<img src="Images/rectOutline.png" alt=" " width=" 600" />
+<img src="Images/charactersRect.png" alt=" " width=" 600" />
+
+
 ### Touch
 - The touch controller used in the P8 is the CST716S, rather than the CST816S
 - It seems to be an equivalent controller in terms of data output
