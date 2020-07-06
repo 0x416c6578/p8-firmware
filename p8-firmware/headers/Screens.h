@@ -357,7 +357,10 @@ class PowerScreen : public WatchScreenBase {
     writeChar(181 - (getWidthOfNChars(1, 4) / 2), 43, 4, GLYPH_BOOTLOADER_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   }
   void screenDestroy() {}
-  void screenLoop() {}
+  void screenLoop() {
+
+  
+  }
   void screenTap(uint8_t x, uint8_t y) {
     if (y < 118 && x < 118) {
       __DSB(); /* Ensure all outstanding memory accesses included

@@ -1,18 +1,9 @@
 #include "headers/interrupts.h"
 
-/* #define LF_FREQUENCY 32768UL
-#define SECONDS(x) ((uint32_t)((LF_FREQUENCY * x) + 0.5))
-#define TIMER_WAKEUP_INTERVAL 0.5 */
-
-/* bma4_accel acclData; */
-
 bool pendingButtonInt = false;
 bool pendingTouchInt = false;
-/* bool pendingTimerInt = true; */
-/* bool pendingAcclInt = false; */
 bool lastButtonState;
 bool lastTouchState;
-/* bool lastAcclState; */
 
 /*
   Initialize interrupts using a GPIO port for reduced power draw
@@ -33,19 +24,6 @@ void initInterrupts() {
 
   lastTouchState = digitalRead(TP_INT);
   NRF_GPIO->PIN_CNF[TP_INT] |= (GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos);
-
-  /* NVIC_ClearPendingIRQ(RTC2_IRQn);
-  NVIC_SetPriority(RTC2_IRQn, 15);
-  NVIC_EnableIRQ(RTC2_IRQn);
-
-  NRF_RTC2->PRESCALER = 0;
-  NRF_RTC2->CC[0] = SECONDS(TIMER_WAKEUP_INTERVAL);
-  NRF_RTC2->INTENSET = RTC_EVTENSET_COMPARE0_Enabled << RTC_EVTENSET_COMPARE0_Pos;
-  NRF_RTC2->EVTENSET = RTC_INTENSET_COMPARE0_Enabled << RTC_INTENSET_COMPARE0_Pos;
-  NRF_RTC2->TASKS_START = 1;
-  
-  lastAcclState = digitalRead(BMA421_INT);
-  NRF_GPIO->PIN_CNF[BMA421_INT] |= (GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos); */
 }
 
 /* 
@@ -66,10 +44,9 @@ void GPIOTE_IRQHandler() {
   if ((NRF_GPIOTE->EVENTS_PORT != 0)) {
     NRF_GPIOTE->EVENTS_PORT = 0;  //Reset flag for the port event
 
-    updateTouchStruct();  //Preemptively update the touch data as quickly as possible
-
     bool touchIntRead = digitalRead(TP_INT);
     if (touchIntRead != lastTouchState) {  //If there has been a change in state of the touch interrupt
+      updateTouchStruct();                 //Preemptively update the touch data as quickly as possible
       lastTouchState = touchIntRead;
       NRF_GPIO->PIN_CNF[TP_INT] &= ~GPIO_PIN_CNF_SENSE_Msk;
       NRF_GPIO->PIN_CNF[TP_INT] |= ((lastTouchState ? GPIO_PIN_CNF_SENSE_Low : GPIO_PIN_CNF_SENSE_High) << GPIO_PIN_CNF_SENSE_Pos);
@@ -77,16 +54,6 @@ void GPIOTE_IRQHandler() {
         pendingTouchInt = true;
       }
     }
-
-    /* bool acclIntRead = digitalRead(BMA421_INT);
-    if (acclIntRead != lastAcclState) {  //If there has been a change in state of the accelerometer interrupt
-      lastAcclState = acclIntRead;
-      NRF_GPIO->PIN_CNF[BMA421_INT] &= ~GPIO_PIN_CNF_SENSE_Msk;
-      NRF_GPIO->PIN_CNF[BMA421_INT] |= ((lastAcclState ? GPIO_PIN_CNF_SENSE_Low : GPIO_PIN_CNF_SENSE_High) << GPIO_PIN_CNF_SENSE_Pos);
-      if (lastAcclState == LOW) {
-        pendingAcclInt = true;
-      }
-    } */
 
     bool buttonRead = digitalRead(PUSH_BUTTON_IN);
     if (buttonRead != lastButtonState) {  //If there has been a change in state of the button
@@ -105,26 +72,6 @@ void GPIOTE_IRQHandler() {
 }
 #endif
 
-/* #ifdef __cplusplus
-extern "C" {
-#endif
-void RTC2_IRQHandler(void) {
-  volatile uint32_t dummy;
-  if (NRF_RTC2->EVENTS_COMPARE[0] == 1) {
-    NRF_RTC2->EVENTS_COMPARE[0] = 0;
-    NRF_RTC2->CC[0] = NRF_RTC2->COUNTER + SECONDS(TIMER_WAKEUP_INTERVAL);
-    dummy = NRF_RTC2->EVENTS_COMPARE[0];
-    dummy;
-    // shot = true;
-    if (getPowerMode() == POWER_OFF) {
-      pendingTimerInt = true;
-    }
-  }
-}
-#ifdef __cplusplus
-}
-#endif */
-
 /* 
 This method is called AFAP by the main Arduino loop()
  */
@@ -133,6 +80,7 @@ void handleInterrupts() {
   if (pendingTouchInt) {
     /* setSleepTime(DEFAULT_SLEEP_TIME); */
     updateLastWakeTime();
+    ledPing();
 
     TouchDataStruct *touchData = getTouchDataStruct();
     //Handle the touch type
@@ -156,6 +104,7 @@ void handleInterrupts() {
         handleRightSwipe();
         break;
     }
+    resetInterrupts();
 
     //If we have a pending button interrupt
   } else if (pendingButtonInt) {
@@ -176,27 +125,11 @@ void handleInterrupts() {
       /* setSleepTime(DEFAULT_SLEEP_TIME); */
       updateLastWakeTime();
       handleButtonPress();
-    }
-  }
-  //Wake up if we receive an accelerometer interrupt
-  /*  else if (pendingTimerInt) {
-    getAcclData(&acclData);
-    if (acclData.y < -250 && acclData.y > -750) {
-      exitSleep();
-      resetInterrupts();
-      setSleepTime(2);
-      updateLastWakeTime();
-      return;
-    } else {
       resetInterrupts();
     }
-  } */
-
-  else {  //If this is called when there is no interrupt, check the wake time and sleep if necessary
+  } else {  //If this is called when there is no interrupt, check the wake time and sleep if necessary
     checkWakeTime();
   }
-
-  resetInterrupts();  //Reset all interrupt flags
 }
 
 /* 
@@ -205,6 +138,4 @@ void handleInterrupts() {
 void resetInterrupts() {
   pendingTouchInt = false;
   pendingButtonInt = false;
-  /* pendingTimerInt = false; */
-  /* pendingAcclInt = false; */
 }
