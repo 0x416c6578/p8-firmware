@@ -11,7 +11,7 @@ HUGE HUGE thanks to [Aaron](https://github.com/atc1441) for all his work, I woul
 #### In the future
 - [x] Get RTC working
 - [x] Get touch display working
-- [ ] Get accelerometer working
+- [x] Get accelerometer working
 - [ ] Get heart rate sensor working
 - [x] Implement main screen, and a framework for adding new screens
 ## New Features over ATCWatch
