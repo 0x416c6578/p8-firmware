@@ -2,6 +2,7 @@
 #include "headers/fastSPI.h"
 //#include "headers/heartrate.h"
 //#include "headers/accelerometer.h"
+#include "headers/bluetooth.h"
 #include "headers/i2cLock.h"
 #include "headers/interrupts.h"  //Includes screenController.h
 #include "headers/ioControl.h"
@@ -25,11 +26,13 @@ void setup() {
   //initAccel();
   initTouch();  //Initialize touch panel
 
+  //initBluetooth();
   initInterrupts();  //Setup interrupts
 
   initScreen();  //Initialize the screen controller (the thing that actually handles what is displayed)
   initSleep();   //Initialize the sleep power mode
   //initHeartrate();   //Initialize the heartrate sensors
+
   randomTests();
 }
 
@@ -40,6 +43,7 @@ void loop() {
   if (!getButtonState()) {
     feedWatchdog();
   }
+  feedBle();
   addToCumulativeBatReading();
   if (getPowerMode() == POWER_ON) {
     screenControllerLoop();  //This will run the main loop of the current screen
