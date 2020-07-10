@@ -19,7 +19,7 @@ void enterSleep() {
   sleepTouchController();
 
   setPowerMode(POWER_OFF);
-  displayEnable(POWER_OFF);
+  sleepDisplay();
   setBrightness(BACKLIGHT_OFF);
   ledOutput(POWER_OFF);
   motorOutput(POWER_OFF);
@@ -32,7 +32,7 @@ void exitSleep() {
   resetTouchController();
 
   setPowerMode(POWER_ON);
-  displayEnable(POWER_ON);
+  wakeDisplay();
   setBrightness(getBrightness());
   ledOutput(POWER_OFF);
   motorOutput(POWER_OFF);

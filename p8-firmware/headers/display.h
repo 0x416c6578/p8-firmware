@@ -6,7 +6,8 @@
 #include "font.h"
 
 void initDisplay();
-void displayEnable(bool state);
+void wakeDisplay();
+void sleepDisplay();
 void drawRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t colour);
 void setRowColRAMAddr(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 void fillRectWithColour(uint16_t colour);

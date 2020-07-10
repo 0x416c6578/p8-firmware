@@ -6,6 +6,10 @@ BLEService bleService = BLEService("190A");
 BLECharacteristic   TXchar        = BLECharacteristic("0002", BLENotify, 20);
 BLECharacteristic   RXchar        = BLECharacteristic("0001", BLEWriteWithoutResponse, 20);
 
+/* 
+  Basically all code here was ripped from ATCWatch to enable the softdevice
+  for power draw debugging. No work has been done on the bluetooth stack yet
+ */
 void initBluetooth() {
   blePeripheral.setLocalName("P8Watch1");
   blePeripheral.setAdvertisingInterval(500);

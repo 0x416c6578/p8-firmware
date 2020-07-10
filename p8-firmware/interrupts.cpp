@@ -47,7 +47,7 @@ void GPIOTE_IRQHandler() {
 
     bool touchIntRead = digitalRead(TP_INT);
     if (touchIntRead != lastTouchState) {  //If there has been a change in state of the touch interrupt
-      updateTouchStruct();                 //Preemptively update the touch data as quickly as possible
+      //updateTouchStruct();                 //Preemptively update the touch data as quickly as possible
       lastTouchState = touchIntRead;
       NRF_GPIO->PIN_CNF[TP_INT] &= ~GPIO_PIN_CNF_SENSE_Msk;
       NRF_GPIO->PIN_CNF[TP_INT] |= ((lastTouchState ? GPIO_PIN_CNF_SENSE_Low : GPIO_PIN_CNF_SENSE_High) << GPIO_PIN_CNF_SENSE_Pos);
@@ -79,6 +79,7 @@ This method is called AFAP by the main Arduino loop()
 void handleInterrupts() {
   //If we have a pending touch interrupt
   if (pendingTouchInt) {
+    updateTouchStruct(); //Get the touch information
     updateLastWakeTime();
 
     TouchDataStruct *touchData = getTouchDataStruct();
@@ -129,6 +130,10 @@ void handleInterrupts() {
   } else {  //If this is called when there is no interrupt, check the wake time and sleep if necessary
     checkWakeTime();
   }
+
+  //I left this in and it caused a race condition that would sometimes mean touches were ignored since their flag
+  //would be reset before they were handled. Now the flags are only reset when an interrupt was handled
+  //resetInterrupts();
 }
 
 /* 
