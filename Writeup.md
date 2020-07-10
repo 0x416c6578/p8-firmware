@@ -15,8 +15,8 @@
 - There are still further optimizations that could be made to this routine (and parameterising it for use with different fonts), however I am happy with the current implementation
 #### Drawing Rectangle Outlines with Text
 
-<img src="Images/rectOutline.png" alt=" " width=" 600" />
-<img src="Images/charactersRect.png" alt=" " width=" 600" />
+<img src="Random/rectOutline.png" alt=" " width=" 600" />
+<img src="Random/charactersRect.png" alt=" " width=" 600" />
 
 
 ### Touch
@@ -29,7 +29,7 @@
 ## Heartrate sensor
 - There are two LEDs on the heartrate sensor board, however these are independently controllable separate to the heartrate sensor itself (which has its own LED in the package) through pin 27
 
-<img src="Images/leds.jpg" alt=" " width=" 600" />
+<img src="Random/leds.jpg" alt=" " width=" 600" />
 
 ## Accelerometer
 ## Implementation of Screens as Classes
@@ -37,6 +37,6 @@
 ___
 # Internal Images
 
-<img src="Images/leds.jpg" alt=" " width=" 600" />
-<img src="Images/batteryCon.jpg" alt=" " width=" 600" />
-<img src="Images/overview.jpg" alt=" " width=" 600" />
+<img src="Random/leds.jpg" alt=" " width=" 600" />
+<img src="Random/batteryCon.jpg" alt=" " width=" 600" />
+<img src="Random/overview.jpg" alt=" " width=" 600" />
