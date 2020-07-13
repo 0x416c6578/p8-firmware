@@ -1,7 +1,8 @@
 #include "headers/display.h"
 #include "headers/fastSPI.h"
 //#include "headers/heartrate.h"
-#include "headers/accelerometer.h"
+//#include "headers/accelerometer.h"
+#include "headers/bluetooth.h"
 #include "headers/i2cLock.h"
 #include "headers/interrupts.h"  //Includes screenController.h
 #include "headers/ioControl.h"
@@ -15,40 +16,47 @@
 void setup() {
   initIO();                //Init GPIOs
   if (getButtonState()) {  //If the button is held at boot, enter bootloader
+    /* This sets a bit in the general purpose retention register which (I assume) 
+    the bootloader sees and halts booting */
     NRF_POWER->GPREGRET = 0x01;
     NVIC_SystemReset();
   }
-  initWatchdog();  //Start the watchdog
-  initFastSPI();   //Initialize EasyDMA SPI
-  initDisplay();   //Initialize display
-  initI2C();
-  initAccel();
-  initTouch();  //Initialize touch panel
-
+  initWatchdog();    //Start the watchdog
+  initFastSPI();     //Initialize EasyDMA SPI
+  initDisplay();     //Initialize display
+  initI2C();         //Initialize the I2C interface
+  initTouch();       //Initialize touch panel
   initInterrupts();  //Setup interrupts
-
-  initScreen();  //Initialize the screen controller (the thing that actually handles what is displayed)
-  initSleep();   //Initialize the sleep power mode
+  initScreen();      //Initialize the screen controller (the thing that actually handles what is displayed)
+  initSleep();       //Initialize the sleep power mode
   //initHeartrate();   //Initialize the heartrate sensors
-  randomTests();
+
+  randomTests();  //Debugging stuff
 }
 
 void randomTests() {
+  //NRF_RTC1->TASKS_TRIGOVRFLW = 1;
 }
 
 void loop() {
-  if (!getButtonState()) {
+  if (!getButtonState()) {  //If the button is pressed, we don't want to feed the watchdog (allows for rebooting if needed)
     feedWatchdog();
-  } else{
-    updateLastWakeTime();
-    setSleepTime(10);  //We must make sure that the device cannot go to sleep whilst the button is held otherwise there may be a softlock
   }
-  addToCumulativeBatReading();
+
+  //feedBle();
+
+  addToCumulativeBatReading();  //Battery readings are taken over a period and the mean is taken periodically to get a more accurate reading
+
   if (getPowerMode() == POWER_ON) {
     screenControllerLoop();  //This will run the main loop of the current screen
   } else {
-    sleepWait();
+    sleepWait();  //This puts the MCU into its sleep mode, only waking on an interrupt
   }
-  handleInterrupts();  //If any interrupts were detected, this function will dispatch any events, and
-                       //reset the interrupt flag
+
+  /* If any interrupts were detected, this function will dispatch any events, and
+  reset the interrupt flag. This is not the NVIC interrupt handler, but a function called
+  in the main loop. This means that the interrupt handlers can just be simple flag-sets, and we 
+  can guarantee the atomic execution of interrupt handling (ie making sure that the interrupt handler
+  doesn't read i2c whilst another part of the program was). */
+  handleInterrupts();
 }

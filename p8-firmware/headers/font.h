@@ -11,6 +11,7 @@
 
 #define FONT_NEEDS_OFFSET false
 #define FONT_WIDTH 5
+#define FONT_HEIGHT 8
 
 #define CHAR_NONE 0
 #define GLYPH_CLOCK_UNSEL 1
