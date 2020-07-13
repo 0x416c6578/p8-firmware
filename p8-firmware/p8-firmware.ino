@@ -35,6 +35,7 @@ void setup() {
 }
 
 void randomTests() {
+  //NRF_RTC1->TASKS_TRIGOVRFLW = 1;
 }
 
 void loop() {
