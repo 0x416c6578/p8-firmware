@@ -436,7 +436,7 @@ void drawRectOutlineWithChar(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uin
 }
 
 /*
-  Clear display (not including app draw when argument is false)
+  Clear display (clear whole display when no arg (or false) is passed in)
 */
 void clearDisplay(bool appDrawClear) {
   drawRect(0, 0, 240, appDrawClear ? 213 : 240, 0x0000);

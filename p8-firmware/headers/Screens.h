@@ -1,6 +1,7 @@
 #pragma once
 #include "Arduino.h"
 #include "WatchScreenBase.h"
+#include "accelerometer.h"
 #include "display.h"
 #include "p8Time.h"
 #include "pinoutP8.h"
@@ -18,26 +19,27 @@
   This demo screen is used for testing purposes
 */
 class DemoScreen : public WatchScreenBase {
+ private:
+  bma4_accel data;
+  long lastStepRead = 0;
+
  public:
   void screenSetup() {
     clearDisplay(true);
-    writeString(0, 0, 3, "X:");
-    writeString(0, 30, 3, "Y:");
   }
   void screenDestroy() {}
   void screenLoop() {
-    /* if (millis() - lastUpdateTime > 150) {
-      getAcclData(&data);
-      writeIntWithPrecedingZeroes(25, 0, 2, abs(data.x));
-      writeIntWithPrecedingZeroes(25, 20, 2, abs(data.y));
-      writeIntWithPrecedingZeroes(25, 40, 2, abs(data.z));
-      lastUpdateTime = millis();
-    } */
+    getAcclData(&data);
+    writeIntWithPrecedingZeroes(0, 0, 2, abs(data.x));
+    writeIntWithPrecedingZeroes(0, 20, 2, abs(data.y));
+    writeIntWithPrecedingZeroes(0, 40, 2, abs(data.z));
+    if (millis() - lastStepRead > 100) {
+      writeIntWithoutPrecedingZeroes(0, 60, 2, (int)getStepCount());
+      lastStepRead = millis();
+    }
+    writeIntWithoutPrecedingZeroes(0, 80, 2, (int)getButtonState());
   }
-  void screenTap(uint8_t x, uint8_t y) {
-    writeIntWithPrecedingZeroes(35, 0, 3, x);
-    writeIntWithPrecedingZeroes(35, 30, 3, y);
-  }
+  void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
   void swipeUp() {}
@@ -333,9 +335,9 @@ class InfoScreen : public WatchScreenBase {
     writeString(0, 0, 1, "Firmware by:");
     writeString(0, 10, 2, "Alex Underwood");
     writeString(0, 30, 1, "Uptime:");
-    writeString(0,60,1,"Compiled:");
-    writeString(0,70,2,__DATE__);
-    writeString(0,90,2,__TIME__);
+    writeString(0, 60, 1, "Compiled:");
+    writeString(0, 70, 2, __DATE__);
+    writeString(0, 90, 2, __TIME__);
   }
   void screenDestroy() {}
   void screenLoop() {

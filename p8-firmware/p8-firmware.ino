@@ -2,6 +2,7 @@
 #include "headers/fastSPI.h"
 //#include "headers/heartrate.h"
 //#include "headers/accelerometer.h"
+#include "headers/accelerometer.h"
 #include "headers/bluetooth.h"
 #include "headers/i2cLock.h"
 #include "headers/interrupts.h"  //Includes screenController.h
@@ -21,17 +22,17 @@ void setup() {
     NRF_POWER->GPREGRET = 0x01;
     NVIC_SystemReset();
   }
-  initWatchdog();    //Start the watchdog
-  initFastSPI();     //Initialize EasyDMA SPI
-  initDisplay();     //Initialize display
+  initWatchdog();  //Start the watchdog
+  initFastSPI();   //Initialize EasyDMA SPI
+  initDisplay();   //Initialize display
+  writeChar(100, 120-32, 8, GLYPH_SMILEY, COLOUR_WHITE, COLOUR_BLACK);
   initI2C();         //Initialize the I2C interface
   initTouch();       //Initialize touch panel
+  initAccel();       //Initialize the accelerometer
   initInterrupts();  //Setup interrupts
-  initScreen();      //Initialize the screen controller (the thing that actually handles what is displayed)
   initSleep();       //Initialize the sleep power mode
-  //initHeartrate();   //Initialize the heartrate sensors
-
-  randomTests();  //Debugging stuff
+  initScreen();      //Setup the homescreen
+  randomTests();     //Debugging stuff
 }
 
 void randomTests() {

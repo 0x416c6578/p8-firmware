@@ -18,6 +18,10 @@ void initIO() {
   pinMode(LCD_BACKLIGHT_LOW, OUTPUT);
   pinMode(LCD_BACKLIGHT_MID, OUTPUT);
   pinMode(LCD_BACKLIGHT_HIGH, OUTPUT);
+#ifndef P8
+  pinMode(PUSH_BUTTON_OUT, OUTPUT);
+  digitalWrite(PUSH_BUTTON_OUT, HIGH);
+#endif
   ledOutput(false);
   motorOutput(false);
   //Disable flash
@@ -128,7 +132,7 @@ uint16_t getBatteryPercent() {
 /* 
   Every 500ms add to the cumulative battery reading 
 */
-void addToCumulativeBatReading(){
+void addToCumulativeBatReading() {
   if (millis() - lastBatPollTime > 200) {
     batCounter++;
     cumulativeBatRead += map(analogRead(BATTERY_VOLTAGE), 496, 696, 3000, 4200);
@@ -168,6 +172,6 @@ uint16_t milliVoltToPercent(int batteryMV) {
 /* 
   Get the battery charge state
  */
-bool getChargeState(){
+bool getChargeState() {
   return digitalRead(POWER_INDICATION);
 }

@@ -1363,7 +1363,8 @@ int8_t bma423_step_counter_output(uint32_t *step_count, struct bma4_dev *dev)
                 step_count_2 = (uint32_t)data[2] << 16;
                 step_count_3 = (uint32_t)data[3] << 24;
                 *step_count = step_count_0 | step_count_1 | step_count_2 | step_count_3;
-                // *step_count = 100;
+            } else{
+              *step_count = 100;
             }
         }
         else

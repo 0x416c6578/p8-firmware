@@ -21,7 +21,7 @@ void initInterrupts() {
   NRF_GPIOTE->INTENSET = GPIOTE_INTENSET_PORT_Msk;
 
   lastButtonState = digitalRead(PUSH_BUTTON_IN);
-  NRF_GPIO->PIN_CNF[PUSH_BUTTON_IN] |= (GPIO_PIN_CNF_SENSE_High << GPIO_PIN_CNF_SENSE_Pos);
+  NRF_GPIO->PIN_CNF[PUSH_BUTTON_IN] |= ((lastButtonState ? GPIO_PIN_CNF_SENSE_Low : GPIO_PIN_CNF_SENSE_High) << GPIO_PIN_CNF_SENSE_Pos);
 
   lastTouchState = digitalRead(TP_INT);
   NRF_GPIO->PIN_CNF[TP_INT] |= (GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos);
@@ -79,7 +79,15 @@ This method is called AFAP by the main Arduino loop()
 void handleInterrupts() {
   //If we have a pending touch interrupt
   if (pendingTouchInt) {
-    updateTouchStruct(); //Get the touch information
+#ifndef P8
+    if (getPowerMode() == POWER_OFF && PUSH_BUTTON_OUT != -1) {  //If we have the CST816 use it to wake up
+      exitSleep();
+      resetInterrupts();
+      updateLastWakeTime();
+      return;
+    }
+#endif
+    updateTouchStruct();  //Get the touch information
     updateLastWakeTime();
 
     TouchDataStruct *touchData = getTouchDataStruct();
@@ -124,8 +132,8 @@ void handleInterrupts() {
       updateLastWakeTime();
       handleButtonPress();
       resetInterrupts();
-    } else{
-      resetInterrupts(); //We want to reject any button presses done within the wait period to hopefully stop bouncing
+    } else {
+      resetInterrupts();  //We want to reject any button presses done within the wait period to hopefully stop bouncing
     }
   } else {  //If this is called when there is no interrupt, check the wake time and sleep if necessary
     checkWakeTime();
