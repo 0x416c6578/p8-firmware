@@ -37,13 +37,14 @@ void initAccel() {
     result = 0;
     result = result | bma423_init(&BMAInfoStruct);  //API entry point
     delay(10);
+    result = result | bma423_write_config_file(&BMAInfoStruct);  //Write config file
+    delay(10);
     result = result | bma4_set_accel_enable(1, &BMAInfoStruct);  //Enable accel
     delay(10);
     result = result | bma4_set_accel_config(&accelConfig, &BMAInfoStruct);  //Set accel config
     delay(10);
     result = result | bma423_feature_enable(BMA423_STEP_CNTR | BMA423_STEP_ACT, 1, &BMAInfoStruct);  //Enable step counter
-    delay(10);
-    result = result | bma423_write_config_file(&BMAInfoStruct);  //Write config file
+    
   } while (result != 0);                                         //Repeat until success or reboot
 
   // bma423_reset_step_counter(&BMAInfoStruct);  //API call to reset the step counter

@@ -25,8 +25,9 @@ class WatchScreenBase {
   virtual void swipeRight() {}
   virtual void swipeUp() {}
   virtual void swipeDown() {}
-  virtual bool doesImplementSwipeLeft() {return true;}
-  virtual bool doesImplementSwipeRight() {return true;}
-  virtual bool doesImplementSwipeUp() {return true;}
-  virtual bool doesImplementSwipeDown() {return true;}
+  virtual bool doesImplementSwipeLeft() { return true; }
+  virtual bool doesImplementSwipeRight() { return true; }
+  virtual bool doesImplementSwipeUp() { return true; }
+  virtual bool doesImplementSwipeDown() { return true; }
+  virtual uint8_t getScreenUpdateTimeMS() { return 20; }
 };

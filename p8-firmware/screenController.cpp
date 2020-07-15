@@ -1,6 +1,10 @@
 #include "headers/screenController.h"
 
 #define NUM_SCREENS 6
+
+uint8_t screenUpdateMS = 20;  //Screen update time, defaults to 20ms (50hz)
+
+long lastScreenUpdate = 0;
 /*
   Similar to ATCWatch, an instance of every screen will be instantiated at bootup
   There will be a pointer to the current screen which will have the methods called on it
@@ -22,8 +26,9 @@ WatchScreenBase* currentScreen = homeScreens[currentHomeScreenIndex];
   This is called whenever a new screen is loaded
 */
 void initScreen() {
-  currentScreen->screenSetup();  //Call screenSetup() on the current screen
-  drawAppIndicator();
+  currentScreen->screenSetup();                             //Call screenSetup() on the current screen
+  drawAppIndicator();                                       //Draw the app bar
+  screenUpdateMS = currentScreen->getScreenUpdateTimeMS();  //Set the current screen update time
 }
 
 /* 
@@ -116,7 +121,7 @@ void handleTap(uint8_t x, uint8_t y) {
 
 /* 
   Sleep when we receive a long tap */
-void handleLongTap(uint8_t x, uint8_t y){
+void handleLongTap(uint8_t x, uint8_t y) {
   enterSleep();
 }
 
@@ -126,7 +131,11 @@ void handleLongTap(uint8_t x, uint8_t y){
     For example if any graphics are used, they should be drawn in setup rather than being redrawn every loop
  */
 void screenControllerLoop() {
-  currentScreen->screenLoop();
+  if (millis() - lastScreenUpdate > screenUpdateMS) {
+    //Update the screen every 20 ms
+    currentScreen->screenLoop();
+    lastScreenUpdate = millis();
+  }
 }
 
 /*

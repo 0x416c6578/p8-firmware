@@ -1,7 +1,7 @@
 #ifndef _PINOUT_
 #define _PINOUT_
 
-//#define COMMENT_FOR_PINETIME //Comment this for pinetime
+#define COMMENT_FOR_PINETIME //Comment this for pinetime
 
 #ifdef COMMENT_FOR_PINETIME
 

@@ -37,13 +37,13 @@ class DemoScreen : public WatchScreenBase {
       writeIntWithoutPrecedingZeroes(0, 60, 2, (int)getStepCount());
       lastStepRead = millis();
     }
-    writeIntWithoutPrecedingZeroes(0, 80, 2, (int)getButtonState());
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
   void swipeUp() {}
   void swipeDown() {}
+  uint8_t getScreenUpdateTimeMS(){return 1;} //Fast update time
 };
 
 /* 
@@ -52,24 +52,22 @@ class DemoScreen : public WatchScreenBase {
 class TimeScreen : public WatchScreenBase {
  private:
   uint8_t currentDay = -1;
-  int chargeIndicationCounter = 0;
-  bool chargeIndicationState = false;
-  uint32_t steps = 0;
 
  public:
   void screenSetup() {
     clearDisplay(true);
     currentDay = -1;
     writeString(80, 125, 3, "%");
-    /* writeChar(20, 152, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK); */
+    writeChar(20, 152, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
   }
   void screenDestroy() {}
   void screenLoop() {
     writeString(20, 20, 4, getTimeWithSecs());
     writeString(20, 65, 3, getDate());
     //Only update the day string on a new day
-    if (getDayOfWeek(day(), month(), year()) != currentDay)
+    if (getDayOfWeek(day(), month(), year()) != currentDay) {
       writeString(20, 95, 3, getDay());
+    }
     if (!getChargeState()) {
       if (getBatteryPercent() < 99)
         writeChar(20, 122, 3, GLYPH_BATTERY, COLOUR_RED, COLOUR_BLACK);
@@ -79,12 +77,14 @@ class TimeScreen : public WatchScreenBase {
       writeChar(20, 122, 3, GLYPH_BATTERY, COLOUR_WHITE, COLOUR_BLACK);
     }
     writeIntWithoutPrecedingZeroes(40, 125, 3, getBatteryPercent());
+    writeIntWithoutPrecedingZeroes(40, 155, 3, getStepCount());
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
   void swipeUp() {}
   void swipeDown() {}
+  uint8_t getScreenUpdateTimeMS() { return 20; } //20ms update time
 };
 
 /* 
@@ -348,6 +348,7 @@ class InfoScreen : public WatchScreenBase {
   bool doesImplementSwipeRight() { return false; }
   void swipeUp() {}
   void swipeDown() {}
+  uint8_t getScreenUpdateTimeMS(){return 200;} //Slow update time test
 };
 
 /* 
