@@ -7,6 +7,8 @@
 #include "pinoutP8.h"
 #include "powerControl.h"
 
+#define KM_PER_STEP 0.00065f //65cm per step
+
 /* 
   A screen with a public method bool doesImplementSwipe____ returning true says to the screen controller
   that upon receiving a swipe event when that screen is the currentScreen, the controller should
@@ -43,7 +45,7 @@ class DemoScreen : public WatchScreenBase {
   bool doesImplementSwipeLeft() { return false; }
   void swipeUp() {}
   void swipeDown() {}
-  uint8_t getScreenUpdateTimeMS(){return 1;} //Fast update time
+  uint8_t getScreenUpdateTimeMS() { return 1; }  //Fast update time
 };
 
 /* 
@@ -52,13 +54,16 @@ class DemoScreen : public WatchScreenBase {
 class TimeScreen : public WatchScreenBase {
  private:
   uint8_t currentDay = -1;
+  char distanceChar[10];
+  uint32_t steps;
+  bool distanceShowing = 0;
 
  public:
   void screenSetup() {
     clearDisplay(true);
     currentDay = -1;
     writeString(80, 125, 3, "%");
-    writeChar(20, 152, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
+    writeChar(20, 152, 3, distanceShowing ? GLYPH_KM : GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
   }
   void screenDestroy() {}
   void screenLoop() {
@@ -77,14 +82,31 @@ class TimeScreen : public WatchScreenBase {
       writeChar(20, 122, 3, GLYPH_BATTERY, COLOUR_WHITE, COLOUR_BLACK);
     }
     writeIntWithoutPrecedingZeroes(40, 125, 3, getBatteryPercent());
-    writeIntWithoutPrecedingZeroes(40, 155, 3, getStepCount());
+
+    steps = getStepCount();
+
+    if (distanceShowing) {
+      sprintf(distanceChar, "%.3f", steps * KM_PER_STEP);
+      writeString(40, 155, 3, distanceChar);
+    } else {
+      writeIntWithoutPrecedingZeroes(40, 155, 3, steps);
+    }
   }
-  void screenTap(uint8_t x, uint8_t y) {}
+  void screenTap(uint8_t x, uint8_t y) {
+    if (distanceShowing) {
+      writeString(40,155,3,"     ");
+      writeChar(20, 152, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
+      distanceShowing = !distanceShowing;
+    } else{
+      distanceShowing = !distanceShowing;
+      writeChar(20, 152, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);
+    }
+  }
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
   void swipeUp() {}
   void swipeDown() {}
-  uint8_t getScreenUpdateTimeMS() { return 20; } //20ms update time
+  uint8_t getScreenUpdateTimeMS() { return 20; }  //20ms update time
 };
 
 /* 
@@ -348,7 +370,7 @@ class InfoScreen : public WatchScreenBase {
   bool doesImplementSwipeRight() { return false; }
   void swipeUp() {}
   void swipeDown() {}
-  uint8_t getScreenUpdateTimeMS(){return 200;} //Slow update time test
+  uint8_t getScreenUpdateTimeMS() { return 200; }  //Slow update time test
 };
 
 /* 
