@@ -25,7 +25,7 @@ void setup() {
   initWatchdog();  //Start the watchdog
   initFastSPI();   //Initialize EasyDMA SPI
   initDisplay();   //Initialize display
-  writeChar(100, 120-32, 8, GLYPH_SMILEY, COLOUR_WHITE, COLOUR_BLACK);
+  writeChar(100, 120 - 32, 8, GLYPH_SMILEY, COLOUR_WHITE, COLOUR_BLACK);
   initI2C();         //Initialize the I2C interface
   initTouch();       //Initialize touch panel
   initAccel();       //Initialize the accelerometer
@@ -36,7 +36,9 @@ void setup() {
 }
 
 void randomTests() {
-  //NRF_RTC1->TASKS_TRIGOVRFLW = 1;
+  /* NRF_NVMC->CONFIG = 2;
+  NRF_NVMC->ERASEUICR = 1;
+  NVIC_SystemReset(); */
 }
 
 void loop() {

@@ -21,6 +21,7 @@ class WatchScreenBase {
   virtual void screenDestroy() {}
   virtual void screenLoop() {}
   virtual void screenTap(uint8_t x, uint8_t y) {}
+  virtual void screenLongTap(uint8_t x, uint8_t y) {}
   virtual void swipeLeft() {}
   virtual void swipeRight() {}
   virtual void swipeUp() {}
@@ -29,5 +30,6 @@ class WatchScreenBase {
   virtual bool doesImplementSwipeRight() { return true; }
   virtual bool doesImplementSwipeUp() { return true; }
   virtual bool doesImplementSwipeDown() { return true; }
+  virtual bool doesImplementLongTap() { return false; }
   virtual uint8_t getScreenUpdateTimeMS() { return 20; }
 };

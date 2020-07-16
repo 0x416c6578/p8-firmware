@@ -10,16 +10,17 @@ long lastScreenUpdate = 0;
   There will be a pointer to the current screen which will have the methods called on it
   Finally a screen will be switched by moving the pointer to a different instance of a different screen
 */
-//DemoScreen demoScreen;
 TimeScreen timeScreen;
 StopWatchScreen stopWatchScreen;
 TimeDateSetScreen timeDateSetScreen;
-DemoScreen demoScreen;
+/* DemoScreen demoScreen; */
 InfoScreen infoScreen;
 PowerScreen powerScreen;
+ExerciseScreen exerciseScreen;
 
 int currentHomeScreenIndex = 0;
-WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, &stopWatchScreen, &timeDateSetScreen, &infoScreen, &powerScreen, &demoScreen};
+WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, &exerciseScreen, &stopWatchScreen, &timeDateSetScreen, &infoScreen, &powerScreen /* , &demoScreen */};
+
 WatchScreenBase* currentScreen = homeScreens[currentHomeScreenIndex];
 
 /*
@@ -122,7 +123,11 @@ void handleTap(uint8_t x, uint8_t y) {
 /* 
   Sleep when we receive a long tap */
 void handleLongTap(uint8_t x, uint8_t y) {
-  enterSleep();
+  if (currentScreen->doesImplementLongTap() == true) {
+    currentScreen->screenLongTap(x, y);
+  } else {
+    enterSleep();
+  }
 }
 
 /* 
@@ -148,11 +153,12 @@ void drawAppIndicator() {
   uint8_t startOfString = 120 - (widthOfIndicator / 2);
   //Draw the current screen indicators
   writeChar(startOfString + (0 * indicatorFontSize * FONT_WIDTH) + (0 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 0) ? GLYPH_CLOCK_SEL : GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  writeChar(startOfString + (1 * indicatorFontSize * FONT_WIDTH) + (1 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 1) ? GLYPH_STOPWATCH_SEL : GLYPH_STOPWATCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  writeChar(startOfString + (2 * indicatorFontSize * FONT_WIDTH) + (2 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 2) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  writeChar(startOfString + (3 * indicatorFontSize * FONT_WIDTH) + (3 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 3) ? GLYPH_INFO_SEL : GLYPH_INFO_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  writeChar(startOfString + (4 * indicatorFontSize * FONT_WIDTH) + (4 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 4) ? GLYPH_POWER_SEL : GLYPH_POWER_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  writeChar(startOfString + (5 * indicatorFontSize * FONT_WIDTH) + (5 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 5) ? GLYPH_DATA_SEL : GLYPH_DATA_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  writeChar(startOfString + (1 * indicatorFontSize * FONT_WIDTH) + (1 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 1) ? GLYPH_DATA_SEL : GLYPH_DATA_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  writeChar(startOfString + (2 * indicatorFontSize * FONT_WIDTH) + (2 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 2) ? GLYPH_STOPWATCH_SEL : GLYPH_STOPWATCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  writeChar(startOfString + (3 * indicatorFontSize * FONT_WIDTH) + (3 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 3) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  writeChar(startOfString + (4 * indicatorFontSize * FONT_WIDTH) + (4 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 4) ? GLYPH_INFO_SEL : GLYPH_INFO_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  writeChar(startOfString + (5 * indicatorFontSize * FONT_WIDTH) + (5 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 5) ? GLYPH_POWER_SEL : GLYPH_POWER_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  /* writeChar(startOfString + (6 * indicatorFontSize * FONT_WIDTH) + (6 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 6) ? GLYPH_DATA_SEL : GLYPH_DATA_UNSEL, COLOUR_WHITE, COLOUR_BLACK); */
   //Draw the "can scroll left/right" indicators in the corners of the screen
   switch (currentHomeScreenIndex) {
     case 0:
@@ -160,17 +166,8 @@ void drawAppIndicator() {
       writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
       break;
     case 1:
-      writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
-      writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
-      break;
     case 2:
-      writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
-      writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
-      break;
     case 3:
-      writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
-      writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
-      break;
     case 4:
       writeChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
       writeChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
