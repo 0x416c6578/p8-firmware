@@ -145,6 +145,8 @@ class ExerciseScreen : public WatchScreenBase {
       if (hasStartedWorkout == false) {
         drawRectOutlineWithChar(80, 60, 80, 80, 5, COLOUR_GREEN, GLYPH_WALKING_NO_EARTH, 8);     //Button to start workout
         writeString(120 - (getWidthOfString("Start Logging", 2) / 2), 150, 2, "Start Logging");  //Button label
+        if (hasExerciseLog == true)
+          writeString(120 - (getWidthOfString("^ Last Activity ^", 2) / 2), 0, 2, "^ Last Activity ^");
       } else {
         writeString(0, 0, 3, "Exercise:");                                                                               //Exercise label
         writeChar(0, 78, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);                                                  //Walking glyph
@@ -154,7 +156,7 @@ class ExerciseScreen : public WatchScreenBase {
     } else if (currentExerciseWindow == LAST_ACT) {
       //Show last activity info
       writeString(0, 0, 3, "Previous Log");
-      writeChar(0, 60, 3, GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+      writeChar(0, 61, 3, GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
       writeChar(0, 87, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
       writeChar(0, 118, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);
       writeString(20, 60, 3, getStopWatchTime(lastLog.startTime, lastLog.endTime));
@@ -178,12 +180,18 @@ class ExerciseScreen : public WatchScreenBase {
     }
   }
   void screenTap(uint8_t x, uint8_t y) {
-    if (x > 80 && x < 160 && y > 60 && y < 140 && hasStartedWorkout == false) {  //If we click the button and we haven't started a workout
-      startWorkout();
+    if (currentExerciseWindow == ACTIVITY) {
+      if (x > 80 && x < 160 && y > 60 && y < 140 && hasStartedWorkout == false) {
+        startWorkout();  //Clicked button to start workout
+      } else if (y < 40 && hasExerciseLog == true) {
+        currentExerciseWindow = LAST_ACT;  //Move to the last log screen if there is a previous stored log
+        screenSetup();
+      }
     }
   }
   void screenLongTap(uint8_t x, uint8_t y) {
-    if (hasStartedWorkout == true) {  //Only stop workout if we have started one
+    //Only stop workout if we have started one, and we are on the activity screen
+    if (hasStartedWorkout == true && currentExerciseWindow == ACTIVITY) {
       stopWorkout();
     }
   }
