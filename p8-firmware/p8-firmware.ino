@@ -1,19 +1,17 @@
-#include "headers/display.h"
-#include "headers/fastSPI.h"
-//#include "headers/heartrate.h"
-//#include "headers/accelerometer.h"
+#include <Wire.h>
+
 #include "headers/accelerometer.h"
 #include "headers/bluetooth.h"
-#include "headers/i2cLock.h"
+#include "headers/display.h"
+#include "headers/fastSPI.h"
 #include "headers/interrupts.h"  //Includes screenController.h
 #include "headers/ioControl.h"
 #include "headers/p8Time.h"
-#include "headers/pinoutP8.h"
+#include "headers/pinout.h"
 #include "headers/powerControl.h"
 #include "headers/touch.h"
 #include "headers/watchdog.h"
 #include "nrf52.h"
-
 void setup() {
   initIO();                //Init GPIOs
   if (getButtonState()) {  //If the button is held at boot, enter bootloader
@@ -26,7 +24,8 @@ void setup() {
   initFastSPI();   //Initialize EasyDMA SPI
   initDisplay();   //Initialize display
   writeChar(100, 120 - 32, 8, GLYPH_SMILEY, COLOUR_WHITE, COLOUR_BLACK);
-  initI2C();         //Initialize the I2C interface
+  Wire.begin();
+  Wire.setClock(250000);
   initTouch();       //Initialize touch panel
   initAccel();       //Initialize the accelerometer
   initInterrupts();  //Setup interrupts

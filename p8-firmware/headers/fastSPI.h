@@ -2,7 +2,7 @@
 #include "Arduino.h"
 #include "nrf52.h"
 #include "nrf52_bitfields.h"
-#include "pinoutP8.h"
+#include "pinout.h"
 
 void initFastSPI();
 void enableSPI(bool state);

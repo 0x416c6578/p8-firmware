@@ -23,7 +23,7 @@ void initAccel() {
   accelConfig.odr = BMA4_OUTPUT_DATA_RATE_100HZ;   //Output data rate (originally BMA4_OUTPUT_DATA_RATE_100HZ)
   accelConfig.range = BMA4_ACCEL_RANGE_2G;         //G-range
   accelConfig.bandwidth = BMA4_ACCEL_NORMAL_AVG4;  //Bandwidth parameter
-  accelConfig.perf_mode = BMA4_CIC_AVG_MODE;       //Filter performance mode (average or continus)
+  accelConfig.perf_mode = BMA4_CIC_AVG_MODE;       //Filter performance mode (average or continuous)
 
   feedWatchdog();  //Make sure to feed the watchdog here so the while loop has the most time to succeed
 
@@ -44,8 +44,8 @@ void initAccel() {
     result = result | bma4_set_accel_config(&accelConfig, &BMAInfoStruct);  //Set accel config
     delay(10);
     result = result | bma423_feature_enable(BMA423_STEP_CNTR | BMA423_STEP_ACT, 1, &BMAInfoStruct);  //Enable step counter
-    
-  } while (result != 0);                                         //Repeat until success or reboot
+
+  } while (result != 0);  //Repeat until success or reboot
 
   // bma423_reset_step_counter(&BMAInfoStruct);  //API call to reset the step counter
 
@@ -126,6 +126,6 @@ uint32_t getStepCount() {
 /* 
   Reset the step counter
  */
-void resetStepCounter(){
+void resetStepCounter() {
   bma423_reset_step_counter(&BMAInfoStruct);
 }

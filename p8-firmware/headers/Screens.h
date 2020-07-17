@@ -4,7 +4,7 @@
 #include "accelerometer.h"
 #include "display.h"
 #include "p8Time.h"
-#include "pinoutP8.h"
+#include "pinout.h"
 #include "powerControl.h"
 
 #define KM_PER_STEP 0.00065f  //65cm per step

@@ -3,9 +3,8 @@
 
 #include "Arduino.h"
 #include "bma423.h"
-#include "pinoutP8.h"
+#include "pinout.h"
 #include "watchdog.h"
-#include "i2cLock.h"
 #include "ioControl.h"
 
 void initAccel();

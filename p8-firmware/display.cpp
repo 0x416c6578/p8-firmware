@@ -303,7 +303,7 @@ void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, u
   //Width and height of the character on the display
   int characterDispWidth = FONT_WIDTH * pixelsPerPixel;
   int characterDispHeight = FONT_HEIGHT * pixelsPerPixel;
-  setRowColRAMAddr(x, y, characterDispWidth, characterDispHeight); //Set the window of display memory to write to
+  setRowColRAMAddr(x, y, characterDispWidth, characterDispHeight);  //Set the window of display memory to write to
   //Depending on the font, an offset to the current character index might be needed to skip over the unprintable characters
   int offset = FONT_NEEDS_OFFSET ? 32 : 0;
 
@@ -317,7 +317,7 @@ void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, u
   }
   sendSPICommand(0x2C);
   //Size 8 is probably the largest useful font, and at that size, a character takes up < 6000 bytes in the buffer, meaning we are nowhere near to filling up the buffer with a character
-  writeSPI(lcdBuffer, characterDispWidth * characterDispHeight * 2); //Write the character to the display
+  writeSPI(lcdBuffer, characterDispWidth * characterDispHeight * 2);  //Write the character to the display
 
   postWrite();
 }
@@ -330,7 +330,7 @@ void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool 
   int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;
   int rowFontIndexScaledByPixelCount = charRow * pixelsPerPixel;
   int pixelsPerRow = FONT_WIDTH * pixelsPerPixel;
-  
+
   if (colourFG == COLOUR_WHITE && colourBG == COLOUR_BLACK) {
     //If we are writing white on black (very common), hardcode the colours and don't use the ones from the parameter
     //This is slightly more efficient

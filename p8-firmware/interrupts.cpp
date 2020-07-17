@@ -74,7 +74,7 @@ void GPIOTE_IRQHandler() {
 #endif
 
 /* 
-This method is called AFAP by the main Arduino loop()
+This method is called as fast as possible by the main Arduino loop()
  */
 void handleInterrupts() {
   //If we have a pending touch interrupt

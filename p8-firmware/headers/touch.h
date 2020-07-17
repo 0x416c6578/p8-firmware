@@ -2,9 +2,8 @@
 #include <Wire.h>
 
 #include "Arduino.h"
-#include "pinoutP8.h"
-#include "i2cLock.h"
 #include "ioControl.h"
+#include "pinout.h"
 
 #define NO_GESTURE 0x00
 #define SWIPE_DOWN 0x01

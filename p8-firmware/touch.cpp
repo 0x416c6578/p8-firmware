@@ -44,12 +44,10 @@ void initTouch() {
   pinMode(TP_RESET, OUTPUT);  //Reset pin
   pinMode(TP_INT, INPUT);     //Interrupt pin
   resetTouchController(true);
-  lockI2C();
   Wire.beginTransmission(0x15);
   Wire.write(0xED);
   Wire.write(0xC8);
   Wire.endTransmission();
-  unlockI2C();
 }
 
 /* 
@@ -73,18 +71,6 @@ void resetTouchController(bool bootup) {
   Read touch data from the controller and store it in the global touchDataStruct
  */
 void updateTouchStruct() {
-  if (getI2CState() == I2C_LOCKED) {
-    /* 
-      Make sure that no previous transmission is happening when this is called
-      When this is called during the interrupt, sometimes it would interfere
-      with another accelerometer transmission and there would be undefined behaviour
-      resulting in a crash
-    */
-    Wire.end();
-    Wire.begin();
-    Wire.setClock(250000);
-  }
-  lockI2C();
 
   uint8_t readBufSize = 6;
   uint8_t readBuf[readBufSize];  //Read buffer where the raw bytes are stored
@@ -119,8 +105,6 @@ void updateTouchStruct() {
    */
   touchData.x = (readBuf[3]);  // << 8 | (uint16_t)readBuf[4]; (Not needed)
   touchData.y = (readBuf[5]);  // << 8 | (uint16_t)readBuf[6]; (Not needed)
-
-  unlockI2C();
 }
 
 /* 
@@ -134,11 +118,9 @@ TouchDataStruct* getTouchDataStruct() {
   Put the touch panel to sleep
  */
 void sleepTouchController() {
-  lockI2C();
   Wire.beginTransmission(0x15);
   Wire.write(0xA5);
   Wire.write(0x03);
   delay(20);
   Wire.endTransmission();
-  unlockI2C();
 }

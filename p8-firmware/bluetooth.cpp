@@ -3,8 +3,8 @@
 BLEPeripheral blePeripheral = BLEPeripheral();
 BLEService bleService = BLEService("190A");
 
-BLECharacteristic   TXchar        = BLECharacteristic("0002", BLENotify, 20);
-BLECharacteristic   RXchar        = BLECharacteristic("0001", BLEWriteWithoutResponse, 20);
+BLECharacteristic TXchar = BLECharacteristic("0002", BLENotify, 20);
+BLECharacteristic RXchar = BLECharacteristic("0001", BLEWriteWithoutResponse, 20);
 
 /* 
   Basically all code here was ripped from ATCWatch to enable the softdevice
@@ -25,18 +25,18 @@ void initBluetooth() {
   feedBle();
 }
 
-void feedBle(){
+void feedBle() {
   blePeripheral.poll();
 }
 
-void connectHandler(BLECentral& central){
+void connectHandler(BLECentral& central) {
   ledPing();
 }
 
-void disconnectHandler(BLECentral& central){
+void disconnectHandler(BLECentral& central) {
   ledPing();
 }
 
-void writeHandler(BLECentral& central, BLECharacteristic& characteristic){
+void writeHandler(BLECentral& central, BLECharacteristic& characteristic) {
   ledPing();
 }

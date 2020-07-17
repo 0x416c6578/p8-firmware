@@ -1,9 +1,9 @@
 #pragma once
 #include "Arduino.h"
 #include "colours.h"
-#include "pinoutP8.h"
 #include "fastSPI.h"
 #include "font.h"
+#include "pinout.h"
 
 void initDisplay();
 void wakeDisplay();

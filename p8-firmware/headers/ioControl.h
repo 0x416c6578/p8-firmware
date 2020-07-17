@@ -1,6 +1,6 @@
 #pragma once
 #include "Arduino.h"
-#include "pinoutP8.h"
+#include "pinout.h"
 #define MAX_BRIGHTNESS 7
 #define MIN_BRIGHTNESS 1
 #define BACKLIGHT_OFF 0

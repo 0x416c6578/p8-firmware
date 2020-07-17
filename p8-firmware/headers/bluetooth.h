@@ -1,6 +1,7 @@
 #pragma once
-#include "Arduino.h"
 #include <BLEPeripheral.h>
+
+#include "Arduino.h"
 #include "ioControl.h"
 
 void initBluetooth();

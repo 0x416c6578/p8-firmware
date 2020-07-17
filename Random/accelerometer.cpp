@@ -64,10 +64,6 @@ void initAccel() {
   for reading
  */
 int8_t acclI2CRead(uint8_t registerAddress, uint8_t *readBuf, uint32_t readBufLength, void *intf_ptr) {
-  if (getI2CState() == I2C_LOCKED) {
-    return 1;
-  }
-  lockI2C();
   Wire.beginTransmission(BMA4_I2C_ADDR_PRIMARY);
   Wire.write(registerAddress);
   if (Wire.endTransmission()) {
@@ -78,7 +74,6 @@ int8_t acclI2CRead(uint8_t registerAddress, uint8_t *readBuf, uint32_t readBufLe
   for (int i = 0; i < readBufLength; i++) {
     *readBuf++ = Wire.read();
   }
-  unlockI2C();
   return BMA4_INTF_RET_SUCCESS;
 }
 
@@ -86,11 +81,6 @@ int8_t acclI2CRead(uint8_t registerAddress, uint8_t *readBuf, uint32_t readBufLe
   This is the user defined function for writing to the i2c bus
  */
 int8_t acclI2CWrite(uint8_t registerAddress, const uint8_t *writeBuf, uint32_t writeBufLength, void *intf_ptr) {
-  //ledPing();
-  if (getI2CState() == I2C_LOCKED) {
-    return 1;
-  }
-  lockI2C();
   Wire.beginTransmission(BMA4_I2C_ADDR_PRIMARY);
   Wire.write(registerAddress);
   for (int i = 0; i < writeBufLength; i++) {
@@ -100,7 +90,6 @@ int8_t acclI2CWrite(uint8_t registerAddress, const uint8_t *writeBuf, uint32_t w
     //If we have an error in ending the transmission
     return 1;
   }
-  unlockI2C();
   return BMA4_INTF_RET_SUCCESS;
 }
 
@@ -115,11 +104,9 @@ void acclDelay(uint32_t period_us, void *intf_ptr) {
   Test function to get the accelerometer data
  */
 void getAcclData(struct bma4_accel *data) {
-  if (getI2CState() != I2C_LOCKED) {
-    uint8_t result = bma4_read_accel_xyz(data, &BMAInfoStruct);
-    if (result == 0)
-      return;
-  }
+  uint8_t result = bma4_read_accel_xyz(data, &BMAInfoStruct);
+  if (result == 0)
+    return;
   data->x = 69;
   data->y = 69;
   data->z = 69;

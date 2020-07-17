@@ -120,8 +120,8 @@ void writeSPI(uint8_t *ptr, uint32_t len) {
     }
     NRF_SPIM2->RXD.PTR = 0;
     NRF_SPIM2->RXD.MAXCNT = 0;
-    NRF_SPIM2->TASKS_START = 1;  //Start SPI transaction
-    while (NRF_SPIM2->EVENTS_END == 0) //Wait until write is done
+    NRF_SPIM2->TASKS_START = 1;         //Start SPI transaction
+    while (NRF_SPIM2->EVENTS_END == 0)  //Wait until write is done
       ;
     NRF_SPIM2->EVENTS_END = 0;
   } while (len);
