@@ -9,6 +9,12 @@
 
 #define KM_PER_STEP 0.00065f  //65cm per step
 
+typedef struct {
+  int startTime;
+  int endTime;
+  int numSteps;
+} ExerciseInfoStruct;
+
 /* 
   A screen with a public method bool doesImplementSwipe____ returning true says to the screen controller
   that upon receiving a swipe event when that screen is the currentScreen, the controller should
@@ -53,7 +59,7 @@ class DemoScreen : public WatchScreenBase {
  */
 class TimeScreen : public WatchScreenBase {
  private:
-  uint8_t currentDay = -1;
+  uint8_t lastDay = 255;
   char distanceChar[10];
   uint32_t steps;
   bool distanceShowing = 0;
@@ -61,7 +67,6 @@ class TimeScreen : public WatchScreenBase {
  public:
   void screenSetup() {
     clearDisplay(true);
-    currentDay = -1;
     writeString(80, 145, 3, "%");
     writeChar(20, 172, 3, distanceShowing ? GLYPH_KM : GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
     // drawRectOutline(14, 14, getWidthOfString("00:00:00", 4) + 12, 40, 1, COLOUR_WHITE);
@@ -70,10 +75,14 @@ class TimeScreen : public WatchScreenBase {
   void screenLoop() {
     writeString(20, 20, 4, getTimeWithSecs());
     writeString(20, 70, 3, getDate());
-    //Only update the day string on a new day
-    if (getDayOfWeek(day(), month(), year()) != currentDay) {
-      writeString(20, 100, 3, getDay());
+    //If we are on a new day, reset the current step count
+    if (getDayOfWeek(day(), month(), year()) != lastDay) {
+      lastDay = getDayOfWeek(day(), month(), year());
+      resetStepCounter();
+      screenSetup();
     }
+    writeString(20, 100, 3, getDay());
+
     if (!getChargeState()) {
       if (getBatteryPercent() < 99)
         writeChar(20, 142, 3, GLYPH_BATTERY, COLOUR_RED, COLOUR_BLACK);
@@ -115,34 +124,57 @@ class TimeScreen : public WatchScreenBase {
  */
 class ExerciseScreen : public WatchScreenBase {
  private:
+  enum currentWindow {
+    ACTIVITY,
+    LAST_ACT
+  };
+  currentWindow currentExerciseWindow = ACTIVITY;
+
   bool hasStartedWorkout = false;
-  int startStepCount;     //Starting step count, to calculate difference
-  int currentSteps;       //Current step count
-  char distanceChar[10];  //Buffer for distance sprintf
-  int startTime;          //Millis when workout was started
+  int startStepCount;           //Starting step count, to calculate difference
+  int currentSteps;             //Current step count
+  char distanceChar[10];        //Buffer for distance sprintf
+  int startTime;                //Millis when workout was started
+  bool hasExerciseLog = false;  //Bool to check if we have a previous log
+  ExerciseInfoStruct lastLog;   //Info from last log
 
  public:
   void screenSetup() {
     clearDisplay(true);
-    if (hasStartedWorkout == false) {
-      drawRectOutlineWithChar(80, 60, 80, 80, 5, COLOUR_GREEN, GLYPH_WALKING_NO_EARTH, 8);     //Button to start workout
-      writeString(120 - (getWidthOfString("Start Logging", 2) / 2), 150, 2, "Start Logging");  //Button label
-    } else {
-      writeString(0, 0, 3, "Exercise:");                                                                               //Exercise label
-      writeChar(0, 78, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);                                                  //Walking glyph
-      writeChar(0, 108, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);                                                      //KM glyph
-      writeString(120 - (getWidthOfString("Long tap to stop logging.", 1) / 2), 204, 1, "Long tap to stop logging.");  //Info at bottom of screen
+    if (currentExerciseWindow == ACTIVITY) {  //If we are on the main window:
+      if (hasStartedWorkout == false) {
+        drawRectOutlineWithChar(80, 60, 80, 80, 5, COLOUR_GREEN, GLYPH_WALKING_NO_EARTH, 8);     //Button to start workout
+        writeString(120 - (getWidthOfString("Start Logging", 2) / 2), 150, 2, "Start Logging");  //Button label
+      } else {
+        writeString(0, 0, 3, "Exercise:");                                                                               //Exercise label
+        writeChar(0, 78, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);                                                  //Walking glyph
+        writeChar(0, 108, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);                                                      //KM glyph
+        writeString(120 - (getWidthOfString("Long tap to stop logging.", 1) / 2), 204, 1, "Long tap to stop logging.");  //Info at bottom of screen
+      }
+    } else if (currentExerciseWindow == LAST_ACT) {
+      //Show last activity info
+      writeString(0, 0, 3, "Previous Log");
+      writeChar(0, 60, 3, GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+      writeChar(0, 87, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
+      writeChar(0, 118, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);
+      writeString(20, 60, 3, getStopWatchTime(lastLog.startTime, lastLog.endTime));
+      writeIntWithoutPrecedingZeroes(20, 90, 3, lastLog.numSteps);
+      sprintf(distanceChar, "%.3f", (lastLog.numSteps) * KM_PER_STEP);
+      writeString(20, 120, 3, distanceChar);
     }
   }
-  void screenDestroy() {}
+
   void screenLoop() {
-    if (hasStartedWorkout) {
-      //Print current workout info if we have started a workout
-      currentSteps = getStepCount();
-      writeString(0, 30, 3, getStopWatchTime(startTime, millis()));                  //Workout time
-      writeIntWithoutPrecedingZeroes(20, 80, 3, currentSteps - startStepCount);      //Step count
-      sprintf(distanceChar, "%.3f", (currentSteps - startStepCount) * KM_PER_STEP);  //KM walked calc
-      writeString(20, 110, 3, distanceChar);
+    //If we are on the activity window, and a workout has started, show current activity info
+    if (currentExerciseWindow == ACTIVITY) {
+      if (hasStartedWorkout == true) {
+        //Print current workout info if we have started a workout
+        currentSteps = getStepCount();
+        writeString(0, 30, 3, getStopWatchTime(startTime, millis()));                  //Workout time
+        writeIntWithoutPrecedingZeroes(20, 80, 3, currentSteps - startStepCount);      //Step count
+        sprintf(distanceChar, "%.3f", (currentSteps - startStepCount) * KM_PER_STEP);  //KM walked calc
+        writeString(20, 110, 3, distanceChar);
+      }
     }
   }
   void screenTap(uint8_t x, uint8_t y) {
@@ -155,6 +187,21 @@ class ExerciseScreen : public WatchScreenBase {
       stopWorkout();
     }
   }
+  void swipeDown() {
+    //If we are on the activity window, we have a previous log, go to the last activity screen
+    if (currentExerciseWindow == ACTIVITY && hasExerciseLog == true) {
+      currentExerciseWindow = LAST_ACT;
+      screenSetup();
+    }
+  }
+  void swipeUp() {
+    //Go back to the current activity window
+    if (currentExerciseWindow == LAST_ACT) {
+      currentExerciseWindow = ACTIVITY;
+      screenSetup();
+    }
+  }
+
   void startWorkout() {
     hasStartedWorkout = true;
     screenSetup();
@@ -163,8 +210,15 @@ class ExerciseScreen : public WatchScreenBase {
   }
   void stopWorkout() {
     hasStartedWorkout = false;
+    hasExerciseLog = true;
+    //Store exercise info
+    lastLog.startTime = startTime;
+    lastLog.endTime = millis();
+    lastLog.numSteps = currentSteps - startStepCount;
     screenSetup();
   }
+
+  //Setup functions
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
   bool doesImplementLongTap() { return true; }     //We do use long tap to stop the workout
@@ -318,19 +372,19 @@ class TimeDateSetScreen : public WatchScreenBase {
             setSecond++;
           break;
         case MINUTE:
-          if (setSecond < 60)
+          if (setMinute < 60)
             setMinute++;
           break;
         case HOUR:
-          if (setSecond < 23)
+          if (setHour < 23)
             setHour++;
           break;
         case DAY:
-          if (setSecond < 31)
+          if (setDay < 31)
             setDay++;
           break;
         case MONTH:
-          if (setSecond < 12)
+          if (setMonth < 12)
             setMonth++;
           break;
         case YEAR:

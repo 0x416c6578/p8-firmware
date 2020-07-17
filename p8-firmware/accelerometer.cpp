@@ -112,10 +112,20 @@ void getAcclData(struct bma4_accel *data) {
   data->z = 69;
 }
 
+/* 
+  Get the step counter
+ */
 uint32_t getStepCount() {
   uint32_t steps;
   if (bma423_step_counter_output(&steps, &BMAInfoStruct) == BMA4_OK) {
     return steps;
   }
   return 69;
+}
+
+/* 
+  Reset the step counter
+ */
+void resetStepCounter(){
+  bma423_reset_step_counter(&BMAInfoStruct);
 }
