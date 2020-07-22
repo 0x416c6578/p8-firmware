@@ -2,6 +2,7 @@
 
 /*
   Get a String object of the current time, with seconds
+  Todo: replace with char* mechanism
 */
 String getTimeWithSecs() {
   String timeStr = "";

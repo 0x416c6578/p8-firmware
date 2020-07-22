@@ -69,7 +69,6 @@ class TimeScreen : public WatchScreenBase {
     clearDisplay(true);
     writeString(80, 145, 3, "%");
     writeChar(20, 172, 3, distanceShowing ? GLYPH_KM : GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
-    // drawRectOutline(14, 14, getWidthOfString("00:00:00", 4) + 12, 40, 1, COLOUR_WHITE);
   }
   void screenDestroy() {}
   void screenLoop() {
@@ -142,16 +141,21 @@ class ExerciseScreen : public WatchScreenBase {
   void screenSetup() {
     clearDisplay(true);
     if (currentExerciseWindow == ACTIVITY) {  //If we are on the main window:
+
+      /* 
+        Text x pos offset values were calculated with a helper program in the folder.
+        (this removed the need for the function(s) in display.cpp to calculate the length of a string)
+      */
       if (hasStartedWorkout == false) {
-        drawRectOutlineWithChar(80, 60, 80, 80, 5, COLOUR_GREEN, GLYPH_WALKING_NO_EARTH, 8);     //Button to start workout
-        writeString(120 - (getWidthOfString("Start Logging", 2) / 2), 150, 2, "Start Logging");  //Button label
+        drawRectOutlineWithChar(80, 60, 80, 80, 5, COLOUR_GREEN, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
+        writeString(120 - 77, 150, 2, "Start Logging");                                       //Button label
         if (hasExerciseLog == true)
-          writeString(120 - (getWidthOfString("^ Last Activity ^", 2) / 2), 0, 2, "^ Last Activity ^");
+          writeString(19, 0, 2, "^ Last Activity ^");
       } else {
-        writeString(0, 0, 3, "Exercise:");                                                                               //Exercise label
-        writeChar(0, 78, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);                                                  //Walking glyph
-        writeChar(0, 108, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);                                                      //KM glyph
-        writeString(120 - (getWidthOfString("Long tap to stop logging.", 1) / 2), 204, 1, "Long tap to stop logging.");  //Info at bottom of screen
+        writeString(0, 0, 3, "Exercise:");                               //Exercise label
+        writeChar(0, 78, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);  //Walking glyph
+        writeChar(0, 108, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);      //KM glyph
+        writeString(120 - 75, 204, 1, "Long tap to stop logging.");      //Info at bottom of screen
       }
     } else if (currentExerciseWindow == LAST_ACT) {
       //Show last activity info

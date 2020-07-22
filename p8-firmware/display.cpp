@@ -141,20 +141,6 @@ void sleepDisplay() {
   postWrite();
 }
 
-uint32_t getWidthOfString(String string, uint8_t pixelsPerPixel) {
-  int numChars = string.length();
-  return numChars * pixelsPerPixel * FONT_WIDTH + (numChars - 1) * pixelsPerPixel;
-}
-
-/* 
-  This is the same implementation as above, except for a char*
- */
-uint32_t getWidthOfString(char* string, uint8_t pixelsPerPixel) {
-  int numChars = 0;
-  while (string[numChars] != 0) numChars++;
-  return numChars * pixelsPerPixel * FONT_WIDTH + (numChars - 1) * pixelsPerPixel;
-}
-
 /* 
   Same implementation as above, except for just passing in the number of characters rather than a string
  */
