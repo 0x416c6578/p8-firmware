@@ -528,6 +528,9 @@ class PowerScreen : public WatchScreenBase {
       {
         __NOP();
       }
+    } else if (x > 70 && x < 140 && y < 70) {
+      NRF_POWER->GPREGRET = 0x01;
+      NVIC_SystemReset();
     }
   }
   bool doesImplementSwipeLeft() { return false; }
