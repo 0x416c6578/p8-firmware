@@ -35,7 +35,6 @@ class DemoScreen : public WatchScreenBase {
   void screenSetup() {
     clearDisplay(true);
   }
-  void screenDestroy() {}
   void screenLoop() {
     getAcclData(&data);
     writeIntWithPrecedingZeroes(0, 0, 2, abs(data.x));
@@ -46,11 +45,8 @@ class DemoScreen : public WatchScreenBase {
       lastStepRead = millis();
     }
   }
-  void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
-  void swipeUp() {}
-  void swipeDown() {}
   uint8_t getScreenUpdateTimeMS() { return 1; }  //Fast update time
 };
 
@@ -70,7 +66,6 @@ class TimeScreen : public WatchScreenBase {
     writeString(80, 145, 3, "%");
     writeChar(20, 172, 3, distanceShowing ? GLYPH_KM : GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
   }
-  void screenDestroy() {}
   void screenLoop() {
     writeString(20, 20, 4, getTimeWithSecs());
     writeString(20, 70, 3, getDate());
@@ -113,8 +108,6 @@ class TimeScreen : public WatchScreenBase {
   }
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
-  void swipeUp() {}
-  void swipeDown() {}
   uint8_t getScreenUpdateTimeMS() { return 20; }  //20ms update time
 };
 
@@ -248,15 +241,14 @@ class StopWatchScreen : public WatchScreenBase {
  public:
   void screenSetup() {
     clearDisplay(true);
-    drawRect(0, 0, 120, 60, 0b0000011101000000);
-    drawRect(120, 0, 120, 60, 0b1110100000000000);
-    writeString(60 - (getWidthOfNChars(5, 3) / 2), 18, 3, "Start", COLOUR_WHITE, 0b0000011101000000);  //Look at screenTap() for more info
-    writeString(180 - (getWidthOfNChars(4, 3) / 2), 18, 3, "Stop", COLOUR_WHITE, 0b1110100000000000);
+    drawRectOutline(0, 0, 110, 60, 7, COLOUR_GREEN);
+    drawRectOutline(130, 0, 110, 60, 7, COLOUR_RED);
+    writeString(55 - (87 / 2), 18, 3, "Start");  //Look at screenTap() for more info
+    writeString(185 - (69 / 2), 18, 3, "Stop");
   }
-  void screenDestroy() {}
   void screenLoop() {
     if (hasStarted) {
-      writeString(26, 130, 4, getStopWatchTime(startTime, millis()));
+      writeString(26, 115, 4, getStopWatchTime(startTime, millis()));
     }
   }
   void screenTap(uint8_t x, uint8_t y) {
@@ -309,7 +301,6 @@ class TimeDateSetScreen : public WatchScreenBase {
     drawRects();
     currentSettingsWindow = BRIGHTNESS;
   }
-  void screenDestroy() {}
   void screenLoop() {
     switch (currentSettingsWindow) {
       case BRIGHTNESS:
@@ -468,10 +459,12 @@ class TimeDateSetScreen : public WatchScreenBase {
     }
   }
   void drawRects() {
-    drawRect(0, 50, 120, 150, COLOUR_RED);
-    drawRect(120, 50, 120, 150, COLOUR_BLUE);
-    writeChar(30, 107, 6, '-', COLOUR_WHITE, COLOUR_RED);
-    writeChar(175, 107, 6, '+', COLOUR_WHITE, COLOUR_BLUE);
+    drawRectOutlineWithChar(0, 60, 115, 130, 8, COLOUR_RED, '-', 6);
+    drawRectOutlineWithChar(120, 60, 115, 130, 8, COLOUR_GREEN, '+', 6);
+    // drawRect(0, 50, 120, 150, COLOUR_RED);
+    // drawRect(120, 50, 120, 150, COLOUR_BLUE);
+    // writeChar(30, 107, 6, '-', COLOUR_WHITE, COLOUR_RED);
+    // writeChar(175, 107, 6, '+', COLOUR_WHITE, COLOUR_BLUE);
   }
 };
 
@@ -485,20 +478,18 @@ class InfoScreen : public WatchScreenBase {
     writeString(0, 0, 1, "Firmware by:");
     writeString(0, 10, 2, "Alex Underwood");
     writeString(0, 30, 1, "Uptime:");
-    writeString(0, 60, 1, "Compiled:");
-    writeString(0, 70, 2, __DATE__);
-    writeString(0, 90, 2, __TIME__);
+    writeString(0, 80, 1, "Compiled:");
+    writeString(0, 90, 2, __DATE__);
+    writeString(0, 110, 2, __TIME__);
   }
-  void screenDestroy() {}
   void screenLoop() {
     writeIntWithPrecedingZeroes(0, 40, 2, millis());
+    writeIntWithoutPrecedingZeroes(0, 60, 2, millis() / 1000 / 60 / 60 / 24);
+    writeString(35, 60, 2, getStopWatchTime(0, millis() % 86400000));
   }
-  void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeLeft() { return false; }
   bool doesImplementSwipeRight() { return false; }
-  void swipeUp() {}
-  void swipeDown() {}
-  uint8_t getScreenUpdateTimeMS() { return 200; }  //Slow update time test
+  uint8_t getScreenUpdateTimeMS() { return 200; }  //Slow update time
 };
 
 /* 
@@ -512,8 +503,6 @@ class PowerScreen : public WatchScreenBase {
     drawRectOutlineWithChar(85, 0, 70, 70, 5, COLOUR_WHITE, GLYPH_BOOTLOADER_UNSEL, 4);
     drawRectOutline(170, 0, 70, 70, 5, COLOUR_WHITE);
   }
-  void screenDestroy() {}
-  void screenLoop() {}
   void screenTap(uint8_t x, uint8_t y) {
     if (y < 70 && x < 70) {
       __DSB(); /* Ensure all outstanding memory accesses included
@@ -529,12 +518,11 @@ class PowerScreen : public WatchScreenBase {
         __NOP();
       }
     } else if (x > 70 && x < 140 && y < 70) {
+      //Enter the bootloader by setting the general purpose retention register to 1 and rebooting
       NRF_POWER->GPREGRET = 0x01;
       NVIC_SystemReset();
     }
   }
   bool doesImplementSwipeLeft() { return false; }
   bool doesImplementSwipeRight() { return false; }
-  void swipeUp() {}
-  void swipeDown() {}
 };

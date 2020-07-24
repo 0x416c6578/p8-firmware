@@ -2,7 +2,7 @@
 #include <stdlib.h>
 int main(int argc, char* argv[]) {
   if (argc < 3) {
-    printf("Too few args\n");
+    printf("Too few args\nUsage: strwidth STR fontSize");
     return 1;
   }
   int numChars = 0;
