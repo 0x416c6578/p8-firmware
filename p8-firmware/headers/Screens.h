@@ -58,13 +58,12 @@ class TimeScreen : public WatchScreenBase {
   uint8_t lastDay = 255;
   char distanceChar[10];
   uint32_t steps;
-  bool distanceShowing = 0;
 
  public:
   void screenSetup() {
     clearDisplay(true);
     writeString(80, 145, 3, "%");
-    writeChar(20, 172, 3, distanceShowing ? GLYPH_KM : GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
+    writeChar(20, 172, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
   }
   void screenLoop() {
     writeString(20, 20, 4, getTimeWithSecs());
@@ -88,24 +87,9 @@ class TimeScreen : public WatchScreenBase {
     writeIntWithoutPrecedingZeroes(40, 145, 3, getBatteryPercent());
 
     steps = getStepCount();
-
-    if (distanceShowing) {
-      sprintf(distanceChar, "%.3f", steps * KM_PER_STEP);
-      writeString(40, 175, 3, distanceChar);
-    } else {
-      writeIntWithoutPrecedingZeroes(40, 175, 3, steps);
-    }
+    writeIntWithoutPrecedingZeroes(40, 175, 3, steps);
   }
-  void screenTap(uint8_t x, uint8_t y) {
-    if (distanceShowing) {
-      writeString(40, 175, 3, "     ");
-      writeChar(20, 172, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
-      distanceShowing = !distanceShowing;
-    } else {
-      distanceShowing = !distanceShowing;
-      writeChar(20, 172, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);
-    }
-  }
+  void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
   uint8_t getScreenUpdateTimeMS() { return 20; }  //20ms update time
@@ -140,15 +124,15 @@ class ExerciseScreen : public WatchScreenBase {
         (this removed the need for the function(s) in display.cpp to calculate the length of a string)
       */
       if (hasStartedWorkout == false) {
-        drawRectOutlineWithChar(80, 60, 80, 80, 5, COLOUR_GREEN, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
-        writeString(120 - 77, 150, 2, "Start Logging");                                       //Button label
+        drawRectOutlineWithChar(80, 60, 80, 80, 8, COLOUR_WHITE, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
+        writeString(120 - STR_WIDTH("Start", 2) / 2, 150, 2, "Start");                        //Button label
         if (hasExerciseLog == true)
-          writeString(19, 0, 2, "^ Last Activity ^");
+          writeString(120 - STR_WIDTH("^ Last Activity ^", 2) / 2, 0, 2, "^ Last Activity ^");
       } else {
-        writeString(0, 0, 3, "Exercise:");                               //Exercise label
-        writeChar(0, 78, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);  //Walking glyph
-        writeChar(0, 108, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);      //KM glyph
-        writeString(120 - 75, 204, 1, "Long tap to stop logging.");      //Info at bottom of screen
+        writeString(0, 0, 3, "Exercise:");                                                                      //Exercise label
+        writeChar(0, 78, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);                                         //Walking glyph
+        writeChar(0, 108, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);                                             //KM glyph
+        writeString(120 - STR_WIDTH("Long tap to stop logging.", 1) / 2, 204, 1, "Long tap to stop logging.");  //Info at bottom of screen
       }
     } else if (currentExerciseWindow == LAST_ACT) {
       //Show last activity info
@@ -243,12 +227,12 @@ class StopWatchScreen : public WatchScreenBase {
     clearDisplay(true);
     drawRectOutline(0, 0, 110, 60, 7, COLOUR_GREEN);
     drawRectOutline(130, 0, 110, 60, 7, COLOUR_RED);
-    writeString(55 - (87 / 2), 18, 3, "Start");  //Look at screenTap() for more info
-    writeString(185 - (69 / 2), 18, 3, "Stop");
+    writeString(55 - STR_WIDTH("Start", 3) / 2, 18, 3, "Start");  //Look at screenTap() for more info
+    writeString(185 - STR_WIDTH("Stop", 3) / 2, 18, 3, "Stop");
   }
   void screenLoop() {
     if (hasStarted) {
-      writeString(26, 115, 4, getStopWatchTime(startTime, millis()));
+      writeString(120 - STR_WIDTH("00:00:00", 4) / 2, 115, 4, getStopWatchTime(startTime, millis()));
     }
   }
   void screenTap(uint8_t x, uint8_t y) {
@@ -261,8 +245,6 @@ class StopWatchScreen : public WatchScreenBase {
   }
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
-  void swipeUp() { startStopWatch(); }
-  void swipeDown() { stopStopWatch(); }
   void startStopWatch() {
     startTime = millis();
     hasStarted = true;
@@ -461,10 +443,6 @@ class TimeDateSetScreen : public WatchScreenBase {
   void drawRects() {
     drawRectOutlineWithChar(0, 60, 115, 130, 8, COLOUR_RED, '-', 6);
     drawRectOutlineWithChar(120, 60, 115, 130, 8, COLOUR_GREEN, '+', 6);
-    // drawRect(0, 50, 120, 150, COLOUR_RED);
-    // drawRect(120, 50, 120, 150, COLOUR_BLUE);
-    // writeChar(30, 107, 6, '-', COLOUR_WHITE, COLOUR_RED);
-    // writeChar(175, 107, 6, '+', COLOUR_WHITE, COLOUR_BLUE);
   }
 };
 

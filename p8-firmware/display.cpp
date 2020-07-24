@@ -416,7 +416,7 @@ void drawRectOutline(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lin
  */
 void drawRectOutlineWithChar(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t rectColour, char character, uint8_t fontSize) {
   drawRectOutline(x, y, w, h, lineWidth, rectColour);
-  writeChar((x + (w / 2)) - ((getWidthOfNChars(1, fontSize)) / 2),
+  writeChar((x + (w / 2)) - (STR_WIDTH("-",fontSize) / 2),
             (y + (h / 2)) - ((FONT_HEIGHT * fontSize) / 2),
             fontSize, character, COLOUR_WHITE, COLOUR_BLACK);
 }

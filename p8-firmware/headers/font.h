@@ -12,6 +12,7 @@
 #define FONT_NEEDS_OFFSET false
 #define FONT_WIDTH 5
 #define FONT_HEIGHT 8
+#define STR_WIDTH(str, size) ((sizeof(str) - 1) * size * FONT_WIDTH + (sizeof(str) - 2) * size) //Macro to get the display width of a string literal
 
 #define CHAR_NONE 0
 #define GLYPH_CLOCK_UNSEL 1
