@@ -124,8 +124,8 @@ class ExerciseScreen : public WatchScreenBase {
         (this removed the need for the function(s) in display.cpp to calculate the length of a string)
       */
       if (hasStartedWorkout == false) {
-        drawRectOutlineWithChar(80, 60, 80, 80, 8, COLOUR_WHITE, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
-        writeString(120 - STR_WIDTH("Start", 2) / 2, 150, 2, "Start");                        //Button label
+        drawRectOutlineWithChar(50, 50, 140, 100, 15, COLOUR_WHITE, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
+        writeString(120 - STR_WIDTH("Start", 4) / 2, 160, 4, "Start");                        //Button label
         if (hasExerciseLog == true)
           writeString(120 - STR_WIDTH("^ Last Activity ^", 2) / 2, 0, 2, "^ Last Activity ^");
       } else {
@@ -162,7 +162,7 @@ class ExerciseScreen : public WatchScreenBase {
   }
   void screenTap(uint8_t x, uint8_t y) {
     if (currentExerciseWindow == ACTIVITY) {
-      if (x > 80 && x < 160 && y > 60 && y < 140 && hasStartedWorkout == false) {
+      if (x > 50 && x < 190 && y > 50 && y < 150 && hasStartedWorkout == false) {
         startWorkout();  //Clicked button to start workout
       } else if (y < 40 && hasExerciseLog == true) {
         currentExerciseWindow = LAST_ACT;  //Move to the last log screen if there is a previous stored log
