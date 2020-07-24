@@ -5,6 +5,21 @@
 #define MIN_BRIGHTNESS 1
 #define BACKLIGHT_OFF 0
 
+/* class IOController {
+ private:
+  static IOController* instance;
+  IOController();
+  uint8_t currentBrightness;
+
+
+ public:
+  static IOController* getInstance();
+  void init();
+  void setLED(bool state);
+  void setMotor(bool state);
+  void setBrightness(int brightness);
+}; */
+
 void initIO();
 bool getButtonState();
 void ledOutput(bool on);

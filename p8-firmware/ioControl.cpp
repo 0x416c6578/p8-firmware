@@ -8,6 +8,38 @@ uint16_t batCounter = 0;
 int cumulativeBatRead = 0;
 uint16_t lastBatPercent = 69;
 
+/* IOController* IOController::getInstance() {
+  if (!instance)
+    instance = new IOController;
+  return instance;
+}
+
+void IOController::init() {
+  pinMode(GREEN_LEDS, OUTPUT);
+  pinMode(VIBRATOR_OUT, OUTPUT);
+  pinMode(PUSH_BUTTON_IN, INPUT);
+  pinMode(LCD_BACKLIGHT_LOW, OUTPUT);
+  pinMode(LCD_BACKLIGHT_MID, OUTPUT);
+  pinMode(LCD_BACKLIGHT_HIGH, OUTPUT);
+#ifndef P8
+  pinMode(PUSH_BUTTON_OUT, OUTPUT);
+  digitalWrite(PUSH_BUTTON_OUT, HIGH);
+#endif
+  ledOutput(false);
+  motorOutput(false);
+  //Disable flash
+  pinMode(SPI_CE, OUTPUT);
+  digitalWrite(SPI_CE, HIGH);
+
+  //From battery.h
+  pinMode(CHARGE_INDICATION, INPUT);
+  pinMode(POWER_INDICATION, INPUT);
+  pinMode(POWER_CONTROL, OUTPUT);
+  digitalWrite(POWER_CONTROL, HIGH);
+
+  setBrightness(3);
+} */
+
 /*
   Initialize various GPIOs, should be done at bootup
 */
