@@ -5,14 +5,14 @@ All code is commented so that people wanting to learn about how Aaron's firmware
 If you would like to know how to set up the toolchain in Linux, see the documentation I wrote [here](https://github.com/0x416c6578/ATCwatch/blob/master/linux-tutorial.md).  
 HUGE HUGE thanks to [Aaron](https://github.com/atc1441) for all his work, I would have never have got this far on my own. This has been a great learning experience in writing efficient embedded C(++), and learning about the nRF SDK.
 ## TODO:
-- [x] Implement hyphenated text wrapping
+- [x] ~~Implement hyphenated text wrapping~~ This has been removed since it was unused, and didn't take some edge-cases into account
 - [x] Improve character printing by creating, populating and eventually displaying a single buffer for an entire character, rather than writing many small rects as pixels
 - [ ] Implement stripped down version of <Wire.h> for increased power efficiency (use EasyDMA directly instead of a wrapper)
 #### In the future
 - [x] Get RTC working
 - [x] Get touch display working
 - [x] Get accelerometer working
-- [ ] Get heart rate sensor working
+- [x] Get heart rate sensor working
 - [x] Implement main screen, and a framework for adding new screens
 ## New Features over ATCWatch
 - Faster bulk test displaying with ignoreBlankPixels parameter for writing characters
