@@ -141,6 +141,7 @@ void sleepDisplay() {
   postWrite();
 }
 
+
 /* 
   Same implementation as above, except for just passing in the number of characters rather than a string
  */
