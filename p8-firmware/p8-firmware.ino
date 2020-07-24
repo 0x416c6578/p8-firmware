@@ -55,16 +55,27 @@ void loop() {
 
   addToCumulativeBatReading();  //Battery readings are taken over a period and the mean is taken periodically to get a more accurate reading
 
+  /* 
+    Interrupts will wake the device and cause the interrupt handler to run.
+    The device then starts running thread mode code (normal code) from where it last slept
+    That means that if the interrupt didn't cause getPowerMode to be awake, then the device will
+    go back to sleep
+    If the type of interrupt is one where the device wakes up (eg button press), then
+    the THREAD MODE interrupt handler (not the NVIC interrupt handler) will set the device wakeup state (as well as enabling hardware),
+    meaning that the screenControllerLoop is run and the device is awake 
+  */
   if (getPowerMode() == POWER_ON) {
     screenControllerLoop();  //This will run the main loop of the current screen
   } else {
     sleepWait();  //This puts the MCU into its sleep mode, only waking on an interrupt
   }
 
-  /* If any interrupts were detected, this function will dispatch any events, and
-  reset the interrupt flag. This is not the NVIC interrupt handler, but a function called
-  in the main loop. This means that the interrupt handlers can just be simple flag-sets, and we 
-  can guarantee the atomic execution of interrupt handling (ie making sure that the interrupt handler
-  doesn't read i2c whilst another part of the program was). */
+  /* 
+    If any interrupts were detected, this function will dispatch any events, and
+    reset the interrupt flag. This is not the NVIC interrupt handler, but a function called
+    in the main loop. This means that the interrupt handlers can just be simple flag-sets, and we 
+    can guarantee the atomic execution of actual interrupt handling (ie making sure that the interrupt handler
+    doesn't read i2c whilst another part of the program was).
+   */
   handleInterrupts();
 }

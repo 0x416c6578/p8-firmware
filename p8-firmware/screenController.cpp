@@ -25,6 +25,7 @@ WatchScreenBase* currentScreen = homeScreens[currentHomeScreenIndex];
 
 /*
   This is called whenever a new screen is loaded
+  It will setup the screen and draw the indicator and update the screen refresh time
 */
 void initScreen() {
   currentScreen->screenSetup();                             //Call screenSetup() on the current screen
@@ -61,6 +62,7 @@ void handleRightSwipe() {
  */
 void prevScreen() {
   if (currentHomeScreenIndex != 0) {
+    currentScreen->screenDestroy();  //Call 'destructor' for current screen
     currentHomeScreenIndex--;
     currentScreen = homeScreens[currentHomeScreenIndex];
     initScreen();
@@ -72,6 +74,7 @@ void prevScreen() {
  */
 void nextScreen() {
   if (currentHomeScreenIndex != NUM_SCREENS - 1) {
+    currentScreen->screenDestroy();  //Call 'destructor' for current screen
     currentHomeScreenIndex++;
     currentScreen = homeScreens[currentHomeScreenIndex];
     initScreen();
@@ -109,9 +112,9 @@ void handleButtonPress() {
   The parameters are the x and y coords of the tap
 */
 void handleTap(uint8_t x, uint8_t y) {
-  if (y < 212) {
+  if (y < 212) {  //If the tap is on the main application
     currentScreen->screenTap(x, y);
-  } else {
+  } else {  //Else we are pressing in the app drawer buttons, so go to the prev or next screen
     if (x < 100) {
       prevScreen();
     } else if (x > 160) {
@@ -121,9 +124,10 @@ void handleTap(uint8_t x, uint8_t y) {
 }
 
 /* 
-  Sleep when we receive a long tap */
+  Sleep when we receive a long tap 
+*/
 void handleLongTap(uint8_t x, uint8_t y) {
-  if (currentScreen->doesImplementLongTap() == true) {
+  if (currentScreen->doesImplementLongTap() == true) {  //Make sure the current screen doesn't implement the long tap
     currentScreen->screenLongTap(x, y);
   } else {
     enterSleep();
@@ -137,7 +141,7 @@ void handleLongTap(uint8_t x, uint8_t y) {
  */
 void screenControllerLoop() {
   if (millis() - lastScreenUpdate > screenUpdateMS) {
-    //Update the screen every 20 ms
+    //The refresh time is variable depending on the current screen
     currentScreen->screenLoop();
     lastScreenUpdate = millis();
   }

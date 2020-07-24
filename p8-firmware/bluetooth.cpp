@@ -11,9 +11,9 @@ BLECharacteristic RXchar = BLECharacteristic("0001", BLEWriteWithoutResponse, 20
   for power draw debugging. No work has been done on the bluetooth stack yet
  */
 void initBluetooth() {
-  blePeripheral.setLocalName("P8Watch1");
+  blePeripheral.setLocalName("P8Watch");
   blePeripheral.setAdvertisingInterval(500);
-  blePeripheral.setDeviceName("P8Watch1");
+  blePeripheral.setDeviceName("P8Watch");
   blePeripheral.setAdvertisedServiceUuid(bleService.uuid());
   blePeripheral.addAttribute(bleService);
   blePeripheral.addAttribute(TXchar);
