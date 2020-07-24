@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Bitmap font
  * font[character] is a byte array of the vertical columns of a letter
@@ -12,7 +13,8 @@
 #define FONT_NEEDS_OFFSET false
 #define FONT_WIDTH 5
 #define FONT_HEIGHT 8
-#define STR_WIDTH(str, size) ((sizeof(str) - 1) * size * FONT_WIDTH + (sizeof(str) - 2) * size) //Macro to get the display width of a string literal
+#define STR_WIDTH(str, size) ((sizeof(str) - 1) * size * FONT_WIDTH + (sizeof(str) - 2) * size)  //Macro to get the display width of a string literal
+#define NCHAR_WIDTH(numChars, size) (numChars * size * FONT_WIDTH + (numChars - 1) * size)       //Macro to get the display width of n characters
 
 #define CHAR_NONE 0
 #define GLYPH_CLOCK_UNSEL 1

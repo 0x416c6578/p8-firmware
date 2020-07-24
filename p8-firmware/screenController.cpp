@@ -149,7 +149,7 @@ Draw an indicator as to which screen you are currently on
 void drawAppIndicator() {
   drawRect(0, 213, 240, 1, COLOUR_WHITE);
   uint8_t indicatorFontSize = 3;
-  uint8_t widthOfIndicator = getWidthOfNChars(NUM_SCREENS, 3);
+  uint8_t widthOfIndicator = NCHAR_WIDTH(NUM_SCREENS, 3);
   uint8_t startOfString = 120 - (widthOfIndicator / 2);
   //Draw the current screen indicators
   writeChar(startOfString + (0 * indicatorFontSize * FONT_WIDTH) + (0 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 0) ? GLYPH_CLOCK_SEL : GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);

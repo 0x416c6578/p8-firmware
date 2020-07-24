@@ -141,14 +141,6 @@ void sleepDisplay() {
   postWrite();
 }
 
-
-/* 
-  Same implementation as above, except for just passing in the number of characters rather than a string
- */
-uint32_t getWidthOfNChars(uint8_t numChars, uint8_t pixelsPerPixel) {
-  return numChars * pixelsPerPixel * FONT_WIDTH + (numChars - 1) * pixelsPerPixel;
-}
-
 /*
   Write a string to the specified position using a string literal (null terminated char array)
 */

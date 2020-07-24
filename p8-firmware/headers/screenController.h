@@ -1,6 +1,7 @@
 #pragma once
 #include "Arduino.h"
 #include "Screens.h"
+#include "font.h"
 
 void initScreen();
 void screenControllerLoop();
