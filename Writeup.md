@@ -12,6 +12,7 @@
 - My implementation does the work before writing, writing pixel data into the LCD Buffer directly, then using EasyDMA to write that whole buffer into display RAM
   - This is different to Aarons, which draws a rect for each pixel
   - This implementation is faster still than Aarons implementation, and by the naked eye, writing a full screen of text is equally as fast as drawing a rect equal to the display size (theoretically the fastest you could write to the display)
+    - As an aside, writing a full 240*240 rect to the display would take approximately (1/8000000*16*240*240) seconds, or about 0.1 seconds
 - There are still further optimizations that could be made to this routine (and parameterising it for use with different fonts), however I am happy with the current implementation
 
 #### Drawing A Character
