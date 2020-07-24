@@ -86,9 +86,8 @@ void drawCharPixelToBuffer(int charColumn, int charRow, uint8_t pixelsPerPixel, 
 - This means if you want tap-to-wake, you must settle with a ~3mA current draw, which is very bad
 - Also, the display has a different swipe behaviour in that if you swipe a direction without removing your finger, the 816 will register the swipe, whereas the 716 will only register it when the finger is removed
 ## RTC
-- There is a 32768KHz oscillator in the main CPU, however I am still researching how to use that for RTC needs (and whether the `millis()` function uses that or the base system clock for timing)
-- Using the stock Time library, the time deviates by +1 second after about 17-18 hours of uptime
-  - I am fine with a total delta of up to +-30 seconds, so I am more than happy with the current deviation
+- A bug I found in the millis() function causes the millis() function to wrap over about every 2 days (caused by &ing the overflow bits with 0xff meaning they wrap prematurely)
+  - An issue has been filed with arduino-nRF5 (https://github.com/sandeepmistry/arduino-nRF5/issues/417) but the project is inactive now, so if you use that library, be sure to fix that bug to get propper 32 bit millis() functionality
 ## Heartrate sensor
 - There are two LEDs on the heartrate sensor board, however these are independently controllable separate to the heartrate sensor itself (which has its own LED in the package) through pin 27
 
