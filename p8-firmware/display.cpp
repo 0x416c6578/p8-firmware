@@ -144,19 +144,11 @@ void sleepDisplay() {
 /*
   Write a string to the specified position using a string literal (null terminated char array)
 */
-void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, uint16_t colourFG, uint16_t colourBG) {
+void drawString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, uint16_t colourFG, uint16_t colourBG) {
   int currentLine = 0;      //Current line
   int charPos = 0;          //Position of the character we are on along the line
   int i = 0;                //Character index
   while (string[i] != 0) {  //Loop through every character of the string (only stop when you reach the null terminator)
-    //If printing the next character would result in it being of screen:
-    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH * pixelsPerPixel * 2) {
-      //If the current character is not a space, and the prev char is not a space, write a dash to join a word
-      if (string[i] != 32 && string[i - 1] != 32)
-        writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, '-', colourFG, colourBG);
-      currentLine++;  //Move to the next line (LF)
-      charPos = 0;    //Go to the beginning of the line (CR)
-    }
     /* 
       Writing a string is as follows:
       The x position of character n (starting at char 0) in a string is
@@ -167,9 +159,9 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, u
       proportional to the current character we are on, so we add n*pixelsPerPixel, which 
       effectively adds another pixel-width between characters
     */
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos,
-              y + currentLine * FONT_HEIGHT * pixelsPerPixel,
-              pixelsPerPixel, string[i], colourFG, colourBG);
+    drawChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos,
+             y + currentLine * FONT_HEIGHT * pixelsPerPixel,
+             pixelsPerPixel, string[i], colourFG, colourBG);
     //Move to the next character
     charPos++;
     i++;
@@ -178,11 +170,11 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, u
 
 /*
   Write an (up to 9 digit) integer to x,y, without preceding zeroes (useful when you know the numbers you are writing will have the same number of digits on rewriting)
-  The logic for writing the string is basically the same as writeString
+  The logic for writing the string is basically the same as drawString
 */
-void writeIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
+void drawIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
   if (toWrite == 0) {
-    writeChar(x, y, pixelsPerPixel, '0', colourFG, colourBG);
+    drawChar(x, y, pixelsPerPixel, '0', colourFG, colourBG);
     return;
   }
   //Byte array for storing the digits
@@ -211,7 +203,7 @@ void writeIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPix
       charPos = 0;
     }
     sprintf(charToWrite, "%d", digits[i]);
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
+    drawChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
     charPos++;
   }
 }
@@ -219,9 +211,9 @@ void writeIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPix
 /*
   Write a number always with 9 digits to x,y (with preceding zeroes for variable length rewrites)
 */
-void writeIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
+void drawIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
   if (toWrite == 0) {
-    writeString(x, y, pixelsPerPixel, "000000000", colourFG, colourBG);
+    drawString(x, y, pixelsPerPixel, "000000000", colourFG, colourBG);
     return;
   }
   //Byte array for storing the digits
@@ -244,7 +236,7 @@ void writeIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel,
       charPos = 0;
     }
     sprintf(charToWrite, "%d", digits[i]);
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
+    drawChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
     charPos++;
   }
 }
@@ -252,13 +244,13 @@ void writeIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel,
 /*
   Write a character to the screen position (x,y)
 */
-void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, uint16_t colourFG, uint16_t colourBG) {
+void drawChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, uint16_t colourFG, uint16_t colourBG) {
   preWrite();
 
   //Width and height of the character on the display
   int characterDispWidth = FONT_WIDTH * pixelsPerPixel;
   int characterDispHeight = FONT_HEIGHT * pixelsPerPixel;
-  setRowColRAMAddr(x, y, characterDispWidth, characterDispHeight);  //Set the window of display memory to write to
+  setDisplayWriteRegion(x, y, characterDispWidth, characterDispHeight);  //Set the window of display memory to write to
   //Depending on the font, an offset to the current character index might be needed to skip over the unprintable characters
   int offset = FONT_NEEDS_OFFSET ? 32 : 0;
 
@@ -266,8 +258,8 @@ void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, u
   for (int row = 0; row < FONT_HEIGHT; row++) {
     for (int col = 0; col < FONT_WIDTH; col++) {
       //(font[character][col] >> row) & 1 will return true if the font dictates that (col, row) should have a pixel there
-      //setDisplayPixels writes into the LCD buffer the correct colour data for the current character pixel
-      setDisplayPixels(col, row, pixelsPerPixel, (font[character - offset][col] >> row) & 1, colourFG, colourBG);
+      //drawCharPixelToBuffer writes into the LCD buffer the correct colour data for the current character pixel
+      drawCharPixelToBuffer(col, row, pixelsPerPixel, (font[character - offset][col] >> row) & 1, colourFG, colourBG);
     }
   }
   sendSPICommand(0x2C);
@@ -281,7 +273,7 @@ void writeChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, u
   Add pixel data into the LCD buffer for the character's current pixel
   (logic is explained in Writeup.md)
 */
-void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colourFG, uint16_t colourBG) {
+void drawCharPixelToBuffer(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colourFG, uint16_t colourBG) {
   int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;
   int rowFontIndexScaledByPixelCount = charRow * pixelsPerPixel;
   int pixelsPerRow = FONT_WIDTH * pixelsPerPixel;
@@ -308,10 +300,10 @@ void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool 
 /*
   Draw a rect with origin x,y and width w, height h
 */
-void drawRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t colour) {
+void drawFilledRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t colour) {
   preWrite();
-  setRowColRAMAddr(x, y, w, h);
-  fillRectWithColour(colour);
+  setDisplayWriteRegion(x, y, w, h);
+  fillDisplayRam(colour);
   postWrite();
 }
 
@@ -321,11 +313,11 @@ void drawRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t colour) {
   This region has an xStart, xEnd, yStart and yEnd address
   As you write half-words (pixels) over SPI, the RAM fills horizontally per row
 */
-void setRowColRAMAddr(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
+void setDisplayWriteRegion(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
   uint8_t buf[4];        //Parameter buffer
   windowArea = w * h;    //Calculate window area
   sendSPICommand(0x2A);  //Column address set
-  buf[0] = 0x00;
+  buf[0] = 0x00;         //Padding write value to make it 16 bit
   buf[1] = x;
   buf[2] = 0x00;
   buf[3] = (x + w - 1);
@@ -341,7 +333,7 @@ void setRowColRAMAddr(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
 /*
   Fill the current window with the colour specified (16 bit RGB 5-6-5)
 */
-void fillRectWithColour(uint16_t colour) {
+void fillDisplayRam(uint16_t colour) {
   sendSPICommand(0x2C);  //Memory write
   uint32_t numberOfBytesToWriteToLCD;
   uint32_t numberBytesInWindowArea = (windowArea * 2);
@@ -368,31 +360,31 @@ void fillRectWithColour(uint16_t colour) {
 /* 
   Draw a rectangle with outline of width lineWidth
  */
-void drawRectOutline(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t colour) {
-  drawRect(x, y, w, h, COLOUR_BLACK);  //Clear rect of stuff
+void drawUnfilledRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t colour) {
+  drawFilledRect(x, y, w, h, COLOUR_BLACK);  //Clear rect of stuff
   //Top rect
-  drawRect(x, y, w, lineWidth, colour);
+  drawFilledRect(x, y, w, lineWidth, colour);
   //Bottom rect
-  drawRect(x, y + h - lineWidth, w, lineWidth, colour);
+  drawFilledRect(x, y + h - lineWidth, w, lineWidth, colour);
   //Left rect
-  drawRect(x, y, lineWidth, h, colour);
+  drawFilledRect(x, y, lineWidth, h, colour);
   //Right rect
-  drawRect(x + w - lineWidth, y, lineWidth, h, colour);
+  drawFilledRect(x + w - lineWidth, y, lineWidth, h, colour);
 }
 
 /* 
   Draw a rect outline with character in the middle (look at writeup for explanation)
  */
-void drawRectOutlineWithChar(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t rectColour, char character, uint8_t fontSize) {
-  drawRectOutline(x, y, w, h, lineWidth, rectColour);
-  writeChar((x + (w / 2)) - (STR_WIDTH("-",fontSize) / 2),
-            (y + (h / 2)) - ((FONT_HEIGHT * fontSize) / 2),
-            fontSize, character, COLOUR_WHITE, COLOUR_BLACK);
+void drawUnfilledRectWithChar(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t rectColour, char character, uint8_t fontSize) {
+  drawUnfilledRect(x, y, w, h, lineWidth, rectColour);
+  drawChar((x + (w / 2)) - (STR_WIDTH("-", fontSize) / 2),
+           (y + (h / 2)) - ((FONT_HEIGHT * fontSize) / 2),
+           fontSize, character, COLOUR_WHITE, COLOUR_BLACK);
 }
 
 /*
   Clear display (clear whole display when no arg (or false) is passed in)
 */
-void clearDisplay(bool appDrawClear) {
-  drawRect(0, 0, 240, appDrawClear ? 213 : 240, 0x0000);
+void clearDisplay(bool leaveAppDrawer) {
+  drawFilledRect(0, 0, 240, leaveAppDrawer ? 213 : 240, 0x0000);
 }

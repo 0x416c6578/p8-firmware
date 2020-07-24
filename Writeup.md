@@ -48,7 +48,7 @@ ___
 - In explicit form, this looks like:
 
 ```cpp
-void setDisplayPixels(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colour) {
+void drawCharPixelToBuffer(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colour) {
   //Get the row and column of the origin of the current FONT pixel as a DISPLAY position
   //by scaling by the font size
   int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;

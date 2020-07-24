@@ -13,17 +13,23 @@
 #include "headers/watchdog.h"
 #include "nrf52.h"
 void setup() {
-  initIO();                //Init GPIOs
-  if (getButtonState()) {  //If the button is held at boot, enter bootloader
+  //Make sure that we do a button press check ASAP with as little code as possible run before
+  pinMode(PUSH_BUTTON_IN, INPUT);
+#ifndef P8
+  pinMode(PUSH_BUTTON_OUT, OUTPUT);
+  digitalWrite(PUSH_BUTTON_OUT, HIGH);
+#endif
+  if (digitalRead(PUSH_BUTTON_IN)) {  //If the button is held at boot, enter bootloader
     /* This sets a bit in the general purpose retention register which (I assume) 
     the bootloader sees and halts booting */
     NRF_POWER->GPREGRET = 0x01;
     NVIC_SystemReset();
   }
+  initIO();        //Init GPIOs
   initWatchdog();  //Start the watchdog
   initFastSPI();   //Initialize EasyDMA SPI
   initDisplay();   //Initialize display
-  writeChar(100, 120 - 32, 8, GLYPH_SMILEY, COLOUR_WHITE, COLOUR_BLACK);
+  drawChar(100, 120 - 32, 8, GLYPH_SMILEY, COLOUR_WHITE, COLOUR_BLACK);
   Wire.begin();
   Wire.setClock(250000);
   initTouch();       //Initialize touch panel

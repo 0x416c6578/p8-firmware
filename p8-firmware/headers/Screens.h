@@ -37,11 +37,11 @@ class DemoScreen : public WatchScreenBase {
   }
   void screenLoop() {
     getAcclData(&data);
-    writeIntWithPrecedingZeroes(0, 0, 2, abs(data.x));
-    writeIntWithPrecedingZeroes(0, 20, 2, abs(data.y));
-    writeIntWithPrecedingZeroes(0, 40, 2, abs(data.z));
+    drawIntWithPrecedingZeroes(0, 0, 2, abs(data.x));
+    drawIntWithPrecedingZeroes(0, 20, 2, abs(data.y));
+    drawIntWithPrecedingZeroes(0, 40, 2, abs(data.z));
     if (millis() - lastStepRead > 100) {
-      writeIntWithoutPrecedingZeroes(0, 60, 2, (int)getStepCount());
+      drawIntWithoutPrecedingZeroes(0, 60, 2, (int)getStepCount());
       lastStepRead = millis();
     }
   }
@@ -65,35 +65,35 @@ class TimeScreen : public WatchScreenBase {
  public:
   void screenSetup() {
     clearDisplay(true);
-    writeChar(80, 145, 3, '%', COLOUR_WHITE, COLOUR_BLACK);
-    writeChar(20, 172, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
+    drawChar(80, 145, 3, '%', COLOUR_WHITE, COLOUR_BLACK);
+    drawChar(20, 172, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
   }
   void screenLoop() {
     getTime(timeStr);
-    writeString(20, 15, 5, timeStr);
+    drawString(20, 15, 5, timeStr);
     getDate(dateStr);
-    writeString(20, 70, 3, dateStr);
+    drawString(20, 70, 3, dateStr);
     //If we are on a new day, reset the current step count
     if (getDayOfWeek() != lastDay) {
       lastDay = getDayOfWeek();
       resetStepCounter();
-      screenSetup();
+      drawString(40,175,3,"          ");
     }
     getDay(dayStr);
-    writeString(20, 100, 3, dayStr);
+    drawString(20, 100, 3, dayStr);
 
     if (!getChargeState()) {
       if (getBatteryPercent() < 99)
-        writeChar(20, 142, 3, GLYPH_BATTERY, COLOUR_RED, COLOUR_BLACK);
+        drawChar(20, 142, 3, GLYPH_BATTERY, COLOUR_RED, COLOUR_BLACK);
       else
-        writeChar(20, 142, 3, GLYPH_BATTERY, COLOUR_GREEN, COLOUR_BLACK);
+        drawChar(20, 142, 3, GLYPH_BATTERY, COLOUR_GREEN, COLOUR_BLACK);
     } else {
-      writeChar(20, 142, 3, GLYPH_BATTERY, COLOUR_WHITE, COLOUR_BLACK);
+      drawChar(20, 142, 3, GLYPH_BATTERY, COLOUR_WHITE, COLOUR_BLACK);
     }
-    writeIntWithoutPrecedingZeroes(40, 145, 3, getBatteryPercent());
+    drawIntWithoutPrecedingZeroes(40, 145, 3, getBatteryPercent());
 
     steps = getStepCount();
-    writeIntWithoutPrecedingZeroes(40, 175, 3, steps);
+    drawIntWithoutPrecedingZeroes(40, 175, 3, steps);
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
@@ -131,27 +131,27 @@ class ExerciseScreen : public WatchScreenBase {
         (this removed the need for the function(s) in display.cpp to calculate the length of a string)
       */
       if (hasStartedWorkout == false) {
-        drawRectOutlineWithChar(50, 50, 140, 100, 15, COLOUR_WHITE, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
-        writeString(120 - STR_WIDTH("Start", 4) / 2, 160, 4, "Start");                           //Button label
+        drawUnfilledRectWithChar(50, 50, 140, 100, 15, COLOUR_WHITE, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
+        drawString(120 - STR_WIDTH("Start", 4) / 2, 160, 4, "Start");                           //Button label
         if (hasExerciseLog == true)
-          writeString(120 - STR_WIDTH("^ Last Activity ^", 2) / 2, 0, 2, "^ Last Activity ^");
+          drawString(120 - STR_WIDTH("^ Last Activity ^", 2) / 2, 0, 2, "^ Last Activity ^");
       } else {
-        writeString(0, 0, 3, "Exercise:");                                                                      //Exercise label
-        writeChar(0, 78, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);                                         //Walking glyph
-        writeChar(0, 108, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);                                             //KM glyph
-        writeString(120 - STR_WIDTH("Long tap to stop logging.", 1) / 2, 204, 1, "Long tap to stop logging.");  //Info at bottom of screen
+        drawString(0, 0, 3, "Exercise:");                                                                      //Exercise label
+        drawChar(0, 78, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);                                         //Walking glyph
+        drawChar(0, 108, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);                                             //KM glyph
+        drawString(120 - STR_WIDTH("Long tap to stop logging.", 1) / 2, 204, 1, "Long tap to stop logging.");  //Info at bottom of screen
       }
     } else if (currentExerciseWindow == LAST_ACT) {
       //Show last activity info
-      writeString(0, 0, 3, "Previous Log");
-      writeChar(0, 61, 3, GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-      writeChar(0, 87, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
-      writeChar(0, 118, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);
+      drawString(0, 0, 3, "Previous Log");
+      drawChar(0, 61, 3, GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+      drawChar(0, 87, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
+      drawChar(0, 118, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);
       getStopWatchTime(timeBuf, lastLog.startTime, lastLog.endTime);
-      writeString(20, 60, 3, timeBuf);
-      writeIntWithoutPrecedingZeroes(20, 90, 3, lastLog.numSteps);
+      drawString(20, 60, 3, timeBuf);
+      drawIntWithoutPrecedingZeroes(20, 90, 3, lastLog.numSteps);
       sprintf(distanceChar, "%.3f", (lastLog.numSteps) * KM_PER_STEP);
-      writeString(20, 120, 3, distanceChar);
+      drawString(20, 120, 3, distanceChar);
     }
   }
 
@@ -162,10 +162,10 @@ class ExerciseScreen : public WatchScreenBase {
         //Print current workout info if we have started a workout
         currentSteps = getStepCount();
         getStopWatchTime(timeBuf, startTime, millis());
-        writeString(0, 30, 3, timeBuf);                                                //Workout time
-        writeIntWithoutPrecedingZeroes(20, 80, 3, currentSteps - startStepCount);      //Step count
+        drawString(0, 30, 3, timeBuf);                                                //Workout time
+        drawIntWithoutPrecedingZeroes(20, 80, 3, currentSteps - startStepCount);      //Step count
         sprintf(distanceChar, "%.3f", (currentSteps - startStepCount) * KM_PER_STEP);  //KM walked calc
-        writeString(20, 110, 3, distanceChar);
+        drawString(20, 110, 3, distanceChar);
       }
     }
   }
@@ -235,15 +235,15 @@ class StopWatchScreen : public WatchScreenBase {
  public:
   void screenSetup() {
     clearDisplay(true);
-    drawRectOutline(0, 0, 110, 60, 7, COLOUR_GREEN);
-    drawRectOutline(130, 0, 110, 60, 7, COLOUR_RED);
-    writeString(55 - STR_WIDTH("Start", 3) / 2, 18, 3, "Start");  //Look at screenTap() for more info
-    writeString(185 - STR_WIDTH("Stop", 3) / 2, 18, 3, "Stop");
+    drawUnfilledRect(0, 0, 110, 60, 7, COLOUR_GREEN);
+    drawUnfilledRect(130, 0, 110, 60, 7, COLOUR_RED);
+    drawString(55 - STR_WIDTH("Start", 3) / 2, 18, 3, "Start");  //Look at screenTap() for more info
+    drawString(185 - STR_WIDTH("Stop", 3) / 2, 18, 3, "Stop");
   }
   void screenLoop() {
     if (hasStarted) {
       getStopWatchTime(timeBuf, startTime, millis());
-      writeString(120 - STR_WIDTH("00:00:00", 4) / 2, 115, 4, timeBuf);
+      drawString(120 - STR_WIDTH("00:00:00", 4) / 2, 115, 4, timeBuf);
     }
   }
   void screenTap(uint8_t x, uint8_t y) {
@@ -297,32 +297,32 @@ class TimeDateSetScreen : public WatchScreenBase {
   void screenLoop() {
     switch (currentSettingsWindow) {
       case BRIGHTNESS:
-        writeString(0, 0, 3, "Brightness");
-        writeIntWithPrecedingZeroes(0, 26, 3, getBrightness());
+        drawString(0, 0, 3, "Brightness");
+        drawIntWithPrecedingZeroes(0, 26, 3, getBrightness());
         break;
       case SECOND:
-        writeString(0, 0, 3, "Second");
-        writeIntWithPrecedingZeroes(0, 26, 3, setSecond);
+        drawString(0, 0, 3, "Second");
+        drawIntWithPrecedingZeroes(0, 26, 3, setSecond);
         break;
       case MINUTE:
-        writeString(0, 0, 3, "Minute");
-        writeIntWithPrecedingZeroes(0, 26, 3, setMinute);
+        drawString(0, 0, 3, "Minute");
+        drawIntWithPrecedingZeroes(0, 26, 3, setMinute);
         break;
       case HOUR:
-        writeString(0, 0, 3, "Hour");
-        writeIntWithPrecedingZeroes(0, 26, 3, setHour);
+        drawString(0, 0, 3, "Hour");
+        drawIntWithPrecedingZeroes(0, 26, 3, setHour);
         break;
       case DAY:
-        writeString(0, 0, 3, "Day");
-        writeIntWithPrecedingZeroes(0, 26, 3, setDay);
+        drawString(0, 0, 3, "Day");
+        drawIntWithPrecedingZeroes(0, 26, 3, setDay);
         break;
       case MONTH:
-        writeString(0, 0, 3, "Month");
-        writeIntWithPrecedingZeroes(0, 26, 3, setMonth);
+        drawString(0, 0, 3, "Month");
+        drawIntWithPrecedingZeroes(0, 26, 3, setMonth);
         break;
       case YEAR:
-        writeString(0, 0, 3, "Year");
-        writeIntWithPrecedingZeroes(0, 26, 3, setYear);
+        drawString(0, 0, 3, "Year");
+        drawIntWithPrecedingZeroes(0, 26, 3, setYear);
         setTimeWrapper(setYear, setMonth, setDay, setHour, setMinute, setSecond);
         break;
     }
@@ -395,27 +395,27 @@ class TimeDateSetScreen : public WatchScreenBase {
     switch (currentSettingsWindow) {
       case BRIGHTNESS:
         currentSettingsWindow = SECOND;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       case SECOND:
         currentSettingsWindow = MINUTE;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       case MINUTE:
         currentSettingsWindow = HOUR;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       case HOUR:
         currentSettingsWindow = DAY;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       case DAY:
         currentSettingsWindow = MONTH;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       case MONTH:
         currentSettingsWindow = YEAR;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       default:
         break;
@@ -425,35 +425,35 @@ class TimeDateSetScreen : public WatchScreenBase {
     switch (currentSettingsWindow) {
       case SECOND:
         currentSettingsWindow = BRIGHTNESS;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       case MINUTE:
         currentSettingsWindow = SECOND;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       case HOUR:
         currentSettingsWindow = MINUTE;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       case DAY:
         currentSettingsWindow = HOUR;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       case MONTH:
         currentSettingsWindow = DAY;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       case YEAR:
         currentSettingsWindow = MONTH;
-        drawRect(0, 0, 240, 50, COLOUR_BLACK);
+        drawFilledRect(0, 0, 240, 50, COLOUR_BLACK);
         break;
       default:
         break;
     }
   }
   void drawRects() {
-    drawRectOutlineWithChar(0, 60, 115, 130, 8, COLOUR_RED, '-', 6);
-    drawRectOutlineWithChar(120, 60, 115, 130, 8, COLOUR_GREEN, '+', 6);
+    drawUnfilledRectWithChar(0, 60, 115, 130, 8, COLOUR_RED, '-', 6);
+    drawUnfilledRectWithChar(120, 60, 115, 130, 8, COLOUR_GREEN, '+', 6);
   }
 };
 
@@ -467,18 +467,18 @@ class InfoScreen : public WatchScreenBase {
  public:
   void screenSetup() {
     clearDisplay(true);
-    writeString(0, 0, 1, "Firmware by:");
-    writeString(0, 10, 2, "Alex Underwood");
-    writeString(0, 30, 1, "Uptime:");
-    writeString(0, 80, 1, "Compiled:");
-    writeString(0, 90, 2, __DATE__);
-    writeString(0, 110, 2, __TIME__);
+    drawString(0, 0, 1, "Firmware by:");
+    drawString(0, 10, 2, "Alex Underwood");
+    drawString(0, 30, 1, "Uptime:");
+    drawString(0, 80, 1, "Compiled:");
+    drawString(0, 90, 2, __DATE__);
+    drawString(0, 110, 2, __TIME__);
   }
   void screenLoop() {
-    writeIntWithPrecedingZeroes(0, 40, 2, millis());
-    writeIntWithoutPrecedingZeroes(0, 60, 2, millis() / 1000 / 60 / 60 / 24);
+    drawIntWithPrecedingZeroes(0, 40, 2, millis());
+    drawIntWithoutPrecedingZeroes(0, 60, 2, millis() / 1000 / 60 / 60 / 24);
     getStopWatchTime(timeBuf, 0, millis() % 86400000);
-    writeString(35, 60, 2, timeBuf);
+    drawString(35, 60, 2, timeBuf);
   }
   bool doesImplementSwipeLeft() { return false; }
   bool doesImplementSwipeRight() { return false; }
@@ -492,9 +492,9 @@ class PowerScreen : public WatchScreenBase {
  public:
   void screenSetup() {
     clearDisplay(true);
-    drawRectOutlineWithChar(0, 0, 70, 70, 5, COLOUR_WHITE, GLYPH_REBOOT_UNSEL, 4);
-    drawRectOutlineWithChar(85, 0, 70, 70, 5, COLOUR_WHITE, GLYPH_BOOTLOADER_UNSEL, 4);
-    drawRectOutline(170, 0, 70, 70, 5, COLOUR_WHITE);
+    drawUnfilledRectWithChar(0, 0, 70, 70, 5, COLOUR_WHITE, GLYPH_REBOOT_UNSEL, 4);
+    drawUnfilledRectWithChar(85, 0, 70, 70, 5, COLOUR_WHITE, GLYPH_BOOTLOADER_UNSEL, 4);
+    drawUnfilledRect(170, 0, 70, 70, 5, COLOUR_WHITE);
   }
   void screenTap(uint8_t x, uint8_t y) {
     if (y < 70 && x < 70) {
