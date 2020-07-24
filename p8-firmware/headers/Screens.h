@@ -58,23 +58,29 @@ class TimeScreen : public WatchScreenBase {
   uint8_t lastDay = 255;
   char distanceChar[10];
   uint32_t steps;
+  char timeStr[6];   //00:00\0
+  char dateStr[11];  //01.01.1970\0
+  char dayStr[10];   //wednesday\0
 
  public:
   void screenSetup() {
     clearDisplay(true);
-    writeString(80, 145, 3, "%");
+    writeChar(80, 145, 3, '%', COLOUR_WHITE, COLOUR_BLACK);
     writeChar(20, 172, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
   }
   void screenLoop() {
-    writeString(20, 20, 4, getTimeWithSecs());
-    writeString(20, 70, 3, getDate());
+    getTime(timeStr);
+    writeString(20, 15, 5, timeStr);
+    getDate(dateStr);
+    writeString(20, 70, 3, dateStr);
     //If we are on a new day, reset the current step count
-    if (getDayOfWeek(day(), month(), year()) != lastDay) {
-      lastDay = getDayOfWeek(day(), month(), year());
+    if (getDayOfWeek() != lastDay) {
+      lastDay = getDayOfWeek();
       resetStepCounter();
       screenSetup();
     }
-    writeString(20, 100, 3, getDay());
+    getDay(dayStr);
+    writeString(20, 100, 3, dayStr);
 
     if (!getChargeState()) {
       if (getBatteryPercent() < 99)
@@ -100,6 +106,7 @@ class TimeScreen : public WatchScreenBase {
  */
 class ExerciseScreen : public WatchScreenBase {
  private:
+  char timeBuf[9];  //String for any times needing writing
   enum currentWindow {
     ACTIVITY,
     LAST_ACT
@@ -125,7 +132,7 @@ class ExerciseScreen : public WatchScreenBase {
       */
       if (hasStartedWorkout == false) {
         drawRectOutlineWithChar(50, 50, 140, 100, 15, COLOUR_WHITE, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
-        writeString(120 - STR_WIDTH("Start", 4) / 2, 160, 4, "Start");                        //Button label
+        writeString(120 - STR_WIDTH("Start", 4) / 2, 160, 4, "Start");                           //Button label
         if (hasExerciseLog == true)
           writeString(120 - STR_WIDTH("^ Last Activity ^", 2) / 2, 0, 2, "^ Last Activity ^");
       } else {
@@ -140,7 +147,8 @@ class ExerciseScreen : public WatchScreenBase {
       writeChar(0, 61, 3, GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
       writeChar(0, 87, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
       writeChar(0, 118, 3, GLYPH_KM, COLOUR_WHITE, COLOUR_BLACK);
-      writeString(20, 60, 3, getStopWatchTime(lastLog.startTime, lastLog.endTime));
+      getStopWatchTime(timeBuf, lastLog.startTime, lastLog.endTime);
+      writeString(20, 60, 3, timeBuf);
       writeIntWithoutPrecedingZeroes(20, 90, 3, lastLog.numSteps);
       sprintf(distanceChar, "%.3f", (lastLog.numSteps) * KM_PER_STEP);
       writeString(20, 120, 3, distanceChar);
@@ -153,7 +161,8 @@ class ExerciseScreen : public WatchScreenBase {
       if (hasStartedWorkout == true) {
         //Print current workout info if we have started a workout
         currentSteps = getStepCount();
-        writeString(0, 30, 3, getStopWatchTime(startTime, millis()));                  //Workout time
+        getStopWatchTime(timeBuf, startTime, millis());
+        writeString(0, 30, 3, timeBuf);                                                //Workout time
         writeIntWithoutPrecedingZeroes(20, 80, 3, currentSteps - startStepCount);      //Step count
         sprintf(distanceChar, "%.3f", (currentSteps - startStepCount) * KM_PER_STEP);  //KM walked calc
         writeString(20, 110, 3, distanceChar);
@@ -221,6 +230,7 @@ class StopWatchScreen : public WatchScreenBase {
  private:
   bool hasStarted = false;
   long startTime = 0;
+  char timeBuf[9];
 
  public:
   void screenSetup() {
@@ -232,7 +242,8 @@ class StopWatchScreen : public WatchScreenBase {
   }
   void screenLoop() {
     if (hasStarted) {
-      writeString(120 - STR_WIDTH("00:00:00", 4) / 2, 115, 4, getStopWatchTime(startTime, millis()));
+      getStopWatchTime(timeBuf, startTime, millis());
+      writeString(120 - STR_WIDTH("00:00:00", 4) / 2, 115, 4, timeBuf);
     }
   }
   void screenTap(uint8_t x, uint8_t y) {
@@ -450,6 +461,9 @@ class TimeDateSetScreen : public WatchScreenBase {
   Show info/uptime
  */
 class InfoScreen : public WatchScreenBase {
+ private:
+  char timeBuf[9];
+
  public:
   void screenSetup() {
     clearDisplay(true);
@@ -463,7 +477,8 @@ class InfoScreen : public WatchScreenBase {
   void screenLoop() {
     writeIntWithPrecedingZeroes(0, 40, 2, millis());
     writeIntWithoutPrecedingZeroes(0, 60, 2, millis() / 1000 / 60 / 60 / 24);
-    writeString(35, 60, 2, getStopWatchTime(0, millis() % 86400000));
+    getStopWatchTime(timeBuf, 0, millis() % 86400000);
+    writeString(35, 60, 2, timeBuf);
   }
   bool doesImplementSwipeLeft() { return false; }
   bool doesImplementSwipeRight() { return false; }

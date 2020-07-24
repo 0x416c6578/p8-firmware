@@ -184,30 +184,6 @@ void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, u
 }
 
 /*
-  Write a string to the specified position using a String object
-*/
-void writeString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, String string, uint16_t colourFG, uint16_t colourBG) {
-  int currentLine = 0;  //Current line
-  int charPos = 0;      //Position of the character we are on along the line
-  int stringLen = string.length();
-  for (int i = 0; i < stringLen; i++) {  //Loop through every character of the string
-    /*
-      In order to get dash wrapping, I added the * 2 to the end of the first if to test whether we will overlap with the NEXT character
-      I then also added the test to see if the character we are going to write would be a space (if so, don't add the dash)
-      Otherwise, I put a dash before the newline
-    */
-    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH * pixelsPerPixel * 2) {  //If printing the next character would result in it being of screen
-      if (string[i] != 32)
-        writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, '-', colourFG, colourBG);
-      currentLine++;
-      charPos = 0;
-    }
-    writeChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, string[i], colourFG, colourBG);
-    charPos++;
-  }
-}
-
-/*
   Write an (up to 9 digit) integer to x,y, without preceding zeroes (useful when you know the numbers you are writing will have the same number of digits on rewriting)
   The logic for writing the string is basically the same as writeString
 */

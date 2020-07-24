@@ -1,83 +1,62 @@
 #include "headers/p8Time.h"
 
-/*
-  Get a String object of the current time, with seconds
-  Todo: replace with char* mechanism
-*/
-String getTimeWithSecs() {
-  String timeStr = "";
-  if (hour() < 10)
-    timeStr += "0";
-  timeStr += String(hour());
-  timeStr += ":";
-  if (minute() < 10)
-    timeStr += "0";
-  timeStr += String(minute());
-  timeStr += ":";
-  if (second() < 10)
-    timeStr += "0";
-  timeStr += String(second());
-  return timeStr;
-}
-
-/*
-  Get a String object of the current time, without seconds
-*/
-String getTime() {
-  String timeStr = "";
-  if (hour() < 10)
-    timeStr += "0";
-  timeStr += String(hour());
-  timeStr += ":";
-  if (minute() < 10)
-    timeStr += "0";
-  timeStr += String(minute());
-  return timeStr;
-}
-
-/*
-  Get a String object of the current date
-*/
-String getDate() {
-  String dateStr = "";
-  if (day() < 10)
-    dateStr += "0";
-  dateStr += String(day());
-  dateStr += "/";
-  if (month() < 10)
-    dateStr += "0";
-  dateStr += String(month());
-  dateStr += "/";
-  dateStr += String(year());
-  return dateStr;
+/* 
+  Put current time with seconds into string provided
+ */
+void getTimeWithSecs(char* str) {
+  sprintf(str, "%02d:%02d:%02d", hour(), minute(), second());
 }
 
 /* 
-  Get a String object of the current day
-*/
-String getDay() {
-  switch (getDayOfWeek(day(), month(), year())) {
+  Put the current time without seconds into string provided
+ */
+void getTime(char* str) {
+  sprintf(str, "%02d:%02d", hour(), minute());
+}
+
+/* 
+  Put the current date into string provided
+ */
+void getDate(char* str) {
+  sprintf(str, "%02d.%02d.%04d", day(), month(), year());
+}
+
+/* 
+  Put current day into string provided
+  Memset is used to make buffer all spaces initially, since the string length is variable
+ */
+void getDay(char* str) {
+  memset(str, ' ', 9);
+  switch (getDayOfWeek()) {
     case 0:
-      return String("Sun");
+      sprintf(str, "Sunday");
+      break;
     case 1:
-      return String("Mon");
+      sprintf(str, "Monday");
+      break;
     case 2:
-      return String("Tues");
+      sprintf(str, "Tuesday");
+      break;
     case 3:
-      return String("Wed");
+      sprintf(str, "Wednesday");
+      break;
     case 4:
-      return String("Thurs");
+      sprintf(str, "Thursday");
+      break;
     case 5:
-      return String("Fri");
+      sprintf(str, "Friday");
+      break;
     case 6:
-      return String("Sat");
+      sprintf(str, "Saturday");
+      break;
     default:
-      return String("UNK");
+      sprintf(str, "UNK");
+      break;
   }
 }
 
 /* 
-  Function to get the current weekday (sunday = 1)
+  Get the weekday from a given day month and year
  */
 uint8_t getDayOfWeek(int d, int m, int y) {
   int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
@@ -85,32 +64,24 @@ uint8_t getDayOfWeek(int d, int m, int y) {
   return (y + y / 4 - y / 100 + y / 400 + t[m - 1] + d) % 7;
 }
 
+/* 
+  Get the current weekday
+ */
+uint8_t getDayOfWeek() {
+  return getDayOfWeek(day(), month(), year());
+}
+
 /*
   Set the time (just a wrapper for the library implementation (here for convenience))
 */
-void setTimeWrapper(int yr, int mth, int dayy, int hr, int minn, int sec) {
-  setTime(hr, minn, sec, dayy, mth, yr);
+void setTimeWrapper(int yr, int mth, int _day, int hr, int _min, int sec) {
+  setTime(hr, _min, sec, _day, mth, yr);
 }
 
 /* 
-  Get a string representing the current elapsed time of the stopwatch, given the start time, and the current time
+  Write the elapsed time between two times in milliseconds into string provided
  */
-String getStopWatchTime(int startTime, int currentTime) {
+void getStopWatchTime(char* str, int startTime, int currentTime) {
   int elapsedTimeMillis = currentTime - startTime;
-  int second = (elapsedTimeMillis / 1000) % 60;
-  int minute = (elapsedTimeMillis / 60000) % 60;
-  int hour = (elapsedTimeMillis / 3600000);
-  String timeStr = "";
-  if (hour < 10)
-    timeStr += "0";
-  timeStr += String(hour);
-  timeStr += ":";
-  if (minute < 10)
-    timeStr += "0";
-  timeStr += String(minute);
-  timeStr += ":";
-  if (second < 10)
-    timeStr += "0";
-  timeStr += String(second);
-  return timeStr;
+  sprintf(str, "%02d:%02d:%02d", (elapsedTimeMillis / 3600000), (elapsedTimeMillis / 60000) % 60, (elapsedTimeMillis / 1000) % 60);
 }
