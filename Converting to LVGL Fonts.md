@@ -15,7 +15,7 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t gylph_bitmap[] = {
     0x99, 0x90,
 
     /* U+23 "#" */
-    0x49, 0x2f, 0xd2, 0xfd, 0x24, 0x80, ... and so on ...
+    0x49, 0x2f, 0xd2, 0xfd, 0x24, 0x80, //... and so on ...
 ```
 
 - There is also a corresponding array of font information structs following this format
@@ -36,8 +36,8 @@ typedef struct {
 ...
 	{.bitmap_index = 0, .adv_w = 0, .box_h = 0, .box_w = 0, .ofs_x = 0, .ofs_y = 0}      /* id = 0 reserved */,
     {.bitmap_index = 0, .adv_w = 128, .box_h = 0, .box_w = 0, .ofs_x = 0, .ofs_y = 0},   //Space
-    {.bitmap_index = 0, .adv_w = 128, .box_h = 7, .box_w = 1, .ofs_x = 3, .ofs_y = -1},  //! (index is 0
-    {.bitmap_index = 1, .adv_w = 128, .box_h = 3, .box_w = 4, .ofs_x = 2, .ofs_y = 3},   // backslash
+    {.bitmap_index = 0, .adv_w = 128, .box_h = 7, .box_w = 1, .ofs_x = 3, .ofs_y = -1},  //!
+    {.bitmap_index = 1, .adv_w = 128, .box_h = 3, .box_w = 4, .ofs_x = 2, .ofs_y = 3},   //Backslash
     {.bitmap_index = 3, .adv_w = 128, .box_h = 7, .box_w = 6, .ofs_x = 1, .ofs_y = -1},  //#
 ...
 ```
@@ -47,6 +47,7 @@ typedef struct {
 ## Reading Font Bitmap Data
 - The only part of a character that is written to is the bounding box area, meaning that the data stored in the bitmap correlates to only that part of the character in the bounding box
 - For '!', the data stored is 0xf2, or 0b1111001(0) (the thing in brackets is just padding)
+- Data is read into the bounding box starting in the top-left and working along, then down
   - The bounding box is a 7 down * 1 accross box, meaning the letter looks like:
 ```
 ___
@@ -66,15 +67,28 @@ ___
 ---
 ```
 - Data is read into the bounding box starting in the top-left and working down before accross
-- Another example is the backslash, its data being 0x99 0x90, or 0b100110011001(0000)
+- Another example is the pound (#), its data being 0x49, 0x2f, 0xd2, 0xfd, 0x24, 0x80, or 0b01001001|00101111|11010010|11111101|00100100|10(000000)
 - This looks like:
 ```
-_________
-|@|@| | |
----------
-| |@|@| |
----------
-| | |@|@|
----------
+_____________
+| |@| | |@| |
+-------------
+| |@| | |@| |
+-------------
+|@|@|@|@|@|@|
+-------------
+| |@| | |@| |
+-------------
+|@|@|@|@|@|@|
+-------------
+| |@| | |@| |
+-------------
+| |@| | |@| |
+-------------
 ```
 - To calculate the number of bytes that should be read for a character, find the bounding box area with width*height, then find the next multiple of 8 greater than it, finally dividing that by 8 to find the number of bytes to read into the bounding box
+  - So for example '#', the bounding box area is 7\*6=42, the next highest multiple of 8 is 48, which is 6\*8, meaning you should read indexes offset+0, offset+1,...,offset+5 of the bitmap array
+  - This also means the last 6 bits of the last byte are unused
+
+## LVGL Font Engine
+- So now that we know how LVGL fonts work, we must figure out how to implement them into `p8-firmware`

@@ -25,6 +25,10 @@
   static void drawCharPixelToBuffer(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colourFG, uint16_t colourBG);
 }; */
 
+typedef struct {
+  uint8_t x,y;
+} point;
+
 //Old C style function definitions
 void initDisplay();
 void wakeDisplay();
