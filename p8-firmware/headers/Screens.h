@@ -473,6 +473,8 @@ class InfoScreen : public WatchScreenBase {
     drawString(0, 80, 1, "Compiled:");
     drawString(0, 90, 2, __DATE__);
     drawString(0, 110, 2, __TIME__);
+    drawString(0,130,1,"Based on firmware by");
+    drawString(0,140,2,"ATC1441");
   }
   void screenLoop() {
     drawIntWithPrecedingZeroes(0, 40, 2, millis());
