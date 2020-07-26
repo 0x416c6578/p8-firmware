@@ -1,6 +1,6 @@
 #include "headers/screenController.h"
 
-#define NUM_SCREENS 6
+#define NUM_SCREENS 7
 
 uint8_t screenUpdateMS = 20;  //Screen update time, defaults to 20ms (50hz)
 
@@ -13,13 +13,13 @@ long lastScreenUpdate = 0;
 TimeScreen timeScreen;
 StopWatchScreen stopWatchScreen;
 TimeDateSetScreen timeDateSetScreen;
-/* DemoScreen demoScreen; */
+DemoScreen demoScreen;
 InfoScreen infoScreen;
 PowerScreen powerScreen;
 ExerciseScreen exerciseScreen;
 
 int currentHomeScreenIndex = 0;
-WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, &exerciseScreen, &stopWatchScreen, &timeDateSetScreen, &infoScreen, &powerScreen /* , &demoScreen */};
+WatchScreenBase* homeScreens[NUM_SCREENS] = {&timeScreen, &exerciseScreen, &stopWatchScreen, &timeDateSetScreen, &infoScreen, &powerScreen, &demoScreen};
 
 WatchScreenBase* currentScreen = homeScreens[currentHomeScreenIndex];
 
@@ -162,7 +162,7 @@ void drawAppIndicator() {
   drawChar(startOfString + (3 * indicatorFontSize * FONT_WIDTH) + (3 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 3) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   drawChar(startOfString + (4 * indicatorFontSize * FONT_WIDTH) + (4 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 4) ? GLYPH_INFO_SEL : GLYPH_INFO_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   drawChar(startOfString + (5 * indicatorFontSize * FONT_WIDTH) + (5 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 5) ? GLYPH_POWER_SEL : GLYPH_POWER_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  /* drawChar(startOfString + (6 * indicatorFontSize * FONT_WIDTH) + (6 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 6) ? GLYPH_DATA_SEL : GLYPH_DATA_UNSEL, COLOUR_WHITE, COLOUR_BLACK); */
+  drawChar(startOfString + (6 * indicatorFontSize * FONT_WIDTH) + (6 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 6) ? GLYPH_DATA_SEL : GLYPH_DATA_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   //Draw the "can scroll left/right" indicators in the corners of the screen
   switch (currentHomeScreenIndex) {
     case 0:
@@ -173,10 +173,11 @@ void drawAppIndicator() {
     case 2:
     case 3:
     case 4:
+    case 5:
       drawChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
       drawChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
       break;
-    case 5:
+    case 6:
       drawChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
       drawChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, 0b1000010000010000, COLOUR_BLACK);
       break;

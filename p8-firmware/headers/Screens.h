@@ -3,6 +3,7 @@
 #include "WatchScreenBase.h"
 #include "accelerometer.h"
 #include "display.h"
+#include "font16.h"
 #include "p8Time.h"
 #include "pinout.h"
 #include "powerControl.h"
@@ -27,24 +28,11 @@ typedef struct {
   This demo screen is used for testing purposes
 */
 class DemoScreen : public WatchScreenBase {
- private:
-  bma4_accel data;
-  long lastStepRead = 0;
-
  public:
   void screenSetup() {
     clearDisplay(true);
   }
-  void screenLoop() {
-    getAcclData(&data);
-    drawIntWithPrecedingZeroes(0, 0, 2, abs(data.x));
-    drawIntWithPrecedingZeroes(0, 20, 2, abs(data.y));
-    drawIntWithPrecedingZeroes(0, 40, 2, abs(data.z));
-    if (millis() - lastStepRead > 100) {
-      drawIntWithoutPrecedingZeroes(0, 60, 2, (int)getStepCount());
-      lastStepRead = millis();
-    }
-  }
+  void screenLoop() {}
   bool doesImplementSwipeRight() { return false; }
   bool doesImplementSwipeLeft() { return false; }
   uint8_t getScreenUpdateTimeMS() { return 1; }  //Fast update time
@@ -77,7 +65,7 @@ class TimeScreen : public WatchScreenBase {
     if (getDayOfWeek() != lastDay) {
       lastDay = getDayOfWeek();
       resetStepCounter();
-      drawString(40,175,3,"          ");
+      drawString(40, 175, 3, "          ");
     }
     getDay(dayStr);
     drawString(20, 100, 3, dayStr);
@@ -132,7 +120,7 @@ class ExerciseScreen : public WatchScreenBase {
       */
       if (hasStartedWorkout == false) {
         drawUnfilledRectWithChar(50, 50, 140, 100, 15, COLOUR_WHITE, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
-        drawString(120 - STR_WIDTH("Start", 4) / 2, 160, 4, "Start");                           //Button label
+        drawString(120 - STR_WIDTH("Start", 4) / 2, 160, 4, "Start");                             //Button label
         if (hasExerciseLog == true)
           drawString(120 - STR_WIDTH("^ Last Activity ^", 2) / 2, 0, 2, "^ Last Activity ^");
       } else {
@@ -162,8 +150,8 @@ class ExerciseScreen : public WatchScreenBase {
         //Print current workout info if we have started a workout
         currentSteps = getStepCount();
         getStopWatchTime(timeBuf, startTime, millis());
-        drawString(0, 30, 3, timeBuf);                                                //Workout time
-        drawIntWithoutPrecedingZeroes(20, 80, 3, currentSteps - startStepCount);      //Step count
+        drawString(0, 30, 3, timeBuf);                                                 //Workout time
+        drawIntWithoutPrecedingZeroes(20, 80, 3, currentSteps - startStepCount);       //Step count
         sprintf(distanceChar, "%.3f", (currentSteps - startStepCount) * KM_PER_STEP);  //KM walked calc
         drawString(20, 110, 3, distanceChar);
       }
@@ -473,8 +461,9 @@ class InfoScreen : public WatchScreenBase {
     drawString(0, 80, 1, "Compiled:");
     drawString(0, 90, 2, __DATE__);
     drawString(0, 110, 2, __TIME__);
-    drawString(0,130,1,"Based on firmware by");
-    drawString(0,140,2,"ATC1441");
+    drawString(0, 130, 1, "Based on firmware by");
+    drawString(0, 140, 2, "Aaron Christophel");
+    drawString(0, 160, 2, "https://ATCnetz.de");
   }
   void screenLoop() {
     drawIntWithPrecedingZeroes(0, 40, 2, millis());
