@@ -5,23 +5,19 @@ All code is commented so that people wanting to learn about how Aaron's firmware
 If you would like to know how to set up the toolchain in Linux, see the documentation I wrote [here](https://github.com/0x416c6578/ATCwatch/blob/master/linux-tutorial.md).  
 HUGE HUGE thanks to [Aaron](https://github.com/atc1441) for all his work, I would have never have got this far on my own. This has been a great learning experience in writing efficient embedded C(++), and learning about the nRF SDK.
 ## TODO:
-- [x] ~~Implement hyphenated text wrapping~~ This has been removed since it was unused, and didn't take some edge-cases into account
-- [x] Improve character printing by creating, populating and eventually displaying a single buffer for an entire character, rather than writing many small rects as pixels
-- [ ] Implement stripped down version of <Wire.h> for increased power efficiency (use EasyDMA directly instead of a wrapper)
 #### In the future
-- [x] Get RTC working
-- [x] Get touch display working
-- [x] Get accelerometer working
-- [x] Get heart rate sensor working
+- [ ] Get heart rate sensor working
 - [x] Implement main screen, and a framework for adding new screens
-## New Features over ATCWatch
-- Faster bulk test displaying with ignoreBlankPixels parameter for writing characters
-  - This will skip over drawing the rects for blank pixels in characters
-  - It should only be used when the area you are writing to is blank (perhaps clear the screen before)
-- Coloured text
-  - Coloured FG and BG text was implemented, but removed due to lack of use
-- Writing strings as String objects, and as char[]s
+- [ ] Switch to using LVGL fonts
+  - See https://0x416c6578.github.io/ for information about the switch to LVGL fonts
+- [ ] Better activity estimation with heartrate sensor
+- [ ] Support reading from and writing to the flash chip
+## Changes over ATCWatch
+- Faster text writing routine that writes an entire character's data into the LCD buffer before writing over SPI
 - Writing integers to the display (both with and without preceding zeroes)
-
-## Notes on the P8
-See [Writeup](Writeup.md)
+- Removed usage of String object
+- Activity monitor with approximate distance travelled
+- Stopwatch implemented (works in background also)
+- The app draw is different to ATCwatch, with a row of apps along the bottom, and buttons / swipes between them
+- Device doesn't wakeup on wrist raise (increases battery life a bit)
+- Images are just characters
