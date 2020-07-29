@@ -8,7 +8,7 @@
 #include "pinout.h"
 #include "powerControl.h"
 
-#define KM_PER_STEP 0.00065f  //65cm per step
+#define KM_PER_STEP 0.00079f  //65cm per step
 
 typedef struct {
   int startTime;
