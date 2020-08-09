@@ -1,13 +1,16 @@
 #include "headers/accelerometer.h"
+#define NUM_TRIES_ACCL -1
 
 static uint8_t bmaAddress = BMA4_I2C_ADDR_PRIMARY;
 struct bma4_dev BMAInfoStruct;         //Struct that holds all the information about the accl
 struct bma4_accel_config accelConfig;  //Accelerometer config struct
 
+
 /* 
   Initialize the accelerometer
  */
 void initAccel() {
+  return;
   pinMode(BMA421_INT, INPUT);  //Interrupt pin (not used)
   //Reset the accelerometer
 
@@ -27,6 +30,7 @@ void initAccel() {
 
   feedWatchdog();  //Make sure to feed the watchdog here so the while loop has the most time to succeed
 
+  uint8_t retries = NUM_TRIES_ACCL;
   uint16_t result;
   do {
     Wire.beginTransmission(BMA4_I2C_ADDR_PRIMARY);
@@ -37,17 +41,17 @@ void initAccel() {
     result = 0;
     result = result | bma423_init(&BMAInfoStruct);  //API entry point
     delay(10);
-    result = result | bma423_write_config_file(&BMAInfoStruct);  //Write config file
+    result = result | bma423_write_config_file(&BMAInfoStruct);  //Write config file (binary blob in driver)
     delay(10);
     result = result | bma4_set_accel_enable(1, &BMAInfoStruct);  //Enable accel
     delay(10);
     result = result | bma4_set_accel_config(&accelConfig, &BMAInfoStruct);  //Set accel config
     delay(10);
     result = result | bma423_feature_enable(BMA423_STEP_CNTR | BMA423_STEP_ACT, 1, &BMAInfoStruct);  //Enable step counter
+    retries--;
+  } while (result != 0 || retries != 0);  //Repeat until success or the counter reaches 0
 
-  } while (result != 0);  //Repeat until success or reboot
-
-  // bma423_reset_step_counter(&BMAInfoStruct);  //API call to reset the step counter
+  bma423_reset_step_counter(&BMAInfoStruct);  //API call to reset the step counter
 
   if (result == 0) {
     ledPing();
@@ -94,7 +98,7 @@ int8_t acclI2CWrite(uint8_t registerAddress, const uint8_t *writeBuf, uint32_t w
 }
 
 /*
-  This is the user defined function to do a delay in us that the library needs
+  This is the user defined function to do a delay in micro seconds that the library needs
 */
 void acclDelay(uint32_t period_us, void *intf_ptr) {
   delayMicroseconds(period_us);

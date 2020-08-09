@@ -3,6 +3,7 @@
 #include "colours.h"
 #include "fastSPI.h"
 #include "font.h"
+#include "font16.h"
 #include "pinout.h"
 
 /* class Display {
@@ -44,3 +45,4 @@ void drawIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixe
 void drawIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG = COLOUR_WHITE, uint16_t colourBG = COLOUR_BLACK);
 void drawUnfilledRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t colour);
 void drawUnfilledRectWithChar(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t rectColour, char character, uint8_t fontSize);
+void writeNewChar(uint8_t x, uint8_t y, char toWrite);

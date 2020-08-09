@@ -388,3 +388,27 @@ void drawUnfilledRectWithChar(uint32_t x, uint32_t y, uint32_t w, uint32_t h, ui
 void clearDisplay(bool leaveAppDrawer) {
   drawFilledRect(0, 0, 240, leaveAppDrawer ? 213 : 240, 0x0000);
 }
+
+void writeNewChar(uint8_t x, uint8_t y, char toWrite) {
+  preWrite();
+  setDisplayWriteRegion(x, y, 10, 16); //Set the write region
+  memset(lcdBuffer, 0x00, 10 * 16 * 2);  //Fully clear RAM region where we will be writing the character
+  //The current coordinates inside the character BOUNDING BOX, not the overall character
+  int bbX = 0;
+  int bbY = 0;
+  int byteNumber, byteOffset; //The current character byte number, and the bit offset of that byte
+  for (int row = glyph_dsc[toWrite - 32].ofs_x; row < glyph_dsc[toWrite - 32].ofs_x + glyph_dsc[toWrite - 32].box_w; row++) {
+    for (int col = glyph_dsc[toWrite - 32].ofs_y; col < glyph_dsc[toWrite - 32].ofs_y + glyph_dsc[toWrite - 32].box_h; col++) {
+      byteNumber = ((bbY * glyph_dsc[toWrite - 32].box_w) + bbX) / 8;
+      byteOffset = ((bbY * glyph_dsc[toWrite - 32].box_w) + bbX) % 8;
+      drawCharPixelToBuffer(col, row, 1, 1/* ((gylph_bitmap[glyph_dsc[toWrite - 32].bitmap_index + byteNumber] << byteOffset) & 0x80) >> 7 */, COLOUR_WHITE, COLOUR_BLACK);
+      bbY++;
+    }
+    bbX++;
+  }
+
+  sendSPICommand(0x2C);
+  writeSPI(lcdBuffer, 10 * 16 * 2);  //Write the character to the display
+
+  postWrite();
+}

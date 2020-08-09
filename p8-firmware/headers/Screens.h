@@ -3,7 +3,6 @@
 #include "WatchScreenBase.h"
 #include "accelerometer.h"
 #include "display.h"
-#include "font16.h"
 #include "p8Time.h"
 #include "pinout.h"
 #include "powerControl.h"
@@ -24,13 +23,15 @@ typedef struct {
   swipe left event" and instead the controller will move to the next drawer of apps
 */
 
-/*
-  This demo screen is used for testing purposes
-*/
 class DemoScreen : public WatchScreenBase {
+ private:
+  uint8_t charX, charY;
+  char charToWrite = '~';
+
  public:
   void screenSetup() {
     clearDisplay(true);
+    writeNewChar(20, 20, charToWrite);
   }
   void screenLoop() {}
   bool doesImplementSwipeRight() { return false; }
@@ -38,9 +39,6 @@ class DemoScreen : public WatchScreenBase {
   uint8_t getScreenUpdateTimeMS() { return 1; }  //Fast update time
 };
 
-/* 
-  This screen is used to just display the time and date
- */
 class TimeScreen : public WatchScreenBase {
  private:
   uint8_t lastDay = 255;
@@ -89,9 +87,6 @@ class TimeScreen : public WatchScreenBase {
   uint8_t getScreenUpdateTimeMS() { return 20; }  //20ms update time
 };
 
-/* 
-  This screen is a rudimentary exercise screen
- */
 class ExerciseScreen : public WatchScreenBase {
  private:
   char timeBuf[9];  //String for any times needing writing
@@ -119,7 +114,7 @@ class ExerciseScreen : public WatchScreenBase {
         (this removed the need for the function(s) in display.cpp to calculate the length of a string)
       */
       if (hasStartedWorkout == false) {
-        drawUnfilledRectWithChar(50, 50, 140, 100, 15, COLOUR_WHITE, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
+        drawUnfilledRectWithChar(50, 50, 140, 100, 5, COLOUR_WHITE, GLYPH_WALKING_NO_EARTH, 8);  //Button to start workout
         drawString(120 - STR_WIDTH("Start", 4) / 2, 160, 4, "Start");                             //Button label
         if (hasExerciseLog == true)
           drawString(120 - STR_WIDTH("^ Last Activity ^", 2) / 2, 0, 2, "^ Last Activity ^");
@@ -211,9 +206,6 @@ class ExerciseScreen : public WatchScreenBase {
   uint8_t getScreenUpdateTimeMS() { return 100; }  //Slower update time
 };
 
-/* 
-  This screen is a basic stopwatch
- */
 class StopWatchScreen : public WatchScreenBase {
  private:
   bool hasStarted = false;
@@ -253,9 +245,6 @@ class StopWatchScreen : public WatchScreenBase {
   }
 };
 
-/* 
-  Jank way of setting the time and date and Brightness
- */
 class TimeDateSetScreen : public WatchScreenBase {
  private:
   int8_t setHour = 12;
@@ -445,9 +434,6 @@ class TimeDateSetScreen : public WatchScreenBase {
   }
 };
 
-/* 
-  Show info/uptime
- */
 class InfoScreen : public WatchScreenBase {
  private:
   char timeBuf[9];
@@ -476,9 +462,6 @@ class InfoScreen : public WatchScreenBase {
   uint8_t getScreenUpdateTimeMS() { return 200; }  //Slow update time
 };
 
-/* 
-  Screen to reboot/bootloader etc
- */
 class PowerScreen : public WatchScreenBase {
  public:
   void screenSetup() {
