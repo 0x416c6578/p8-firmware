@@ -2,6 +2,7 @@
 #include <TimeLib.h>
 
 #include "Arduino.h"
+#include "utils.h"
 
 void getTimeWithSecs(char* str);
 void getTime(char* str);

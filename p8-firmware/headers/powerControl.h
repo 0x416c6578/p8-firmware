@@ -9,6 +9,7 @@
 #include "nrf52_bitfields.h"
 #include "nrf_soc.h"
 #include "touch.h"
+#include "utils.h"
 #define POWER_ON 1
 #define POWER_OFF 0
 #define DEFAULT_SLEEP_TIME 10

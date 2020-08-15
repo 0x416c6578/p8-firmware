@@ -2,6 +2,7 @@
 #include "Arduino.h"
 #include "Screens.h"
 #include "font.h"
+#include "utils.h"
 
 void initScreen();
 void screenControllerLoop();

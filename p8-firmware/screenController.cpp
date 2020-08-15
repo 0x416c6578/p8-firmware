@@ -150,33 +150,33 @@ void screenControllerLoop() {
 Draw an indicator as to which screen you are currently on
 */
 void drawAppIndicator() {
-  drawFilledRect(0, 213, 240, 1, COLOUR_WHITE);
+  drawFilledRect({0, 213}, 240, 1, COLOUR_WHITE);
   uint8_t indicatorFontSize = 3;
   uint8_t widthOfIndicator = NCHAR_WIDTH(NUM_SCREENS, 3);
   uint8_t startOfString = 120 - (widthOfIndicator / 2);
   //Draw the current screen indicators
-  drawChar(startOfString + (0 * indicatorFontSize * FONT_WIDTH) + (0 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 0) ? GLYPH_CLOCK_SEL : GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  drawChar(startOfString + (1 * indicatorFontSize * FONT_WIDTH) + (1 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 1) ? GLYPH_STOPWATCH_SEL : GLYPH_STOPWATCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  drawChar(startOfString + (2 * indicatorFontSize * FONT_WIDTH) + (2 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 2) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  drawChar(startOfString + (3 * indicatorFontSize * FONT_WIDTH) + (3 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 3) ? GLYPH_INFO_SEL : GLYPH_INFO_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  drawChar(startOfString + (4 * indicatorFontSize * FONT_WIDTH) + (4 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 4) ? GLYPH_POWER_SEL : GLYPH_POWER_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
-  drawChar(startOfString + (5 * indicatorFontSize * FONT_WIDTH) + (5 * indicatorFontSize), 216, indicatorFontSize, (currentHomeScreenIndex == 5) ? GLYPH_DATA_SEL : GLYPH_DATA_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  drawChar({startOfString + (0 * indicatorFontSize * FONT_WIDTH) + (0 * indicatorFontSize), 216}, indicatorFontSize, (currentHomeScreenIndex == 0) ? GLYPH_CLOCK_SEL : GLYPH_CLOCK_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  drawChar({startOfString + (1 * indicatorFontSize * FONT_WIDTH) + (1 * indicatorFontSize), 216}, indicatorFontSize, (currentHomeScreenIndex == 1) ? GLYPH_STOPWATCH_SEL : GLYPH_STOPWATCH_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  drawChar({startOfString + (2 * indicatorFontSize * FONT_WIDTH) + (2 * indicatorFontSize), 216}, indicatorFontSize, (currentHomeScreenIndex == 2) ? GLYPH_SETTINGS_SEL : GLYPH_SETTINGS_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  drawChar({startOfString + (3 * indicatorFontSize * FONT_WIDTH) + (3 * indicatorFontSize), 216}, indicatorFontSize, (currentHomeScreenIndex == 3) ? GLYPH_INFO_SEL : GLYPH_INFO_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  drawChar({startOfString + (4 * indicatorFontSize * FONT_WIDTH) + (4 * indicatorFontSize), 216}, indicatorFontSize, (currentHomeScreenIndex == 4) ? GLYPH_POWER_SEL : GLYPH_POWER_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
+  drawChar({startOfString + (5 * indicatorFontSize * FONT_WIDTH) + (5 * indicatorFontSize), 216}, indicatorFontSize, (currentHomeScreenIndex == 5) ? GLYPH_DATA_SEL : GLYPH_DATA_UNSEL, COLOUR_WHITE, COLOUR_BLACK);
   //Draw the "can scroll left/right" indicators in the corners of the screen
   switch (currentHomeScreenIndex) {
     case 0:
-      drawChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, 0b1000010000010000, COLOUR_BLACK);
-      drawChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
+      drawChar({0, 216}, indicatorFontSize, GLYPH_ARROW_LEFT, 0b1000010000010000, COLOUR_BLACK);
+      drawChar({225, 216}, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
       break;
     case 1:
     case 2:
     case 3:
     case 4:
-      drawChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
-      drawChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
+      drawChar({0, 216}, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
+      drawChar({225, 216}, indicatorFontSize, GLYPH_ARROW_RIGHT, COLOUR_WHITE, COLOUR_BLACK);
       break;
     case 5:
-      drawChar(0, 216, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
-      drawChar(225, 216, indicatorFontSize, GLYPH_ARROW_RIGHT, 0b1000010000010000, COLOUR_BLACK);
+      drawChar({0, 216}, indicatorFontSize, GLYPH_ARROW_LEFT, COLOUR_WHITE, COLOUR_BLACK);
+      drawChar({225, 216}, indicatorFontSize, GLYPH_ARROW_RIGHT, 0b1000010000010000, COLOUR_BLACK);
       break;
   }
 }

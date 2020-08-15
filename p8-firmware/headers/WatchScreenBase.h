@@ -1,4 +1,5 @@
 #pragma once
+#include "utils.h"
 /*
   This class should be inherited by other screens so that they follow the correct
   blueprint Methods should be overriden if they will be used by that screen,

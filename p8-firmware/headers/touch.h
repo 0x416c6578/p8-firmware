@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "ioControl.h"
 #include "pinout.h"
+#include "utils.h"
 
 #define NO_GESTURE 0x00
 #define SWIPE_DOWN 0x01

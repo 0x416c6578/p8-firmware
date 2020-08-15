@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "ioControl.h"
+#include "utils.h"
 
 void initBluetooth();
 void feedBle();

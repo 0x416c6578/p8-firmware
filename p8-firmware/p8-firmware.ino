@@ -1,6 +1,5 @@
 #include <Wire.h>
 
-// #include "headers/accelerometer.h"
 #include "headers/bluetooth.h"
 #include "headers/display.h"
 #include "headers/fastSPI.h"
@@ -29,11 +28,10 @@ void setup() {
   initWatchdog();  //Start the watchdog
   initFastSPI();   //Initialize EasyDMA SPI
   initDisplay();   //Initialize display
-  drawChar(100, 120 - 32, 8, GLYPH_SMILEY, COLOUR_WHITE, COLOUR_BLACK);
+  drawChar({100, 120 - 32}, 8, GLYPH_SMILEY, COLOUR_WHITE, COLOUR_BLACK);
   Wire.begin();
   Wire.setClock(250000);
   initTouch();       //Initialize touch panel
-  // initAccel();       //Initialize the accelerometer
   initInterrupts();  //Setup interrupts
   initSleep();       //Initialize the sleep power mode
   initScreen();      //Setup the homescreen

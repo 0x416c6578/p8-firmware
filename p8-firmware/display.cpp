@@ -144,7 +144,7 @@ void sleepDisplay() {
 /*
   Write a string to the specified position using a string literal (null terminated char array)
 */
-void drawString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, uint16_t colourFG, uint16_t colourBG) {
+void drawString(coord pos, uint8_t pixelsPerPixel, char* string, uint16_t colourFG, uint16_t colourBG) {
   int currentLine = 0;      //Current line
   int charPos = 0;          //Position of the character we are on along the line
   int i = 0;                //Character index
@@ -159,8 +159,8 @@ void drawString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, ui
       proportional to the current character we are on, so we add n*pixelsPerPixel, which 
       effectively adds another pixel-width between characters
     */
-    drawChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos,
-             y + currentLine * FONT_HEIGHT * pixelsPerPixel,
+    drawChar({pos.x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos,
+              pos.y + currentLine * FONT_HEIGHT * pixelsPerPixel},
              pixelsPerPixel, string[i], colourFG, colourBG);
     //Move to the next character
     charPos++;
@@ -172,9 +172,9 @@ void drawString(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char* string, ui
   Write an (up to 9 digit) integer to x,y, without preceding zeroes (useful when you know the numbers you are writing will have the same number of digits on rewriting)
   The logic for writing the string is basically the same as drawString
 */
-void drawIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
+void drawIntWithoutPrecedingZeroes(coord pos, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
   if (toWrite == 0) {
-    drawChar(x, y, pixelsPerPixel, '0', colourFG, colourBG);
+    drawChar({pos.x, pos.y}, pixelsPerPixel, '0', colourFG, colourBG);
     return;
   }
   //Byte array for storing the digits
@@ -198,12 +198,12 @@ void drawIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixe
   //Do the normal writing routine but for every digit of the number, starting from the first digit
   for (; i < 9; i++) {  //Loop through every character of the string
     //If printing the next character would result in it being of screen
-    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
+    if (pos.x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
       currentLine++;
       charPos = 0;
     }
     sprintf(charToWrite, "%d", digits[i]);
-    drawChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
+    drawChar({pos.x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, pos.y + currentLine * FONT_HEIGHT * pixelsPerPixel}, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
     charPos++;
   }
 }
@@ -211,9 +211,9 @@ void drawIntWithoutPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixe
 /*
   Write a number always with 9 digits to x,y (with preceding zeroes for variable length rewrites)
 */
-void drawIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
+void drawIntWithPrecedingZeroes(coord pos, uint8_t pixelsPerPixel, int toWrite, uint16_t colourFG, uint16_t colourBG) {
   if (toWrite == 0) {
-    drawString(x, y, pixelsPerPixel, "000000000", colourFG, colourBG);
+    drawString({pos.x, pos.y}, pixelsPerPixel, "000000000", colourFG, colourBG);
     return;
   }
   //Byte array for storing the digits
@@ -231,12 +231,12 @@ void drawIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, 
   //Do the normal writing routine but for every digit of the number, starting from the 0th index (writing preceding zeroes)
   for (i = 0; i < 9; i++) {  //Loop through every character of the string
     //If printing the next character would result in it being of screen
-    if (x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
+    if (pos.x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos > 240 - FONT_WIDTH) {
       currentLine++;
       charPos = 0;
     }
     sprintf(charToWrite, "%d", digits[i]);
-    drawChar(x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, y + currentLine * FONT_HEIGHT * pixelsPerPixel, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
+    drawChar({pos.x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos, pos.y + currentLine * FONT_HEIGHT * pixelsPerPixel}, pixelsPerPixel, charToWrite[0], colourFG, colourBG);
     charPos++;
   }
 }
@@ -244,13 +244,13 @@ void drawIntWithPrecedingZeroes(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, 
 /*
   Write a character to the screen position (x,y)
 */
-void drawChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, uint16_t colourFG, uint16_t colourBG) {
+void drawChar(coord pos, uint8_t pixelsPerPixel, char character, uint16_t colourFG, uint16_t colourBG) {
   preWrite();
 
   //Width and height of the character on the display
   int characterDispWidth = FONT_WIDTH * pixelsPerPixel;
   int characterDispHeight = FONT_HEIGHT * pixelsPerPixel;
-  setDisplayWriteRegion(x, y, characterDispWidth, characterDispHeight);  //Set the window of display memory to write to
+  setDisplayWriteRegion({pos.x, pos.y}, characterDispWidth, characterDispHeight);  //Set the window of display memory to write to
   //Depending on the font, an offset to the current character index might be needed to skip over the unprintable characters
   int offset = FONT_NEEDS_OFFSET ? 32 : 0;
 
@@ -259,7 +259,7 @@ void drawChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, ui
     for (int col = 0; col < FONT_WIDTH; col++) {
       //(font[character][col] >> row) & 1 will return true if the font dictates that (col, row) should have a pixel there
       //drawCharPixelToBuffer writes into the LCD buffer the correct colour data for the current character pixel
-      drawCharPixelToBuffer(col, row, pixelsPerPixel, (font[character - offset][col] >> row) & 1, colourFG, colourBG);
+      drawCharPixelToBuffer({col, row}, pixelsPerPixel, (font[character - offset][col] >> row) & 1, colourFG, colourBG);
     }
   }
   sendSPICommand(0x2C);
@@ -273,9 +273,10 @@ void drawChar(uint32_t x, uint32_t y, uint8_t pixelsPerPixel, char character, ui
   Add pixel data into the LCD buffer for the character's current pixel
   (logic is explained in Writeup.md)
 */
-void drawCharPixelToBuffer(int charColumn, int charRow, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colourFG, uint16_t colourBG) {
-  int columnFontIndexScaledByPixelCount = charColumn * pixelsPerPixel;
-  int rowFontIndexScaledByPixelCount = charRow * pixelsPerPixel;
+//(int charColumn, int charRow, u
+void drawCharPixelToBuffer(coord charPos, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colourFG, uint16_t colourBG) {
+  int columnFontIndexScaledByPixelCount = charPos.x * pixelsPerPixel;
+  int rowFontIndexScaledByPixelCount = charPos.y * pixelsPerPixel;
   int pixelsPerRow = FONT_WIDTH * pixelsPerPixel;
 
   if (colourFG == COLOUR_WHITE && colourBG == COLOUR_BLACK) {
@@ -300,9 +301,9 @@ void drawCharPixelToBuffer(int charColumn, int charRow, uint8_t pixelsPerPixel, 
 /*
   Draw a rect with origin x,y and width w, height h
 */
-void drawFilledRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t colour) {
+void drawFilledRect(coord pos, uint32_t w, uint32_t h, uint16_t colour) {
   preWrite();
-  setDisplayWriteRegion(x, y, w, h);
+  setDisplayWriteRegion({pos.x, pos.y}, w, h);
   fillDisplayRam(colour);
   postWrite();
 }
@@ -313,20 +314,20 @@ void drawFilledRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t col
   This region has an xStart, xEnd, yStart and yEnd address
   As you write half-words (pixels) over SPI, the RAM fills horizontally per row
 */
-void setDisplayWriteRegion(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
+void setDisplayWriteRegion(coord pos, uint32_t w, uint32_t h) {
   uint8_t buf[4];        //Parameter buffer
   windowArea = w * h;    //Calculate window area
   sendSPICommand(0x2A);  //Column address set
   buf[0] = 0x00;         //Padding write value to make it 16 bit
-  buf[1] = x;
+  buf[1] = pos.x;
   buf[2] = 0x00;
-  buf[3] = (x + w - 1);
+  buf[3] = (pos.x + w - 1);
   writeSPI(buf, 4);
   sendSPICommand(0x2B);  //Row address set
   buf[0] = 0x00;
-  buf[1] = y;
+  buf[1] = pos.y;
   buf[2] = 0x00;
-  buf[3] = ((y + h - 1) & 0xFF);
+  buf[3] = ((pos.y + h - 1) & 0xFF);
   writeSPI(buf, 4);
 }
 
@@ -360,25 +361,25 @@ void fillDisplayRam(uint16_t colour) {
 /* 
   Draw a rectangle with outline of width lineWidth
  */
-void drawUnfilledRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t colour) {
-  drawFilledRect(x, y, w, h, COLOUR_BLACK);  //Clear rect of stuff
+void drawUnfilledRect(coord pos, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t colour) {
+  drawFilledRect({pos.x, pos.y}, w, h, COLOUR_BLACK);  //Clear rect of stuff
   //Top rect
-  drawFilledRect(x, y, w, lineWidth, colour);
+  drawFilledRect({pos.x, pos.y}, w, lineWidth, colour);
   //Bottom rect
-  drawFilledRect(x, y + h - lineWidth, w, lineWidth, colour);
+  drawFilledRect({pos.x, pos.y + h - lineWidth}, w, lineWidth, colour);
   //Left rect
-  drawFilledRect(x, y, lineWidth, h, colour);
+  drawFilledRect({pos.x, pos.y}, lineWidth, h, colour);
   //Right rect
-  drawFilledRect(x + w - lineWidth, y, lineWidth, h, colour);
+  drawFilledRect({pos.x + w - lineWidth, pos.y}, lineWidth, h, colour);
 }
 
 /* 
   Draw a rect outline with character in the middle (look at writeup for explanation)
  */
-void drawUnfilledRectWithChar(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t rectColour, char character, uint8_t fontSize) {
-  drawUnfilledRect(x, y, w, h, lineWidth, rectColour);
-  drawChar((x + (w / 2)) - (STR_WIDTH("-", fontSize) / 2),
-           (y + (h / 2)) - ((FONT_HEIGHT * fontSize) / 2),
+void drawUnfilledRectWithChar(coord pos, uint32_t w, uint32_t h, uint8_t lineWidth, uint16_t rectColour, char character, uint8_t fontSize) {
+  drawUnfilledRect({pos.x, pos.y}, w, h, lineWidth, rectColour);
+  drawChar({(pos.x + (w / 2)) - (STR_WIDTH("-", fontSize) / 2),
+            (pos.y + (h / 2)) - ((FONT_HEIGHT * fontSize) / 2)},
            fontSize, character, COLOUR_WHITE, COLOUR_BLACK);
 }
 
@@ -386,22 +387,24 @@ void drawUnfilledRectWithChar(uint32_t x, uint32_t y, uint32_t w, uint32_t h, ui
   Clear display (clear whole display when no arg (or false) is passed in)
 */
 void clearDisplay(bool leaveAppDrawer) {
-  drawFilledRect(0, 0, 240, leaveAppDrawer ? 213 : 240, 0x0000);
+  drawFilledRect({0, 0}, 240, leaveAppDrawer ? 213 : 240, 0x0000);
 }
 
-void writeNewChar(uint8_t x, uint8_t y, char toWrite) {
+void writeNewChar(coord pos, char toWrite) {
   preWrite();
-  setDisplayWriteRegion(x, y, 10, 16); //Set the write region
+  setDisplayWriteRegion({pos.x, pos.y}, 10, 16);   //Set the write region
   memset(lcdBuffer, 0x00, 10 * 16 * 2);  //Fully clear RAM region where we will be writing the character
   //The current coordinates inside the character BOUNDING BOX, not the overall character
   int bbX = 0;
   int bbY = 0;
-  int byteNumber, byteOffset; //The current character byte number, and the bit offset of that byte
-  for (int row = glyph_dsc[toWrite - 32].ofs_x; row < glyph_dsc[toWrite - 32].ofs_x + glyph_dsc[toWrite - 32].box_w; row++) {
-    for (int col = glyph_dsc[toWrite - 32].ofs_y; col < glyph_dsc[toWrite - 32].ofs_y + glyph_dsc[toWrite - 32].box_h; col++) {
+  int byteNumber, byteOffset;  //The current character byte number, and the bit offset of that byte
+                               // for (int row = glyph_dsc['~' - 32].ofs_x; row < glyph_dsc[toWrite - 32].ofs_x + glyph_dsc[toWrite - 32].box_w; row++) {
+                               //   for (int col = glyph_dsc[toWrite - 32].ofs_y; col < glyph_dsc[toWrite - 32].ofs_y + glyph_dsc[toWrite - 32].box_h; col++) {
+  for (int row = 0; row < 16; row++) {
+    for (int col = 0; col < 10; col++) {
       byteNumber = ((bbY * glyph_dsc[toWrite - 32].box_w) + bbX) / 8;
       byteOffset = ((bbY * glyph_dsc[toWrite - 32].box_w) + bbX) % 8;
-      drawCharPixelToBuffer(col, row, 1, 1/* ((gylph_bitmap[glyph_dsc[toWrite - 32].bitmap_index + byteNumber] << byteOffset) & 0x80) >> 7 */, COLOUR_WHITE, COLOUR_BLACK);
+      drawCharPixelToBuffer({pos.x + col, pos.y + row}, 1, 1 /* ((gylph_bitmap[glyph_dsc[toWrite - 32].bitmap_index + byteNumber] << byteOffset) & 0x80) >> 7 */, COLOUR_WHITE, COLOUR_BLACK);
       bbY++;
     }
     bbX++;

@@ -3,6 +3,7 @@
 #include "nrf52.h"
 #include "nrf52_bitfields.h"
 #include "pinout.h"
+#include "utils.h"
 
 void initFastSPI();
 void enableSPI(bool state);
