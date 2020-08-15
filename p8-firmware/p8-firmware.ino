@@ -1,6 +1,6 @@
 #include <Wire.h>
 
-#include "headers/accelerometer.h"
+// #include "headers/accelerometer.h"
 #include "headers/bluetooth.h"
 #include "headers/display.h"
 #include "headers/fastSPI.h"
@@ -25,7 +25,7 @@ void setup() {
     NRF_POWER->GPREGRET = 0x01;
     NVIC_SystemReset();
   }
-  initIO();        //Init GPIOs
+  initIO();        //Init GPIO
   initWatchdog();  //Start the watchdog
   initFastSPI();   //Initialize EasyDMA SPI
   initDisplay();   //Initialize display
@@ -33,7 +33,7 @@ void setup() {
   Wire.begin();
   Wire.setClock(250000);
   initTouch();       //Initialize touch panel
-  initAccel();       //Initialize the accelerometer
+  // initAccel();       //Initialize the accelerometer
   initInterrupts();  //Setup interrupts
   initSleep();       //Initialize the sleep power mode
   initScreen();      //Setup the homescreen
