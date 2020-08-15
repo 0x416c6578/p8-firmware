@@ -78,8 +78,8 @@ class TimeScreen : public WatchScreenBase {
     }
     drawIntWithoutPrecedingZeroes(40, 145, 3, getBatteryPercent());
 
-    steps = getStepCount();
-    drawIntWithoutPrecedingZeroes(40, 175, 3, steps);
+    // steps = getStepCount();
+    // drawIntWithoutPrecedingZeroes(40, 175, 3, steps);
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
