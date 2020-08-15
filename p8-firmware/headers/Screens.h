@@ -43,7 +43,6 @@ class TimeScreen : public WatchScreenBase {
  private:
   uint8_t lastDay = 255;
   char distanceChar[10];
-  uint32_t steps;
   char timeStr[6];   //00:00\0
   char dateStr[11];  //01.01.1970\0
   char dayStr[10];   //wednesday\0
@@ -52,7 +51,6 @@ class TimeScreen : public WatchScreenBase {
   void screenSetup() {
     clearDisplay(true);
     drawChar(80, 145, 3, '%', COLOUR_WHITE, COLOUR_BLACK);
-    drawChar(20, 172, 3, GLYPH_WALKING, COLOUR_WHITE, COLOUR_BLACK);
   }
   void screenLoop() {
     getTime(timeStr);
@@ -77,9 +75,6 @@ class TimeScreen : public WatchScreenBase {
       drawChar(20, 142, 3, GLYPH_BATTERY, COLOUR_WHITE, COLOUR_BLACK);
     }
     drawIntWithoutPrecedingZeroes(40, 145, 3, getBatteryPercent());
-
-    steps = getStepCount();
-    drawIntWithoutPrecedingZeroes(40, 175, 3, steps);
   }
   void screenTap(uint8_t x, uint8_t y) {}
   bool doesImplementSwipeRight() { return false; }
