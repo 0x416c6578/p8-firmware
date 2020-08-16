@@ -273,7 +273,6 @@ void drawChar(coord pos, uint8_t pixelsPerPixel, char character, uint16_t colour
   Add pixel data into the LCD buffer for the character's current pixel
   (logic is explained in Writeup.md)
 */
-//(int charColumn, int charRow, u
 void drawCharPixelToBuffer(coord charPos, uint8_t pixelsPerPixel, bool pixelInCharHere, uint16_t colourFG, uint16_t colourBG) {
   int columnFontIndexScaledByPixelCount = charPos.x * pixelsPerPixel;
   int rowFontIndexScaledByPixelCount = charPos.y * pixelsPerPixel;
@@ -402,9 +401,9 @@ void writeNewChar(coord pos, char toWrite) {
                                //   for (int col = glyph_dsc[toWrite - 32].ofs_y; col < glyph_dsc[toWrite - 32].ofs_y + glyph_dsc[toWrite - 32].box_h; col++) {
   for (int row = 0; row < 16; row++) {
     for (int col = 0; col < 10; col++) {
-      byteNumber = ((bbY * glyph_dsc[toWrite - 32].box_w) + bbX) / 8;
-      byteOffset = ((bbY * glyph_dsc[toWrite - 32].box_w) + bbX) % 8;
-      drawCharPixelToBuffer({pos.x + col, pos.y + row}, 1, 1 /* ((gylph_bitmap[glyph_dsc[toWrite - 32].bitmap_index + byteNumber] << byteOffset) & 0x80) >> 7 */, COLOUR_WHITE, COLOUR_BLACK);
+      //This will not work since the drawCharPixelToBuffer function uses the dimensions of the font in font.h (ie 8*5) rather than the 16*10 of the new font
+      //TODO: Complete this function to allow writing lvgl fonts
+      drawCharPixelToBuffer({pos.x + row, pos.y + col}, 1, 1 /* ((gylph_bitmap[glyph_dsc[toWrite - 32].bitmap_index + byteNumber] << byteOffset) & 0x80) >> 7 */, COLOUR_WHITE, COLOUR_BLACK);
       bbY++;
     }
     bbX++;

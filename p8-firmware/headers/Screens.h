@@ -361,7 +361,7 @@ class DemoScreen : public WatchScreenBase {
  public:
   void screenSetup() {
     clearDisplay(true);
-    writeNewChar({20, 20}, charToWrite);
+    writeNewChar({0, 0}, charToWrite);
   }
   void screenLoop() {}
   bool doesImplementSwipeRight() { return false; }
