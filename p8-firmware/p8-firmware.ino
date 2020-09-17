@@ -3,7 +3,8 @@
 #include "headers/bluetooth.h"
 #include "headers/display.h"
 #include "headers/fastSPI.h"
-#include "headers/interrupts.h"  //Includes screenController.h
+#include "headers/interrupts.h"  
+#include "headers/screenController.h"
 #include "headers/ioControl.h"
 #include "headers/p8Time.h"
 #include "headers/pinout.h"
@@ -11,6 +12,7 @@
 #include "headers/touch.h"
 #include "headers/watchdog.h"
 #include "nrf52.h"
+
 void setup() {
   //Make sure that we do a button press check ASAP with as little code as possible run before
   pinMode(PUSH_BUTTON_IN, INPUT);

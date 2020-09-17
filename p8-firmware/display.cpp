@@ -277,31 +277,6 @@ void drawFilledRect(coord pos, uint32_t w, uint32_t h, uint16_t colour) {
   postWrite();
 }
 
-/*
-  Set the column and row RAM addresses for writing to the display
-  You must select a region in the LCD RAM to write pixel data to
-  This region has an xStart, xEnd, yStart and yEnd address
-  As you write half-words (pixels) over SPI, the RAM fills horizontally per row
-*/
-void setDisplayWriteRegion(coord pos, uint32_t w, uint32_t h) {
-  uint8_t buf[4];  //Parameter buffer
-  windowHeight = h;
-  windowWidth = w;
-  windowArea = w * h;    //Calculate window area
-  sendSPICommand(0x2A);  //Column address set
-  buf[0] = 0x00;         //Padding write value to make it 16 bit
-  buf[1] = pos.x;
-  buf[2] = 0x00;
-  buf[3] = (pos.x + w - 1);
-  writeSPI(buf, 4);
-  sendSPICommand(0x2B);  //Row address set
-  buf[0] = 0x00;
-  buf[1] = pos.y;
-  buf[2] = 0x00;
-  buf[3] = ((pos.y + h - 1) & 0xFF);
-  writeSPI(buf, 4);
-}
-
 /* 
   Draw a rectangle with outline of width lineWidth
  */
@@ -328,12 +303,46 @@ void drawUnfilledRectWithChar(coord pos, uint32_t w, uint32_t h, uint8_t lineWid
 }
 
 /*
+  Set the column and row RAM addresses for writing to the display
+  You must select a region in the LCD RAM to write pixel data to
+  This region has an xStart, xEnd, yStart and yEnd address
+  As you write half-words (pixels) over SPI, the RAM fills horizontally per row
+*/
+void setDisplayWriteRegion(coord pos, uint32_t w, uint32_t h) {
+  uint8_t buf[4];  //Parameter buffer
+  windowHeight = h;
+  windowWidth = w;
+  windowArea = w * h;    //Calculate window area
+  sendSPICommand(0x2A);  //Column address set
+  buf[0] = 0x00;         //Padding write value to make it 16 bit
+  buf[1] = pos.x;
+  buf[2] = 0x00;
+  buf[3] = (pos.x + w - 1);
+  writeSPI(buf, 4);
+  sendSPICommand(0x2B);  //Row address set
+  buf[0] = 0x00;
+  buf[1] = pos.y;
+  buf[2] = 0x00;
+  buf[3] = ((pos.y + h - 1) & 0xFF);
+  writeSPI(buf, 4);
+}
+
+/*
   Clear display (clear whole display when no arg (or false) is passed in)
 */
 void clearDisplay(bool leaveAppDrawer) {
   drawFilledRect({0, 0}, 240, leaveAppDrawer ? 213 : 240, 0x0000);
 }
 
+
+//===================================
+//========*Testing Ground*===========
+//===================================
+
+
+/* 
+  Test function to mess with the LVGL fonts
+ */
 void writeNewChar(coord pos, char toWrite) {
   preWrite();
   setDisplayWriteRegion({pos.x, pos.y}, 10, 16);  //Set the write region

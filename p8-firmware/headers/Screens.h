@@ -23,6 +23,9 @@ typedef struct {
   swipe left event" and instead the controller will move to the next drawer of apps
 */
 
+/* 
+  Main screen of the watch, shows time and other info
+ */
 class TimeScreen : public WatchScreenBase {
  private:
   uint8_t lastDay = 255;
@@ -65,6 +68,9 @@ class TimeScreen : public WatchScreenBase {
   uint8_t getScreenUpdateTimeMS() { return 20; }  //20ms update time
 };
 
+/* 
+  Screen that has stopwatch on it
+ */
 class StopWatchScreen : public WatchScreenBase {
  private:
   bool hasStarted = false;
@@ -104,6 +110,10 @@ class StopWatchScreen : public WatchScreenBase {
   }
 };
 
+/* 
+  "Settings" app where you can set the time and date, and the brightness
+  _Awefully_ written
+ */
 class TimeDateSetScreen : public WatchScreenBase {
  private:
   int8_t setHour = 12;
@@ -293,6 +303,9 @@ class TimeDateSetScreen : public WatchScreenBase {
   }
 };
 
+/* 
+  Device info screen, with uptime, compile time and other info
+ */
 class InfoScreen : public WatchScreenBase {
  private:
   char timeBuf[9];
@@ -318,6 +331,9 @@ class InfoScreen : public WatchScreenBase {
   uint8_t getScreenUpdateTimeMS() { return 200; }  //Slow update time
 };
 
+/* 
+  Screen that allows rebooting and reboot to bootloader
+ */
 class PowerScreen : public WatchScreenBase {
  public:
   void screenSetup() {
@@ -350,6 +366,9 @@ class PowerScreen : public WatchScreenBase {
   bool doesImplementSwipeRight() { return false; }
 };
 
+/* 
+  Random screen for messing with and testing stuff 
+*/
 class DemoScreen : public WatchScreenBase {
  private:
   uint8_t charX, charY;
