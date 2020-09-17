@@ -1,46 +1,6 @@
 #include "headers/display.h"
 #define LCD_BUFFER_SIZE 15000  //LCD Buffer set to 15kbytes (approx = 1/2 RAM) meaning you can write up to 7500 pixels into the buffer without having to run over
 
-/*
-   THE DISPLAY:
-      ◀ 240 ▶
-  ______..._______
- |                |
- |   12:32        |
- .   01/01/20     .  ▲
- .                . 240
- .                .  ▼
- |                |
- |                |
- |______..._______|
-
-The top left pixel is (0,0), with the bottom right being (239,239)
-Writing to the display is as simple as:
-
-  uint8_t buf[4]; //Byte buffer
-  sendSPICommand(0x2A); //Column address set
-  buf[0] = 0x00;
-  buf[1] = 50; //xStart = 50
-  buf[2] = 0x00;
-  buf[3] = 60; //yStart = 60
-  writeSPI(buf, 4);
-  sendSPICommand(0x2B); //Row address set
-  buf[0] = 0x00;
-  buf[1] = 50; //yStart = 50
-  buf[2] = 0x00;
-  buf[3] = 60; //yEnd = 60
-  writeSPI(buf, 4);
-  sendSPICommand(0x2C); //Memory write
-  //Since the column / row addresses are inclusive, you must right 121 green half-words to RAM, NOT 100
-  for (int i = 0; i < 121; i++){
-    writeSPISingleByte(0b11111000);
-    writeSPISingleByte(0b00000000);
-  }
-
-However writing a single byte every time is very inefficient, so we want to create a buffer for the current window
-Using the much faster writeSPI function to write the data out in 255 byte chunks will speed up things significantly
-*/
-
 uint8_t lcdBuffer[LCD_BUFFER_SIZE + 4];
 uint32_t windowArea = 0;
 uint32_t windowWidth = 0;
@@ -149,16 +109,6 @@ void drawString(coord pos, uint8_t pixelsPerPixel, char* string, uint16_t colour
   int charPos = 0;          //Position of the character we are on along the line
   int i = 0;                //Character index
   while (string[i] != 0) {  //Loop through every character of the string (only stop when you reach the null terminator)
-    /* 
-      Writing a string is as follows:
-      The x position of character n (starting at char 0) in a string is
-      stringXOrigin + n*pixelsPerPixel*FONT_WIDTH + (n*pixelsPerPixel)
-      This means that before adding the thing in brackets, the position of a character is
-      just the origin + n*(horizontal pixels per character).
-      This doesn't allow for a gap between characters however, so an offset must then be added
-      proportional to the current character we are on, so we add n*pixelsPerPixel, which 
-      effectively adds another pixel-width between characters
-    */
     drawChar({pos.x + charPos * pixelsPerPixel * FONT_WIDTH + pixelsPerPixel * charPos,
               pos.y + currentLine * FONT_HEIGHT * pixelsPerPixel},
              pixelsPerPixel, string[i], colourFG, colourBG);
