@@ -1,5 +1,10 @@
 # p8-firmware
-A firmware for the P8 smartwatch based off of the code from ATC1441.  
+A firmware for the P8 smartwatch based off of the code from ATC1441. 
+
+Recent docs can be found [here](docs/README.md)
+
+From 0x416c6578:
+
 I rewrote a lot of the code from [here](https://github.com/atc1441/ATCwatch) as a way to learn about embedded programming.  
 All code is commented so that people wanting to learn about how Aaron's firmware works can do so more easily.    
 If you would like to know how to set up the toolchain in Linux, see the documentation I wrote [here](https://github.com/0x416c6578/ATCwatch/blob/master/linux-tutorial.md).  
