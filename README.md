@@ -1,10 +1,4 @@
 # p8-firmware
-A firmware for the P8 smartwatch based off of the code from ATC1441. Forked from [0x416c6578](https://github.com/0x416c6578/p8-firmware).
-
-Near-term goals:
-- [ ] Learn the codebase
-- [ ] Look at Freetype as font rendering engine
-- [ ] Build out framework for apps
 
 Recent docs can be found [here](docs/README.md)
 
